@@ -372,26 +372,6 @@ F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -hn ptr2
 ?(anon):1: read-only variable: ptr2
 
- () {
-   typeset -n ptr1=ptr2
-   private -n ptr2=	# Assignment makes this a placeholder, not unset
-   typeset -p ptr1 ptr2
-   typeset val=LOCAL
-   () {
-     ptr1=val		# Test dies here as ptr2 is private and uninitialized
-     typeset -n
-     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
-   }
-   typeset -p ptr1 ptr2
- }
- typeset -p ptr2
-1:up-reference for private namerefs, end not in scope
-F:See K01nameref.ztst up-reference part 5
-F:Here ptr1 finds private ptr2 by scope mismatch
->typeset -n ptr1=ptr2
->typeset -hn ptr2=''
-?(anon):1: ptr1: can't modify read-only parameter
-
  typeset ptr2
  () {
    typeset -n ptr1=ptr2
