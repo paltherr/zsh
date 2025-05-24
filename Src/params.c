@@ -3247,7 +3247,7 @@ assignsparam(char *s, char *val, int flags)
 	/* errflag |= ERRFLAG_ERROR; */
 	return NULL;
     }
-    if (*val && (v->pm->node.flags & PM_NAMEREF)) {
+    if (v->pm->node.flags & PM_NAMEREF) {
 	if (!valid_refname(val, v->pm->node.flags)) {
 	    zerr("invalid name reference: %s", val);
 	    zsfree(val);
@@ -6509,6 +6509,9 @@ static int
 valid_refname(char *val, int flags)
 {
     char *t;
+
+    if (!*val)
+	return 0;
 
     if (flags & PM_UPPER) {
 	/* Upward reference to positionals is doomed to fail */

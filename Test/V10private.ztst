@@ -374,7 +374,7 @@ F:Here ptr1 finds private ptr2 by scope mismatch
 
  () {
    typeset -n ptr1=ptr2
-   private -n ptr2=	# Assignment makes this a placeholder, not unset
+   private -n ptr2=foo
    typeset -p ptr1 ptr2
    typeset val=LOCAL
    () {
@@ -389,12 +389,12 @@ F:Here ptr1 finds private ptr2 by scope mismatch
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -n ptr1=ptr2
->typeset -hn ptr2=''
+>typeset -hn ptr2=foo
 >ptr1=ptr2
 >ptr1=
 >ptr2=
 >typeset -n ptr1=ptr2
->typeset -hn ptr2=''
+>typeset -hn ptr2=foo
 *?*ptr1: assignment failed
 *?*no such variable: ptr2
 
