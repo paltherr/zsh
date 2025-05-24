@@ -141,8 +141,8 @@
 
  typeset -n ptr=
  typeset -n
-0:nameref placeholder
->ptr=''
+1:invalid empty nameref
+*?*invalid variable name: 
 
  typeset -n ptr
  ptr=var
@@ -169,6 +169,17 @@
  typeset -n
 0:convert scalar to nameref
 >ptr=var
+
+ typeset ptr
+ typeset -n ptr
+ typeset -n
+0:convert uninitialized scalar to nameref
+>ptr
+
+ typeset ptr=''
+ typeset -n ptr
+1:convert empty scalar to nameref
+*?*invalid variable name: 
 
  typeset -n ptr=var
  typeset +n ptr
@@ -1049,8 +1060,8 @@ F:runs in `setopt noexec` so $(...) returns nothing
 >typeset ref=RW
 
  () {
-  typeset -n r1 r2=
-  typeset -p r1 r2
+  typeset -n r1
+  typeset -p r1
   print -- ${(!)r1-unset}
   print -- ${+r1}
   typeset -p r1
@@ -1058,7 +1069,6 @@ F:runs in `setopt noexec` so $(...) returns nothing
 0:unset nameref remains unset when resolved
 F:relies on global TYPESET_TO_UNSET in %prep
 >typeset -n r1
->typeset -n r2=''
 >unset
 >0
 >typeset -n r1
