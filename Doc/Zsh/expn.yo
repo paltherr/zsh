@@ -1551,6 +1551,11 @@ is initialized to an active reference to the assigned var(rname). See
 sectref(Named References)(zshparam)ifnzman( under noderef(Parameters))
 for more about placeholders.
 
+If no var(rname) exists when var(pname) is initialized, the reference
+is set to refer to the first var(rname) that gets defined afterwards.
+If var(pname) is assigned to before any var(rname) exists, a global
+var(rname) is defined.
+
 With the few exceptions described here, when
 var(pname) is used in any of the expansion forms described above, the
 parameter var(rname) is expanded instead.  This is similar to the
@@ -1593,11 +1598,10 @@ tt(after func: RESULT))
 
 To force a named reference to refer to the outer scope, even if a
 local has already been declared, add the tt(-u) option when declaring
-the named reference.  In this case var(rname) should already exist in
-the outer scope before var(pname) is initialized, otherwise the
-behavior of assignment through var(pname) is not defined and may
-change the scope of the reference or fail with a status of 1.  Example
-of correct usage:
+the named reference.  In this case, if no var(rname) exists in the
+outer scope of var(pname) but a local var(rname) exists, the
+assignment through var(pname) will fail with a status of 1.  Example
+of usage:
 ifzman()
 example(tt(caller=OUTER)
 tt(func LPAR()RPAR() {)
