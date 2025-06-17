@@ -1622,4 +1622,8 @@ F:converting from association/array to string should work here too
 1:regression: reference loop with same name enclosing variable
 ?(anon):3: ptr2: invalid self reference
 
+ typeset -n ref=ref[1]
+1:self reference with subscript
+*?*: ref: invalid self reference
+
 %clean

@@ -6336,17 +6336,11 @@ resolve_nameref(Param pm, const char *stop_name)
 		seek = refname;
 	}
     }
-    if (pm && (pm->node.flags & PM_NAMEREF) && seek) {
-	queue_signals();
+    if (pm && (pm->node.flags & PM_NAMEREF) && seek && !pm->width) {
 	/* pm->width is the offset of any subscript */
-	if (pm->width) {
-	    if (stop_name) {
-		hn = (HashNode)pm;
-	    } else {
-		/* this has to be the end of any chain */
-		hn = (HashNode)pm;	/* see fetchvalue() */
-	    }
-	} else if ((hn = gethashnode2(realparamtab, seek))) {
+	/* If present, it has to be the end of any chain, see fetchvalue() */
+	queue_signals();
+	if ((hn = gethashnode2(realparamtab, seek))) {
 	    {
 		{
 		    if ((pm->node.flags & PM_UPPER))
