@@ -6314,8 +6314,6 @@ mod_export HashNode
 resolve_nameref(Param pm, const char *stop_name)
 {
     HashNode hn = (HashNode)pm;
-    const char *seek = NULL;
-
     if (pm && (pm->node.flags & PM_NAMEREF)) {
 	char *refname = GETREFNAME(pm);
 	if (pm->node.flags & PM_TAGGED) {
@@ -6332,19 +6330,17 @@ resolve_nameref(Param pm, const char *stop_name)
 		/* zwarnnam(refname, "invalid self reference"); */
 		return (HashNode)pm;
 	    }
-	    if (*refname)
-		seek = refname;
 	}
 	/* pm->width is the offset of any subscript */
 	/* If present, it has to be the end of any chain, see fetchvalue() */
-	if (seek && !pm->width) {
+	if (refname && *refname && !pm->width) {
 	    queue_signals();
-	    if ((hn = gethashnode2(realparamtab, seek))) {
+	    if ((hn = gethashnode2(realparamtab, refname))) {
 		if ((pm->node.flags & PM_UPPER))
 		    hn = (HashNode)upscope_upper((Param)hn, pm->level - 1);
 		else
 		    hn = (HashNode)upscope((Param)hn, pm->base);
-		if ((hn = loadparamnode(paramtab, (Param)hn, seek)) &&
+		if ((hn = loadparamnode(paramtab, (Param)hn, refname)) &&
 		    !(hn->flags & PM_UNSET)) {
 		    /* user can't tag a nameref, safe for loop detection */
 		    pm->node.flags |= PM_TAGGED;
