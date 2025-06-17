@@ -1051,7 +1051,7 @@ createparam(char *name, int flags)
 	     * in typeset_single. It's unclear why these can't be
 	     * handled there too.
 	     **/
-	    Param lastpm = resolve_nameref_rec(oldpm, "");
+	    Param lastpm = resolve_nameref_rec(oldpm, "", 1);
 	    if (lastpm) {
 		if (lastpm->node.flags & PM_NAMEREF) {
 		    char *refname = GETREFNAME(lastpm);
@@ -6313,12 +6313,12 @@ printparamnode(HashNode hn, int printflags)
 mod_export Param
 resolve_nameref(Param pm)
 {
-    return resolve_nameref_rec(pm, NULL);
+    return resolve_nameref_rec(pm, NULL, 0);
 }
 
 /**/
 static Param
-resolve_nameref_rec(Param pm, const char *stop_name)
+resolve_nameref_rec(Param pm, const char *stop_name, int keep_lastref)
 {
     Param hn = pm;
     if (pm && (pm->node.flags & PM_NAMEREF)) {
@@ -6351,10 +6351,10 @@ resolve_nameref_rec(Param pm, const char *stop_name)
 		    !(hn->node.flags & PM_UNSET)) {
 		    /* user can't tag a nameref, safe for loop detection */
 		    pm->node.flags |= PM_TAGGED;
-		    hn = resolve_nameref_rec(hn, stop_name);
+		    hn = resolve_nameref_rec(hn, stop_name, keep_lastref);
 		    pm->node.flags &= ~PM_TAGGED;
 		}
-	    } else if (stop_name)
+	    } else if (keep_lastref)
 		hn = (pm->node.flags & PM_NEWREF) ? NULL : pm;
 	    unqueue_signals();
 	}
@@ -6427,7 +6427,7 @@ setscope(Param pm)
 
 	/* Check for self references */
 	dont_queue_signals();	/* Prevent unkillable loops */
-	basepm = resolve_nameref_rec(pm, pm->node.nam);
+	basepm = resolve_nameref_rec(pm, pm->node.nam, 1);
 	restore_queue_signals(q);
 	if (basepm) {
 	    if (basepm->node.flags & PM_NAMEREF) {
