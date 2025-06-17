@@ -6342,9 +6342,7 @@ resolve_nameref(Param pm, const Asgment stop)
 	}
     }
     else if (pm) {
-	if (!stop)
-	    return (HashNode)pm;
-	return (pm->level < locallevel ? NULL : (HashNode)pm);
+	return (HashNode)pm;
     }
     if (seek) {
 	queue_signals();
