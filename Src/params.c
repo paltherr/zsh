@@ -6336,13 +6336,10 @@ resolve_nameref(Param pm, const char *stop_name)
 		seek = refname;
 	}
     }
-    else if (pm) {
-	return (HashNode)pm;
-    }
-    if (seek) {
+    if (pm && (pm->node.flags & PM_NAMEREF) && seek) {
 	queue_signals();
 	/* pm->width is the offset of any subscript */
-	if (pm && (pm->node.flags & PM_NAMEREF) && pm->width) {
+	if (pm->width) {
 	    if (stop_name) {
 		hn = (HashNode)pm;
 	    } else {
@@ -6350,15 +6347,12 @@ resolve_nameref(Param pm, const char *stop_name)
 		hn = (HashNode)pm;	/* see fetchvalue() */
 	    }
 	} else if ((hn = gethashnode2(realparamtab, seek))) {
-	    if (pm) {
+	    {
 		{
-		    if ((pm->node.flags & PM_NAMEREF) &&
-			(pm->node.flags & PM_UPPER))
+		    if ((pm->node.flags & PM_UPPER))
 			hn = (HashNode)upscope_upper((Param)hn, pm->level - 1);
 		    else
-			hn = (HashNode)upscope((Param)hn,
-					       (pm->node.flags & PM_NAMEREF) ?
-					       (pm->base) : ((Param)hn)->level);
+			hn = (HashNode)upscope((Param)hn, pm->base);
 		}
 		hn = loadparamnode(paramtab, (Param)hn, seek);
 		/* user can't tag a nameref, safe for loop detection */
@@ -6368,10 +6362,9 @@ resolve_nameref(Param pm, const char *stop_name)
 		if (!(hn->flags & PM_UNSET))
 		    hn = resolve_nameref((Param)hn, stop_name);
 	    }
-	    if (pm)
-		pm->node.flags &= ~PM_TAGGED;
+	    pm->node.flags &= ~PM_TAGGED;
 	} else if (stop_name)
-	    hn = (pm && (pm->node.flags & PM_NEWREF)) ? NULL : (HashNode)pm;
+	    hn = (pm->node.flags & PM_NEWREF) ? NULL : (HashNode)pm;
 	unqueue_signals();
     }
 
