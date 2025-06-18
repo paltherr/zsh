@@ -6318,7 +6318,7 @@ resolve_nameref(Param pm)
 
 /**/
 static Param
-resolve_nameref_rec(Param pm, const char *stop_name, int keep_lastref)
+resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 {
     Param hn = pm;
     if (pm && (pm->node.flags & PM_NAMEREF)) {
@@ -6333,7 +6333,7 @@ resolve_nameref_rec(Param pm, const char *stop_name, int keep_lastref)
 		return NULL;
 	    return pm;
 	} else if (refname) {
-	    if (stop_name && strcmp(refname, stop_name) == 0) {
+	    if (stop && strcmp(refname, stop->node.nam) == 0) {
 		/* zwarnnam(refname, "invalid self reference"); */
 		return pm;
 	    }
@@ -6351,7 +6351,7 @@ resolve_nameref_rec(Param pm, const char *stop_name, int keep_lastref)
 		    !(hn->node.flags & PM_UNSET)) {
 		    /* user can't tag a nameref, safe for loop detection */
 		    pm->node.flags |= PM_TAGGED;
-		    hn = resolve_nameref_rec(hn, stop_name, keep_lastref);
+		    hn = resolve_nameref_rec(hn, stop, keep_lastref);
 		    pm->node.flags &= ~PM_TAGGED;
 		}
 	    } else if (keep_lastref)
@@ -6427,7 +6427,7 @@ setscope(Param pm)
 
 	/* Check for self references */
 	dont_queue_signals();	/* Prevent unkillable loops */
-	basepm = resolve_nameref_rec(pm, pm->node.nam, 1);
+	basepm = resolve_nameref_rec(pm, pm, 1);
 	restore_queue_signals(q);
 	if (basepm) {
 	    if (basepm->node.flags & PM_NAMEREF) {
