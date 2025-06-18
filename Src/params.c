@@ -3332,11 +3332,7 @@ assignsparam(char *s, char *val, int flags)
 	}
     }
 
-    if (v->pm->node.flags & PM_NAMEREF)
-	v->pm->node.flags |= PM_NEWREF;
     assignstrvalue(v, val, flags);
-    if (v->pm->node.flags & PM_NAMEREF)
-	v->pm->node.flags &= ~PM_NEWREF;
     unqueue_signals();
     return v->pm;
 }
@@ -6329,8 +6325,6 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 	} else if (pm->node.flags & PM_UNSET) {
 	    /* Semaphore with createparam() */
 	    pm->node.flags &= ~PM_UNSET;
-	    if (pm->node.flags & PM_NEWREF)	/* See setloopvar() */
-		return NULL;
 	    return pm;
 	}
 	/* pm->width is the offset of any subscript */
@@ -6350,7 +6344,7 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 		    pm->node.flags &= ~PM_TAGGED;
 		}
 	    } else if (keep_lastref)
-		hn = (pm->node.flags & PM_NEWREF) ? NULL : pm;
+		hn = pm;
 	    unqueue_signals();
 	}
     }
@@ -6372,10 +6366,7 @@ setloopvar(char *name, char *value)
       pm->base = pm->width = 0;
       SETREFNAME(pm, ztrdup(value));
       pm->node.flags &= ~PM_UNSET;
-      pm->node.flags |= PM_NEWREF;
       setscope(pm);
-      if (!errflag)
-	  pm->node.flags &= ~PM_NEWREF;
   } else
       setsparam(name, ztrdup(value));
 }
@@ -6407,8 +6398,7 @@ setscope(Param pm)
 	if (!(pm->node.flags & PM_UPPER) && refname &&
 	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
 	    (basepm = (Param)loadparamnode(realparamtab, basepm, refname)) &&
-	    (!(basepm->node.flags & PM_NEWREF) ||
-	     !basepm->old || (basepm = basepm->old))) {
+	    (basepm != pm || !basepm->old || (basepm = basepm->old))) {
 	    pm->base = basepm->level;
 	}
 	if (pm->base > pm->level) {
