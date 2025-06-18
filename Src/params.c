@@ -1051,7 +1051,7 @@ createparam(char *name, int flags)
 	     * in typeset_single. It's unclear why these can't be
 	     * handled there too.
 	     **/
-	    Param lastpm = resolve_nameref_rec(oldpm, "", 1);
+	    Param lastpm = resolve_nameref_rec(oldpm, NULL, 1);
 	    if (lastpm) {
 		if (lastpm->node.flags & PM_NAMEREF) {
 		    char *refname = GETREFNAME(lastpm);
