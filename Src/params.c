@@ -1051,12 +1051,7 @@ createparam(char *name, int flags)
 	     * in typeset_single. It's unclear why these can't be
 	     * handled there too.
 	     **/
-	    Param lastpm;
-	    struct asgment stop;
-	    stop.flags = 0;
-	    stop.name = "";
-	    stop.value.scalar = NULL;
-	    lastpm = (Param)resolve_nameref(oldpm, &stop);
+	    Param lastpm = (Param)resolve_nameref(oldpm, "");
 	    if (lastpm) {
 		if (lastpm->node.flags & PM_NAMEREF) {
 		    char *refname = GETREFNAME(lastpm);
@@ -6316,7 +6311,7 @@ printparamnode(HashNode hn, int printflags)
 
 /**/
 mod_export HashNode
-resolve_nameref(Param pm, const Asgment stop)
+resolve_nameref(Param pm, const char *stop_name)
 {
     HashNode hn = (HashNode)pm;
     const char *seek = NULL;
@@ -6333,7 +6328,7 @@ resolve_nameref(Param pm, const Asgment stop)
 		return NULL;
 	    return (HashNode) pm;
 	} else if (refname) {
-	    if (stop && strcmp(refname, stop->name) == 0) {
+	    if (stop_name && strcmp(refname, stop_name) == 0) {
 		/* zwarnnam(refname, "invalid self reference"); */
 		return (HashNode)pm;
 	    }
@@ -6348,7 +6343,7 @@ resolve_nameref(Param pm, const Asgment stop)
 	queue_signals();
 	/* pm->width is the offset of any subscript */
 	if (pm && (pm->node.flags & PM_NAMEREF) && pm->width) {
-	    if (stop) {
+	    if (stop_name) {
 		hn = (HashNode)pm;
 	    } else {
 		/* this has to be the end of any chain */
@@ -6371,11 +6366,11 @@ resolve_nameref(Param pm, const Asgment stop)
 	    }
 	    if (hn) {
 		if (!(hn->flags & PM_UNSET))
-		    hn = resolve_nameref((Param)hn, stop);
+		    hn = resolve_nameref((Param)hn, stop_name);
 	    }
 	    if (pm)
 		pm->node.flags &= ~PM_TAGGED;
-	} else if (stop)
+	} else if (stop_name)
 	    hn = (pm && (pm->node.flags & PM_NEWREF)) ? NULL : (HashNode)pm;
 	unqueue_signals();
     }
@@ -6413,7 +6408,6 @@ setscope(Param pm)
     queue_signals();
     if (pm->node.flags & PM_NAMEREF) do {
 	Param basepm;
-	struct asgment stop;
 	char *refname = GETREFNAME(pm);
 	char *t = refname ? itype_end(refname, INAMESPC, 0) : NULL;
 	int q = queue_signal_level();
@@ -6448,11 +6442,8 @@ setscope(Param pm)
 	}
 
 	/* Check for self references */
-	stop.name = pm->node.nam;
-	stop.value.scalar = NULL;
-	stop.flags = 0;
 	dont_queue_signals();	/* Prevent unkillable loops */
-	basepm = (Param)resolve_nameref(pm, &stop);
+	basepm = (Param)resolve_nameref(pm, pm->node.nam);
 	restore_queue_signals(q);
 	if (basepm) {
 	    if (basepm->node.flags & PM_NAMEREF) {
