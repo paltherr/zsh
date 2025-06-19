@@ -6319,7 +6319,7 @@ mod_export HashNode
 resolve_nameref(Param pm, const Asgment stop)
 {
     HashNode hn = (HashNode)pm;
-    const char *seek = stop ? stop->value.scalar : NULL;
+    const char *seek = NULL;
 
     if (pm && (pm->node.flags & PM_NAMEREF)) {
 	char *refname = GETREFNAME(pm);
@@ -6356,7 +6356,7 @@ resolve_nameref(Param pm, const Asgment stop)
 	    }
 	} else if ((hn = gethashnode2(realparamtab, seek))) {
 	    if (pm) {
-		if (!(stop && (stop->flags & (PM_LOCAL)))) {
+		{
 		    if ((pm->node.flags & PM_NAMEREF) &&
 			(pm->node.flags & PM_UPPER))
 			hn = (HashNode)upscope_upper((Param)hn, pm->level - 1);
