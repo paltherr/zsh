@@ -1053,7 +1053,7 @@ createparam(char *name, int flags)
 	     **/
 	    Param lastpm;
 	    struct asgment stop;
-	    stop.flags = PM_NAMEREF;
+	    stop.flags = 0;
 	    stop.name = "";
 	    stop.value.scalar = NULL;
 	    lastpm = (Param)resolve_nameref(oldpm, &stop);
@@ -6342,7 +6342,7 @@ resolve_nameref(Param pm, const Asgment stop)
 	}
     }
     else if (pm) {
-	if (!(stop && (stop->flags & PM_NAMEREF)))
+	if (!stop)
 	    return (HashNode)pm;
 	if (!(pm->node.flags & PM_NAMEREF))
 	    return (pm->level < locallevel ? NULL : (HashNode)pm);
@@ -6352,10 +6352,7 @@ resolve_nameref(Param pm, const Asgment stop)
 	/* pm->width is the offset of any subscript */
 	if (pm && (pm->node.flags & PM_NAMEREF) && pm->width) {
 	    if (stop) {
-		if (stop->flags & PM_NAMEREF)
-		    hn = (HashNode)pm;
-		else
-		    hn = NULL;
+		hn = (HashNode)pm;
 	    } else {
 		/* this has to be the end of any chain */
 		hn = (HashNode)pm;	/* see fetchvalue() */
@@ -6381,7 +6378,7 @@ resolve_nameref(Param pm, const Asgment stop)
 	    }
 	    if (pm)
 		pm->node.flags &= ~PM_TAGGED;
-	} else if (stop && (stop->flags & PM_NAMEREF))
+	} else if (stop)
 	    hn = (pm && (pm->node.flags & PM_NEWREF)) ? NULL : (HashNode)pm;
 	unqueue_signals();
     }
@@ -6456,7 +6453,7 @@ setscope(Param pm)
 	/* Check for self references */
 	stop.name = pm->node.nam;
 	stop.value.scalar = NULL;
-	stop.flags = PM_NAMEREF;
+	stop.flags = 0;
 	dont_queue_signals();	/* Prevent unkillable loops */
 	basepm = (Param)resolve_nameref(pm, &stop);
 	restore_queue_signals(q);
