@@ -553,7 +553,7 @@ getparamnode(HashTable ht, const char *nam)
 {
     HashNode hn = loadparamnode(ht, (Param)gethashnode2(ht, nam), nam);
     if (hn && ht == realparamtab && !(hn->flags & PM_UNSET))
-	hn = resolve_nameref((Param)hn, NULL);
+	hn = (HashNode)resolve_nameref((Param)hn);
     return hn;
 }
 
@@ -1051,7 +1051,7 @@ createparam(char *name, int flags)
 	     * in typeset_single. It's unclear why these can't be
 	     * handled there too.
 	     **/
-	    Param lastpm = (Param)resolve_nameref(oldpm, "");
+	    Param lastpm = resolve_nameref_rec(oldpm, "");
 	    if (lastpm) {
 		if (lastpm->node.flags & PM_NAMEREF) {
 		    char *refname = GETREFNAME(lastpm);
@@ -6310,10 +6310,17 @@ printparamnode(HashNode hn, int printflags)
 }
 
 /**/
-mod_export HashNode
-resolve_nameref(Param pm, const char *stop_name)
+mod_export Param
+resolve_nameref(Param pm)
 {
-    HashNode hn = (HashNode)pm;
+    return resolve_nameref_rec(pm, NULL);
+}
+
+/**/
+static Param
+resolve_nameref_rec(Param pm, const char *stop_name)
+{
+    Param hn = pm;
     if (pm && (pm->node.flags & PM_NAMEREF)) {
 	char *refname = GETREFNAME(pm);
 	if (pm->node.flags & PM_TAGGED) {
@@ -6324,31 +6331,31 @@ resolve_nameref(Param pm, const char *stop_name)
 	    pm->node.flags &= ~PM_UNSET;
 	    if (pm->node.flags & PM_NEWREF)	/* See setloopvar() */
 		return NULL;
-	    return (HashNode) pm;
+	    return pm;
 	} else if (refname) {
 	    if (stop_name && strcmp(refname, stop_name) == 0) {
 		/* zwarnnam(refname, "invalid self reference"); */
-		return (HashNode)pm;
+		return pm;
 	    }
 	}
 	/* pm->width is the offset of any subscript */
 	/* If present, it has to be the end of any chain, see fetchvalue() */
 	if (refname && *refname && !pm->width) {
 	    queue_signals();
-	    if ((hn = gethashnode2(realparamtab, refname))) {
+	    if ((hn = (Param)gethashnode2(realparamtab, refname))) {
 		if ((pm->node.flags & PM_UPPER))
-		    hn = (HashNode)upscope_upper((Param)hn, pm->level - 1);
+		    hn = upscope_upper(hn, pm->level - 1);
 		else
-		    hn = (HashNode)upscope((Param)hn, pm->base);
-		if ((hn = loadparamnode(paramtab, (Param)hn, refname)) &&
-		    !(hn->flags & PM_UNSET)) {
+		    hn = upscope(hn, pm->base);
+		if ((hn = (Param)loadparamnode(paramtab, hn, refname)) &&
+		    !(hn->node.flags & PM_UNSET)) {
 		    /* user can't tag a nameref, safe for loop detection */
 		    pm->node.flags |= PM_TAGGED;
-		    hn = resolve_nameref((Param)hn, stop_name);
+		    hn = resolve_nameref_rec(hn, stop_name);
 		    pm->node.flags &= ~PM_TAGGED;
 		}
 	    } else if (stop_name)
-		hn = (pm->node.flags & PM_NEWREF) ? NULL : (HashNode)pm;
+		hn = (pm->node.flags & PM_NEWREF) ? NULL : pm;
 	    unqueue_signals();
 	}
     }
@@ -6420,7 +6427,7 @@ setscope(Param pm)
 
 	/* Check for self references */
 	dont_queue_signals();	/* Prevent unkillable loops */
-	basepm = (Param)resolve_nameref(pm, pm->node.nam);
+	basepm = resolve_nameref_rec(pm, pm->node.nam);
 	restore_queue_signals(q);
 	if (basepm) {
 	    if (basepm->node.flags & PM_NAMEREF) {
