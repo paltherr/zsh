@@ -6332,11 +6332,6 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 	    if (pm->node.flags & PM_NEWREF)	/* See setloopvar() */
 		return NULL;
 	    return pm;
-	} else if (refname) {
-	    if (stop && strcmp(refname, stop->node.nam) == 0) {
-		/* zwarnnam(refname, "invalid self reference"); */
-		return pm;
-	    }
 	}
 	/* pm->width is the offset of any subscript */
 	/* If present, it has to be the end of any chain, see fetchvalue() */
@@ -6348,7 +6343,7 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 		else
 		    hn = upscope(hn, pm->base);
 		if ((hn = (Param)loadparamnode(paramtab, hn, refname)) &&
-		    !(hn->node.flags & PM_UNSET)) {
+		    hn != stop && !(hn->node.flags & PM_UNSET)) {
 		    /* user can't tag a nameref, safe for loop detection */
 		    pm->node.flags |= PM_TAGGED;
 		    hn = resolve_nameref_rec(hn, stop, keep_lastref);
@@ -6390,7 +6385,7 @@ static void
 setscope(Param pm)
 {
     queue_signals();
-    if (pm->node.flags & PM_NAMEREF) do {
+    if (pm->node.flags & PM_NAMEREF) {
 	Param basepm = NULL;
 	char *refname = GETREFNAME(pm);
 	char *t = refname ? itype_end(refname, INAMESPC, 0) : NULL;
@@ -6432,27 +6427,11 @@ setscope(Param pm)
 	    basepm = resolve_nameref_rec(pm, pm, 0);
 	    restore_queue_signals(q);
 	}
-	if (basepm) {
-	    if (basepm->node.flags & PM_NAMEREF) {
-		if (pm == basepm) {
-		    if (pm->base == pm->level) {
-			if (strcmp(pm->node.nam, refname) == 0) {
-			    zerr("%s: invalid self reference", refname);
-			    unsetparam_pm(pm, 0, 1);
-			    break;
-			}
-		    }
-		} else if ((t = GETREFNAME(basepm))) {
-		    if (basepm->base <= basepm->level &&
-			strcmp(pm->node.nam, t) == 0) {
-			zerr("%s: invalid self reference", refname);
-			unsetparam_pm(pm, 0, 1);
-			break;
-		    }
-		}
-	    }
+	if (pm == basepm) {
+	    zerr("%s: invalid self reference", refname);
+	    unsetparam_pm(pm, 0, 1);
 	}
-    } while (0);
+    }
     unqueue_signals();
 }
 

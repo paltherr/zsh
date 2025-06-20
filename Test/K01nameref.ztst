@@ -469,6 +469,14 @@ F:unexpected side-effects of previous tests
  }
 0:regression: not a self reference (test 2)
 
+ typeset ptr2=foo
+ () {
+   typeset -n ptr1=ptr2
+   typeset -n ptr2=ptr1
+ }
+0:regression: not a self reference (test 3)
+
+
  unset -n ptr2
  typeset -n ptr2='path[2]'
  print -r -- $ptr2
