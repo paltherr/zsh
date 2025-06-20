@@ -1044,6 +1044,13 @@ createparam(char *name, int flags)
 	    (oldpm->level == locallevel ?
 	     !(oldpm->node.flags & PM_RO_BY_DESIGN) : !(flags & PM_LOCAL)) &&
 	    (oldpm->node.flags & PM_NAMEREF)) {
+	    /**
+	     * Here we only have to deal with namerefs that refer to
+	     * not-yet-defined or unset variable. All other namerefs
+	     * have already been taken care of by the resolve_nameref
+	     * in typeset_single. It's unclear why these can't be
+	     * handled there too.
+	     **/
 	    Param lastpm;
 	    struct asgment stop;
 	    stop.flags = PM_NAMEREF;
