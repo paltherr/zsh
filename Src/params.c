@@ -6344,8 +6344,7 @@ resolve_nameref(Param pm, const Asgment stop)
     else if (pm) {
 	if (!stop)
 	    return (HashNode)pm;
-	if (!(pm->node.flags & PM_NAMEREF))
-	    return (pm->level < locallevel ? NULL : (HashNode)pm);
+	return (pm->level < locallevel ? NULL : (HashNode)pm);
     }
     if (seek) {
 	queue_signals();
