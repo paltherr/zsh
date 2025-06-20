@@ -6391,7 +6391,7 @@ setscope(Param pm)
 {
     queue_signals();
     if (pm->node.flags & PM_NAMEREF) do {
-	Param basepm;
+	Param basepm = NULL;
 	char *refname = GETREFNAME(pm);
 	char *t = refname ? itype_end(refname, INAMESPC, 0) : NULL;
 	int q = queue_signal_level();
@@ -6426,15 +6426,16 @@ setscope(Param pm)
 	}
 
 	/* Check for self references */
-	dont_queue_signals();	/* Prevent unkillable loops */
-	basepm = resolve_nameref_rec(pm, pm, 1);
-	restore_queue_signals(q);
+	if (refname && *refname) {
+	    dont_queue_signals();	/* Prevent unkillable loops */
+	    basepm = resolve_nameref_rec(pm, pm, 1);
+	    restore_queue_signals(q);
+	}
 	if (basepm) {
 	    if (basepm->node.flags & PM_NAMEREF) {
 		if (pm == basepm) {
 		    if (pm->base == pm->level) {
-			if (refname && *refname &&
-			    strcmp(pm->node.nam, refname) == 0) {
+			if (strcmp(pm->node.nam, refname) == 0) {
 			    zerr("%s: invalid self reference", refname);
 			    unsetparam_pm(pm, 0, 1);
 			    break;
