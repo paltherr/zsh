@@ -6412,7 +6412,8 @@ setscope(Param pm)
 	if (!(pm->node.flags & PM_UPPER) && refname &&
 	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
 	    (basepm = (Param)loadparamnode(realparamtab, basepm, refname)) &&
-	    (!(basepm->node.flags & PM_NEWREF) || (basepm = basepm->old))) {
+	    (!(basepm->node.flags & PM_NEWREF) ||
+	     !basepm->old || (basepm = basepm->old))) {
 	    pm->base = basepm->level;
 	}
 	if (pm->base > pm->level) {
@@ -6426,7 +6427,7 @@ setscope(Param pm)
 	}
 
 	/* Check for self references */
-	if (refname && *refname && !pm->width) {
+	if (refname && *refname && !pm->width && basepm != pm) {
 	    dont_queue_signals();	/* Prevent unkillable loops */
 	    basepm = resolve_nameref_rec(pm, pm, 1);
 	    restore_queue_signals(q);
@@ -6450,11 +6451,6 @@ setscope(Param pm)
 		    }
 		}
 	    }
-	}
-	if (refname && upscope(pm, pm->base) == pm &&
-	    strcmp(pm->node.nam, refname) == 0) {
-	    zerr("%s: invalid self reference", refname);
-	    unsetparam_pm(pm, 0, 1);
 	}
     } while (0);
     unqueue_signals();

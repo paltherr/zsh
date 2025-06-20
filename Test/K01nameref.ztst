@@ -1626,4 +1626,24 @@ F:converting from association/array to string should work here too
 1:self reference with subscript
 *?*: ref: invalid self reference
 
+ typeset var=foo
+ typeset -n ref=var
+ () {
+   typeset -n ref
+   ref=""
+   ref=ref
+   echo $ref
+ }
+0:reference always prefers enclosing variable over itself
+>foo
+
+ typeset -n ref1
+ () {
+   typeset -n ref2=ref3
+   ref1=ref2
+   typeset -nu ref3=ref1
+ }
+1:self reference via upper reference
+?(anon):3: ref1: invalid self reference
+
 %clean
