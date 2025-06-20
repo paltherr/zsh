@@ -6426,7 +6426,7 @@ setscope(Param pm)
 	}
 
 	/* Check for self references */
-	if (refname && *refname) {
+	if (refname && *refname && !pm->width) {
 	    dont_queue_signals();	/* Prevent unkillable loops */
 	    basepm = resolve_nameref_rec(pm, pm, 1);
 	    restore_queue_signals(q);
