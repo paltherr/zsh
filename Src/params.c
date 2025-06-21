@@ -2233,13 +2233,8 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 		    *ss = 0;
 		}
 		Param p1 = (Param)gethashnode2(paramtab, ref);
-		if (p1) {
-		    if (pm->node.flags & PM_UPPER)
-			pm = upscope_upper(p1, pm->level - 1);
-		    else
-			pm = upscope(p1, pm->base);
-		    pm = loadparamnode(paramtab, pm, ref);
-		}
+		if (p1)
+		    pm = loadparamnode(paramtab, upscope(p1, pm), ref);
 		if (!(p1 && pm) ||
 		    ((pm->node.flags & PM_UNSET) &&
 		     !(pm->node.flags & PM_DECLARED)))
@@ -6332,11 +6327,7 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 	if (refname && *refname && !pm->width) {
 	    queue_signals();
 	    if ((hn = (Param)gethashnode2(realparamtab, refname))) {
-		if ((pm->node.flags & PM_UPPER))
-		    hn = upscope_upper(hn, pm->level - 1);
-		else
-		    hn = upscope(hn, pm->base);
-		if ((hn = loadparamnode(paramtab, hn, refname)) &&
+		if ((hn = loadparamnode(paramtab, upscope(hn, pm), refname)) &&
 		    hn != stop && !(hn->node.flags & PM_UNSET)) {
 		    /* user can't tag a nameref, safe for loop detection */
 		    pm->node.flags |= PM_TAGGED;
@@ -6427,22 +6418,12 @@ setscope(Param pm)
 
 /**/
 static Param
-upscope(Param pm, int reflevel)
+upscope(Param pm, const Param ref)
 {
-    Param up = pm->old;
-    while (up && up->level >= reflevel) {
-	pm = up;
-	up = up->old;
-    }
-    return pm;
-}
-
-/**/
-static Param
-upscope_upper(Param pm, int reflevel)
-{
-    while (pm && pm->level > reflevel)
-	pm = pm->old;
+    if (ref->node.flags & PM_UPPER)
+	while (pm->level > ref->level - 1 && (pm = pm->old));
+    else
+	for (; pm->old && pm->old->level >= ref->base; pm = pm->old);
     return pm;
 }
 
