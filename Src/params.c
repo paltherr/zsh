@@ -522,7 +522,7 @@ newparamtable(int size, char const *name)
 }
 
 /**/
-static HashNode
+static Param
 loadparamnode(HashTable ht, Param pm, const char *nam)
 {
     if (pm && (pm->node.flags & PM_AUTOLOAD) && pm->u.str) {
@@ -544,17 +544,17 @@ loadparamnode(HashTable ht, Param pm, const char *nam)
 		 nam);
 	}
     }
-    return (HashNode)pm;
+    return pm;
 }
 
 /**/
 static HashNode
 getparamnode(HashTable ht, const char *nam)
 {
-    HashNode hn = loadparamnode(ht, (Param)gethashnode2(ht, nam), nam);
-    if (hn && ht == realparamtab && !(hn->flags & PM_UNSET))
-	hn = (HashNode)resolve_nameref((Param)hn);
-    return hn;
+    Param pm = loadparamnode(ht, (Param)gethashnode2(ht, nam), nam);
+    if (pm && ht == realparamtab && !(pm->node.flags & PM_UNSET))
+	pm = resolve_nameref(pm);
+    return (HashNode)pm;
 }
 
 /* Copy a parameter hash table */
@@ -2238,7 +2238,7 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 			pm = upscope_upper(p1, pm->level - 1);
 		    else
 			pm = upscope(p1, pm->base);
-		    pm = (Param)loadparamnode(paramtab, pm, ref);
+		    pm = loadparamnode(paramtab, pm, ref);
 		}
 		if (!(p1 && pm) ||
 		    ((pm->node.flags & PM_UNSET) &&
@@ -6336,7 +6336,7 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 		    hn = upscope_upper(hn, pm->level - 1);
 		else
 		    hn = upscope(hn, pm->base);
-		if ((hn = (Param)loadparamnode(paramtab, hn, refname)) &&
+		if ((hn = loadparamnode(paramtab, hn, refname)) &&
 		    hn != stop && !(hn->node.flags & PM_UNSET)) {
 		    /* user can't tag a nameref, safe for loop detection */
 		    pm->node.flags |= PM_TAGGED;
