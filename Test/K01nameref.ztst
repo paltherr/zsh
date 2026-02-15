@@ -1006,6 +1006,19 @@ F:Checking for a bug in zmodload that affects later tests
 >
 *?*reference ref*to local variable one
 
+ typeset -n ref=var
+ {
+   for ref in valid1 inv@lid valid2; do typeset -p ref; done
+ } always { TRY_BLOCK_ERROR=0 }
+ typeset -nr ref=var
+ {
+   for ref in valid3 valid4; do typeset -p ref; done
+ } always { TRY_BLOCK_ERROR=0 }
+1:for-loop variable is a reference, part 5, errors
+>typeset -n ref=valid1
+*?*invalid name reference: inv@lid
+*?*read-only reference: ref
+
  unset -n ref
  typeset -n ref
  () {

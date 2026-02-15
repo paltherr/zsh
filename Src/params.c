@@ -6330,6 +6330,10 @@ setloopvar(char *name, char *value)
 	  zerr("read-only reference: %s", pm->node.nam);
 	  return;
       }
+      if (!valid_refname(value, pm->node.flags)) {
+	  zerr("invalid name reference: %s", value);
+	  return;
+      }
       pm->base = 0;
       SETREFNAME(pm, ztrdup(value));
       pm->node.flags &= ~PM_UNSET;
