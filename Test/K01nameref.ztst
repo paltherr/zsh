@@ -1204,6 +1204,80 @@ F:previously this could create an infinite recursion and crash
 >h2: ref1=f1 ref2=f1 ref3=f1
 >f1: ref1=f1 ref2=f1 ref3=f1
 
+ check-valid-referent-name() {
+   local -n ref=$1
+   [[ $ref = $2 ]] || echo "Unexpected expansion result: ref=$1, \$ref=$ref != $2"
+ }
+ check-invalid-variable-name() {
+   {
+     local -- $1=value-$1 2>/dev/null
+     echo "Unexpected valid variable name: $1"
+   } always {
+     TRY_BLOCK_ERROR=0
+   }
+ }
+ check-invalid-referent-name() {
+   {
+     local -n -- ref=$1 2>/dev/null
+     echo "Unexpected valid referent name: $1"
+   } always {
+     TRY_BLOCK_ERROR=0
+   }
+ }
+ local name value;
+ # Test valid variable names.
+ for name in \
+    foo  foo.  foo.bar  foo.456  foo.4ar \
+   .foo       .foo.bar .foo.456
+ do
+   local $name=value-$name
+   check-valid-referent-name "$name" value-$name
+   check-invalid-referent-name "$name"@
+   check-invalid-referent-name "$name""[1]"
+ done
+ # Test valid builtin variable names
+ for name value in 123 "" \! 0 \? 0 \$ $$ - 569X _ -n; do
+   check-valid-referent-name "$name" $value
+   check-invalid-referent-name "$name"@
+   check-invalid-referent-name "$name""[1]"
+ done
+ # Test invalid variable names.
+ for name in \
+        .foo.                   .foo.4ar  .  foo.. \
+         123.  123.bar  123.456  123.4ar .. .foo.. \
+   .123 .123. .123.bar .123.456 .123.4ar \
+    1oo  1oo.  1oo.bar  1oo.456  1oo.4ar \
+   .1oo .1oo. .1oo.bar .1oo.456 .1oo.4ar
+ do
+   check-invalid-variable-name "$name"
+   check-invalid-referent-name "$name"
+   check-invalid-referent-name "$name"@
+   check-invalid-referent-name "$name""[1]"
+ done
+ # Any variable name with more than one non-leading '.' is invalid.
+ for name in {,.}{foo,123,1oo}.{bar,456,4ar}.{,baz,789,7az}; do
+   check-invalid-variable-name "$name"
+   check-invalid-referent-name "$name"
+ done
+ unfunction check-valid-referent-name
+ unfunction check-invalid-variable-name
+ unfunction check-invalid-referent-name
+ unset name value
+0:references to invalid variable names
+F:BUG:Some invalid variable names like .foo. or .123, are valid referent names
+>Unexpected valid referent name: .foo.
+>Unexpected valid referent name: .foo.4ar
+>Unexpected valid referent name: .123
+>Unexpected valid referent name: .123.
+>Unexpected valid referent name: .123.bar
+>Unexpected valid referent name: .123.456
+>Unexpected valid referent name: .123.4ar
+>Unexpected valid referent name: .1oo
+>Unexpected valid referent name: .1oo.
+>Unexpected valid referent name: .1oo.bar
+>Unexpected valid referent name: .1oo.456
+>Unexpected valid referent name: .1oo.4ar
+
  edgelocal() ( local -n x=$1; typeset -p x; print -r $x )
  edgeupper() ( local -nu x=$1; typeset -p x; print -r $x )
  for edge in argv ARGC \@ \* \# 0 1 01 \! \? \$ - _
@@ -1213,6 +1287,7 @@ F:previously this could create an infinite recursion and crash
  done
  unfunction edgelocal edgeupper
 0q:references to builtin specials
+F:BUG:References to 1, 2, ... are supported but don't work (always expand to "")
 >typeset -n x=argv
 >argv
 >typeset -n x=ARGC
