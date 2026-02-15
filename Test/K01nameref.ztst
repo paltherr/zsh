@@ -219,81 +219,190 @@ F:note this causes "var" to become set
  typeset var=value
  typeset -n ptr=var
  print $ptr
-0:basic nameref expansion, no braces
+ print $ptr[2,4]
+0:nameref expansion, no braces
 >value
+>alu
 
  typeset var=value
  typeset -n ptr=var
  print ${ptr}
-0:basic nameref expansion, braces
+ print ${(U)ptr}
+ print ${ptr[2,5][1,3]}
+ print ${(U)ptr[2,5][1,3]}
+0:nameref expansion, braces
 >value
+>VALUE
+>alu
+>ALU
 
  typeset var=(val1 val2)
  typeset -n ptr=var
  print $ptr
-0:nameref array expansion
+ print $ptr[2]
+0:nameref array expansion, no braces
 >val1 val2
+>val2
 
- typeset -A var=(val1 val2)
+ typeset var=(val1 val2)
  typeset -n ptr=var
+ print ${ptr}
+ print ${(O)ptr}
+ print ${ptr[2]}
+ print ${(U)ptr[2]}
+ print ${ptr[2][2,4]}
+ print ${(U)ptr[2][2,4]}
+0:nameref array expansion, braces
+>val1 val2
+>val2 val1
+>val2
+>VAL2
+>al2
+>AL2
+
+ typeset -A var=(key1 val1 key2 val2)
+ typeset -n ptr=var
+ print $ptr
+ print $ptr[key2]
+0:nameref hash expansion, no braces
+>val1 val2
+>val2
+
+ typeset -A var=(key1 val1 key2 val2)
+ typeset -n ptr=var
+ print ${ptr}
  print ${(kv)ptr}
-0:nameref hash expansion
+ print ${ptr[key2]}
+ print ${(U)ptr[key2]}
+ print ${ptr[key2][2,4]}
+ print ${(U)ptr[key2][2,4]}
+0:nameref hash expansion, braces
 >val1 val2
+>key1 val1 key2 val2
+>val2
+>VAL2
+>al2
+>AL2
 
- typeset -n ptr=var
  typeset var=value
- typeset -p ptr var
+ typeset -n ptr=var
  ptr=newvalue
- typeset -p ptr var
-0:assign existing scalar via nameref
->typeset -n ptr=var
->typeset var=value
->typeset -n ptr=var
+ typeset -p var
+ ptr[3]=xt
+ typeset -p var
+ typeset ptr=newvalue
+ typeset -p var
+ typeset ptr[3]=xt
+ typeset -p var
+0:assign/typeset existing scalar via nameref
 >typeset var=newvalue
+>typeset var=nextvalue
+>typeset var=newvalue
+>typeset var=nextvalue
 
+ typeset var=(val1 val2)
  typeset -n ptr=var
+ ptr=(new1 new2 new3 new4 new5)
+ typeset -p var
+ ptr[3]=new6
+ typeset -p var
+ ptr[2,4]=(new7 new8)
+ typeset -p var
+ typeset ptr=(new1 new2 new3 new4 new5)
+ typeset -p var
+ typeset ptr[3]=new6
+ typeset -p var
+ typeset ptr[2,4]=(new7 new8)
+ typeset -p var
+0:assign/typeset existing array via nameref
+>typeset -a var=( new1 new2 new3 new4 new5 )
+>typeset -a var=( new1 new2 new6 new4 new5 )
+>typeset -a var=( new1 new7 new8 new5 )
+>typeset -a var=( new1 new2 new3 new4 new5 )
+>typeset -a var=( new1 new2 new6 new4 new5 )
+>typeset -a var=( new1 new7 new8 new5 )
+
+ typeset -A var=(key1 val1)
+ typeset -n ptr=var
+ ptr=(key2 val2 key3 val3)
+ typeset -p var
+ ptr[key3]=VAL3
+ ptr[key4]=val4
+ typeset -p var
+ typeset ptr=(key2 val2 key3 val3)
+ typeset -p var
+ typeset ptr[key3]=VAL3
+ typeset ptr[key4]=val4
+ typeset -p var
+0:assign/typeset existing array via nameref
+>typeset -A var=( [key2]=val2 [key3]=val3 )
+>typeset -A var=( [key2]=val2 [key3]=VAL3 [key4]=val4 )
+>typeset -A var=( [key2]=val2 [key3]=val3 )
+>typeset -A var=( [key2]=val2 [key3]=VAL3 [key4]=val4 )
+
+ () {
+   unset var
+   typeset -n ptr=var
+   ptr=value
+   typeset -p var
+   unset var
+   typeset ptr=value
+   typeset -p var
+ }
+ typeset -p var
+1:assign/typeset new scalar via nameref
+>typeset -g var=value
+>typeset var=value
+*?*no such variable: var
+
+ () {
+   unset var
+   typeset -n ptr=var
+   ptr=(val1 val2)
+   typeset -p var
+   unset var
+   typeset ptr=(val1 val2)
+   typeset -p var
+ }
+ typeset -p var
+1:assign/typeset new array via nameref
+>typeset -g -a var=( val1 val2 )
+>typeset -a var=( val1 val2 )
+*?*no such variable: var
+
  typeset var=value
+ typeset -n ptr=var
+ unset "ptr[3]"
+ typeset -p var
+ unset "ptr[2,3]"
+ typeset -p var
+ unset ptr
+ typeset -p var
+ typeset var=(val1 val2 val3 val4 val5)
+ unset "ptr[3]"
+ typeset -p var
+ unset "ptr[2,4]"
+ typeset -p var
+ unset ptr
+ typeset -p var
+ typeset -A var=(key1 val1 key2 val2)
+ unset "ptr[key2]"
+ typeset -p var
  unset ptr
  typeset -p var
 0:unset via nameref
+>typeset var=vaue
+>typeset var=ve
+>typeset -a var=( val1 val2 '' val4 val5 )
+>typeset -a var=( val1 '' val5 )
+>typeset -A var=( [key1]=val1 )
 
- typeset -n ptr=var
  typeset var=value
+ typeset -n ptr=var
  unset -n ptr
  typeset -p var ptr
 0:unset of the nameref itself
-F:If earlier tests change, might get "no such variable" here
 >typeset var=value
-
- typeset -n ptr=var
- typeset var=value
- typeset -p ptr var
- typeset ptr=newvalue
- typeset -p ptr var
-0:typeset existing scalar via nameref
->typeset -n ptr=var
->typeset var=value
->typeset -n ptr=var
->typeset var=newvalue
-
- typeset -n ptr=var
- ptr=value
- typeset -p var ptr
-0:assign new scalar via nameref
->typeset -g var=value
->typeset -n ptr=var
-
- unset var
- typeset -n ptr=var
- typeset var=(val1 val2)
- typeset -p ptr var
- ptr=(new1 new2)
- typeset -p ptr var
-0:assign existing array via nameref
->typeset -n ptr=var
->typeset -a var=( val1 val2 )
->typeset -n ptr=var
->typeset -a var=( new1 new2 )
 
  typeset -p ptr ptr1 ptr2 var
 1:check state of paramtab ONE
@@ -302,13 +411,6 @@ F:unexpected side-effects of previous tests
 *?*no such variable: ptr1
 *?*no such variable: ptr2
 *?*no such variable: var
-
- typeset -n ptr=var
- ptr=(val1 val2)
- typeset -p var ptr
-0:assign new array via nameref
->typeset -g -a var=( val1 val2 )
->typeset -n ptr=var
 
  unset var
  typeset -n ptr2=var
