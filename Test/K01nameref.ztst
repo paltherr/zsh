@@ -1264,19 +1264,6 @@ F:previously this could create an infinite recursion and crash
  unfunction check-invalid-referent-name
  unset name value
 0:references to invalid variable names
-F:BUG:Some invalid variable names like .foo. or .123, are valid referent names
->Unexpected valid referent name: .foo.
->Unexpected valid referent name: .foo.4ar
->Unexpected valid referent name: .123
->Unexpected valid referent name: .123.
->Unexpected valid referent name: .123.bar
->Unexpected valid referent name: .123.456
->Unexpected valid referent name: .123.4ar
->Unexpected valid referent name: .1oo
->Unexpected valid referent name: .1oo.
->Unexpected valid referent name: .1oo.bar
->Unexpected valid referent name: .1oo.456
->Unexpected valid referent name: .1oo.4ar
 
  edgelocal() ( local -n x=$1; typeset -p x; print -r $x )
  edgeupper() ( local -nu x=$1; typeset -p x; print -r $x )

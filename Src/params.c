@@ -6394,31 +6394,14 @@ upscope(Param pm, const Param ref)
 static int
 valid_refname(char *val, int flags)
 {
-    char *t;
-
     if (flags & PM_UPPER) {
 	/* Upward reference to positionals is doomed to fail */
-	if (idigit(*val))
+	if (idigit(*val) || !strcmp(val, "argv") || !strcmp(val, "ARGC"))
 	    return 0;
-	t = itype_end(val, INAMESPC, 0);
-	if ((t - val == 4) &&
-	    (!strncmp(val, "argv", 4) ||
-	     !strncmp(val, "ARGC", 4)))
-	    return 0;
-    } else if (idigit(*val)) {
-	t = val;
-	while (*++t)
-	    if (!idigit(*t))
-		break;
-    } else
-	t = itype_end(val, INAMESPC, 0);
-
-    if (t == val) {
-	if (!(*t == '!' || *t == '?' ||
-	      *t == '$' || *t == '-' ||
-	      *t == '_'))
-	    return 0;
-	++t;
     }
-    return !*t;
+
+    if (*val == '!' || *val == '?' || *val == '$' || *val == '-')
+    	return !*(++val);
+
+    return !*itype_end(val, INAMESPC, 0) && isident(val);
 }
