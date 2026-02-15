@@ -2041,13 +2041,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    (on & ~(PM_NAMEREF|PM_LOCAL|PM_READONLY))) {
 	    /* Changing type of PM_SPECIAL|PM_AUTOLOAD is a fatal error.  *
 	     * Should this be a fatal error as well, rather than warning? */
-	    if (pm->width)
-		zwarnnam(cname,
-			 "%s: can't change type via subscript reference",
-			 pm->u.str);
-	    else
-		zwarnnam(cname, "%s: can't change type of a named reference",
-			 pname);
+	    zwarnnam(cname, "%s: can't change type of a named reference",
+		     pname);
 	    return NULL;
 	}
     }
@@ -3915,8 +3910,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    zerrnam(name, "%s: restricted", pm->node.nam);
 	    returnval = 1;
 	} else if (ss) {
-	    if ((pm->node.flags & PM_NAMEREF) &&
-		(!(pm = resolve_nameref(pm)) || pm->width)) {
+	    if ((pm->node.flags & PM_NAMEREF) && !(pm = resolve_nameref(pm))) {
 		/* warning? */
 		continue;
 	    }
