@@ -3207,7 +3207,6 @@ assignsparam(char *s, char *val, int flags)
 	    createparam(t, PM_SCALAR);
 	    created = 1;
 	} else if ((((v->pm->node.flags & PM_ARRAY) &&
-		     !(v->valflags & VALFLAG_REFSLICE) &&
 		     !(flags & ASSPM_AUGMENT)) ||
 		    (v->pm->node.flags & PM_HASHED)) &&
 		   !(v->pm->node.flags & (PM_SPECIAL|PM_TIED)) &&
@@ -3370,7 +3369,6 @@ assignaparam(char *s, char **val, int flags)
 	    unqueue_signals();
 	    return NULL;
 	} else if (!(PM_TYPE(v->pm->node.flags) & (PM_ARRAY|PM_HASHED)) &&
-		   !(v->valflags & VALFLAG_REFSLICE) &&
 		   !(v->pm->node.flags & (PM_SPECIAL|PM_TIED))) {
 	    int uniq = v->pm->node.flags & PM_UNIQUE;
 	    if ((flags & ASSPM_AUGMENT) && !(v->pm->node.flags & PM_UNSET)) {
@@ -3597,8 +3595,7 @@ sethparam(char *s, char **val)
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	createparam(t, PM_HASHED);
 	checkcreate = 1;
-    } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
-	       !(v->valflags & VALFLAG_REFSLICE)) {
+    } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED)) {
 	if (!(v->pm->node.flags & PM_SPECIAL)) {
 	    if (resetparam(v->pm, PM_HASHED)) {
 		unqueue_signals();
