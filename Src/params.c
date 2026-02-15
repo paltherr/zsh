@@ -2226,7 +2226,6 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
     } else {
 	Param pm;
 	int isvarat;
-	int isrefslice = 0;
 
         isvarat = (t[0] == '@' && !t[1]);
 	if (scanflags & SCANPM_NONAMEREF)
@@ -2244,32 +2243,6 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 	if (!pm || ((pm->node.flags & PM_UNSET) &&
 		    !(pm->node.flags & PM_DECLARED)))
 	    return NULL;
-	if ((pm->node.flags & PM_NAMEREF) && !(scanflags & SCANPM_NONAMEREF)) {
-	    char *refname = GETREFNAME(pm);
-	    if (refname && *refname) {
-		/* only happens for namerefs pointing to array elements */
-		char *ref = dupstring(refname);
-		char *ss = pm->width ? ref + pm->width : NULL;
-		if (ss) {
-		    sav = *ss;
-		    *ss = 0;
-		}
-		Param p1 = (Param)gethashnode2(paramtab, ref);
-		if (p1)
-		    pm = loadparamnode(paramtab, upscope(p1, pm), ref);
-		if (!(p1 && pm) ||
-		    ((pm->node.flags & PM_UNSET) &&
-		     !(pm->node.flags & PM_DECLARED)))
-		    return NULL;
-		if (ss) {
-		    scanflags |= SCANPM_NOEXEC;
-		    *ss = sav;
-		    s = dyncat(ss,*pptr);
-		    isrefslice = 1;
-		} else
-		    s = *pptr;
-	    }
-	}
 	if (!v)
 	    v = (Value) zhalloc(sizeof *v);
 	memset(v, 0, sizeof(*v));
@@ -2283,8 +2256,6 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 		v->scanflags = SCANPM_ARRONLY;
 	}
 	v->pm = pm;
-	if (isrefslice)
-	    v->valflags = VALFLAG_REFSLICE;
 	v->end = -1;
 	if (bracks > 0 && (*s == '[' || *s == Inbrack)) {
 	    if (getindex(&s, v, scanflags)) {
@@ -6336,9 +6307,7 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
     Param ref = pm;
     char *refname;
     if (!pm || !(pm->node.flags & PM_NAMEREF) || (pm->node.flags & PM_UNSET)
-	/* pm->width is the offset of any subscript */
-	/* If present, it has to be the end of any chain, see fetchvalue() */
-	|| pm->width || !(refname = GETREFNAME(pm)) || !*refname)
+	|| !(refname = GETREFNAME(pm)) || !*refname)
 	return pm;
     if (pm->node.flags & PM_TAGGED) {
 	zerr("%s: invalid self reference", pm->node.nam);
@@ -6371,7 +6340,7 @@ setloopvar(char *name, char *value)
 	  zerr("read-only reference: %s", pm->node.nam);
 	  return;
       }
-      pm->base = pm->width = 0;
+      pm->base = 0;
       SETREFNAME(pm, ztrdup(value));
       pm->node.flags &= ~PM_UNSET;
       setscope(pm);
@@ -6387,20 +6356,7 @@ setscope(Param pm)
     if (pm->node.flags & PM_NAMEREF) {
 	Param basepm = NULL;
 	char *refname = GETREFNAME(pm);
-	char *t = refname ? itype_end(refname, INAMESPC, 0) : NULL;
 	int q = queue_signal_level();
-
-	/* Compute pm->width */
-	/* Temporarily change nameref to array parameter itself */
-	if (t && *t == '[')
-	    *t = 0;
-	else
-	    t = 0;
-	if (t) {
-	    pm->width = t - refname;
-	    *t = '[';
-	    refname = dupstrpfx(refname, pm->width);
-	}
 
 	/* Compute pm->base */
 	if (!(pm->node.flags & PM_UPPER) && refname &&
@@ -6420,7 +6376,7 @@ setscope(Param pm)
 	}
 
 	/* Check for self references */
-	if (refname && *refname && !pm->width && basepm != pm) {
+	if (refname && *refname && basepm != pm) {
 	    dont_queue_signals();	/* Prevent unkillable loops */
 	    basepm = resolve_nameref_rec(pm, pm, 0);
 	    restore_queue_signals(q);
@@ -6483,8 +6439,6 @@ valid_refname(char *val, int flags)
 	while (*++t)
 	    if (!idigit(*t))
 		break;
-	if (*t && *t != '[')	/* Need to test Inbrack here too? */
-	    return 0;
     } else
 	t = itype_end(val, INAMESPC, 0);
 
@@ -6495,19 +6449,5 @@ valid_refname(char *val, int flags)
 	    return 0;
 	++t;
     }
-    if (*t == '[') {
-	/* Another bit of isident() to emulate */
-	tokenize(t = dupstring(t+1));
-	while ((t = parse_subscript(t, 0, ']')) && *t++ == Outbrack) {
-	    if (*t == Inbrack)
-		++t;
-	    else
-		break;
-	}
-	if (t && *t) {
-	    /* zwarn("%s: stuff after subscript: %s", val, t); */
-	    return 0;
-	}
-    }
-    return !!t;
+    return !*t;
 }
