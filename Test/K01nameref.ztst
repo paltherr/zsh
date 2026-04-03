@@ -1026,16 +1026,15 @@ F:Checking for a bug in zmodload that affects later tests
  typeset -p .K01.{scalar,assoc,array,integer,double,float,readonly}
  unset .K01.{scalar,assoc,array,integer,double,float}
 0:unset various types via nameref, including a readonly special
-F:BUG:Parameters .K01.{scalar,assoc,array,integer,double,float} should be unset
->typeset -g .K01.scalar
->typeset -g -A .K01.assoc
->typeset -g -a .K01.array
->typeset -g -i .K01.integer
->typeset -g -E .K01.double
->typeset -g -F .K01.float
 >typeset -g -r .K01.readonly=RO
 *?*read-only variable: ARGC
 *?*read-only variable: .K01.readonly
+*?*no such variable: .K01.scalar
+*?*no such variable: .K01.assoc
+*?*no such variable: .K01.array
+*?*no such variable: .K01.integer
+*?*no such variable: .K01.double
+*?*no such variable: .K01.float
 
  unset -n ref
  unset one
@@ -2112,11 +2111,8 @@ F:BUG:ref1 should not be unset
  unfunction test-unset
 0:unsetting references referring to parameters in enclosing scopes unsets the parameters
 ># unset refg1 refg2 refl1 refl2
-F:BUG:Parameters g1, g2, l1, and l2 should be unset, not just cleared
->typeset -g g1
->typeset -g g2
->typeset l1
->typeset l2
+>(anon):typeset:7: no such variable: g1
+>(anon):typeset:7: no such variable: g2
 ># unset -m refg1 refg2 refl1 refl2
 >(anon):typeset:7: no such variable: g1
 >(anon):typeset:7: no such variable: g2
@@ -2142,12 +2138,11 @@ F:BUG:Parameters g1, g2, l1, and l2 should be unset, not just cleared
 0:unsetting references referring to hidden parameters unsets the hidden parameters
 ># unset refg refl
 ># inner scope
->typeset g=hide-g
+F:BUG:The inner parameter g should not be unset
+>(anon):typeset:5: no such variable: g
 >typeset l=hide-l
 ># outer scope
-F:BUG:The outer parameters g and l should be unset, not just cleared
->typeset -g g
->typeset l
+>test-unset:typeset:12: no such variable: g
 ># unset -m refg refl
 ># inner scope
 F:BUG:The inner parameters g and l should not be unset

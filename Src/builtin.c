@@ -3938,16 +3938,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    }
 	} else {
 	    if (!OPT_ISSET(ops,'n')) {
-		int ref = (pm->node.flags & PM_NAMEREF);
 		if (!(pm = resolve_nameref(pm)))
 		    continue;
-		if (ref && pm->level < locallevel &&
-		    !(pm->node.flags & PM_READONLY)) {
-		    /* Just mark unset, do not remove from table */
-		    stdunsetfn(pm, 0);
-		    pm->node.flags |= PM_DECLARED;
-		    continue;
-		}
 	    }
 	    if (unsetparam_pm(pm, 0, 1))
 		returnval = 1;
