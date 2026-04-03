@@ -3936,14 +3936,9 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		zerrnam(name, "%s: invalid element for unset", s);
 		returnval = 1;
 	    }
-	} else {
-	    if (!OPT_ISSET(ops,'n')) {
-		if (!(pm = resolve_nameref(pm)))
-		    continue;
-	    }
+	} else if (OPT_ISSET(ops,'n') || (pm = resolve_nameref(pm)))
 	    if (unsetparam_pm(pm, 0, 1))
 		returnval = 1;
-	}
 	if (ss)
 	    *ss = '[';
     }
