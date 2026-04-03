@@ -2053,16 +2053,16 @@ F:converting from association/array to string should work here too
  unfunction test-unset
 0:unsetting placeholder references or their referents has no effect
 ># unset ref1
-F:BUG:ref1 should not be unset
+>typeset -n ref1
 >typeset -n ref2=ref1
 ># unset ref2
-F:BUG:ref1 should not be unset
+>typeset -n ref1
 >typeset -n ref2=ref1
 ># unset -m ref1
-F:BUG:ref1 should not be unset
+>typeset -n ref1
 >typeset -n ref2=ref1
 ># unset -m ref2
-F:BUG:ref1 should not be unset
+>typeset -n ref1
 >typeset -n ref2=ref1
 
  test-unset() {

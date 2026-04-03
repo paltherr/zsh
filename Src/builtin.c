@@ -3841,7 +3841,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 			next = (Param) pm->node.next;
 			if (pattry(pprog, pm->node.nam)) {
 			    if (OPT_ISSET(ops,'n') ||
-				(pm = resolve_nameref(pm)))
+				((pm = resolve_nameref(pm)) &&
+				 !(pm->node.flags & PM_NAMEREF)))
 				unsetparam_pm(pm, 0, 1);
 			    match++;
 			}
@@ -3934,7 +3935,9 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		zerrnam(name, "%s: invalid element for unset", s);
 		returnval = 1;
 	    }
-	} else if (OPT_ISSET(ops,'n') || (pm = resolve_nameref(pm)))
+	} else if (OPT_ISSET(ops,'n') ||
+		   ((pm = resolve_nameref(pm)) &&
+		    !(pm->node.flags & PM_NAMEREF)))
 	    if (unsetparam_pm(pm, 0, 1))
 		returnval = 1;
 	if (ss)
