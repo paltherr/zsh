@@ -2138,11 +2138,10 @@ F:BUG:ref1 should not be unset
 0:unsetting references referring to hidden parameters unsets the hidden parameters
 ># unset refg refl
 ># inner scope
-F:BUG:The inner parameter g should not be unset
->(anon):typeset:5: no such variable: g
+>typeset g=hide-g
 >typeset l=hide-l
 ># outer scope
->test-unset:typeset:12: no such variable: g
+F:BUG:A "no such variable" error should be displayed for the outer parameter g
 ># unset -m refg refl
 ># inner scope
 F:BUG:The inner parameters g and l should not be unset

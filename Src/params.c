@@ -3914,6 +3914,17 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	(pm->node.flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL)
 	return 0;
 
+    /*
+     * Global variables can only be deleted if they aren't hidden by a
+     * local one with the same name.
+     */
+    if (!pm->level &&
+	pm != (Param) (paramtab == realparamtab ?
+		       /* getnode2() to avoid autoloading */
+		       paramtab->getnode2(paramtab, pm->node.nam) :
+		       paramtab->getnode(paramtab, pm->node.nam)))
+	return 0;
+
     /* remove parameter node from table */
     paramtab->removenode(paramtab, pm->node.nam);
 
