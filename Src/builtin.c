@@ -3840,10 +3840,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 			/* record pointer to next, since we may free this one */
 			next = (Param) pm->node.next;
 			if (pattry(pprog, pm->node.nam)) {
-			    if (!OPT_ISSET(ops,'n') &&
-				(pm->node.flags & PM_NAMEREF) && pm->u.str)
-				unsetparam(pm->u.str);
-			    else
+			    if (OPT_ISSET(ops,'n') ||
+				(pm = resolve_nameref(pm)))
 				unsetparam_pm(pm, 0, 1);
 			    match++;
 			}

@@ -1980,8 +1980,6 @@ F:converting from association/array to string should work here too
 >typeset -n ref1=var0
 >typeset -n ref2=ref1
 ># unset -m ref2
-F:BUG:parameter var0 should be unset
->typeset var0=foo
 >typeset -n ref1=var0
 >typeset -n ref2=ref1
 
@@ -2064,7 +2062,7 @@ F:BUG:ref1 should not be unset
 F:BUG:ref1 should not be unset
 >typeset -n ref2=ref1
 ># unset -m ref2
->typeset -n ref1
+F:BUG:ref1 should not be unset
 >typeset -n ref2=ref1
 
  test-unset() {
@@ -2144,11 +2142,10 @@ F:BUG:ref1 should not be unset
 >test-unset:typeset:12: no such variable: g
 ># unset -m refg refl
 ># inner scope
-F:BUG:The inner parameters g and l should not be unset
+>typeset g=hide-g
+>typeset l=hide-l
 ># outer scope
-F:BUG:The outer parameters g and l should be unset
->typeset -g g=glb
->typeset l=lcl
+>test-unset:typeset:12: no such variable: g
 
  typeset -n ref1
  typeset -n ref2
