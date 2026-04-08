@@ -1602,8 +1602,8 @@ F:previously this could create an infinite recursion and crash
 >nameddirs=( v1 /A )
 >nameddirs=( v1 /A v2 /2 r2 /R )
 >nameddirs=( v1 /A r2 /R )
->nameddirs=( v1 /A )
->nameddirs=( v1 /A v2 /B )
+>nameddirs=( v1 /A r2 /R )
+>nameddirs=( v1 /A v2 /B r2 /R )
 *?*
 
  unset var1 var2
