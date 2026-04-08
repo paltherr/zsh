@@ -1475,13 +1475,13 @@ F:$$[1] reference should print the first digit of $$ but prints nothing
  '
 0:Only string parameters are promoted to named directories
 >~v1: /1
->~r1: /1
->nameddirs=( v1 /1 r1 /1 )
->nameddirs=( v1 /A r1 /1 )
->nameddirs=( v1 /A v2 /2 r1 /1 r2 /R )
->nameddirs=( v1 /A r1 /1 r2 /R )
->nameddirs=( v1 /A r1 /1 )
->nameddirs=( v1 /A v2 /B r1 /1 )
+>zsh: no such user or named directory: r1
+>nameddirs=( v1 /1 )
+>nameddirs=( v1 /A )
+>nameddirs=( v1 /A v2 /2 r2 /R )
+>nameddirs=( v1 /A r2 /R )
+>nameddirs=( v1 /A )
+>nameddirs=( v1 /A v2 /B )
 *?*
 
  unset var1 var2
