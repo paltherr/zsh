@@ -2777,6 +2777,7 @@ assignstrvalue(Value v, char *val, int flags)
 		memcpy(z + v->start, val, vlen);
 		/* Implement remainder of strsetfn */
 		if (!(pm->node.flags & PM_HASHELEM) && !pm->level &&
+		    (PM_TYPE(pm->node.flags) == PM_SCALAR) &&
 		    ((pm->node.flags & PM_NAMEDDIR) ||
 		     isset(AUTONAMEDIRS))) {
 		    pm->node.flags |= PM_NAMEDDIR;
@@ -4019,7 +4020,7 @@ floatsetfn(Param pm, double x)
     pm->u.dval = x;
 }
 
-/* Function to get value of a scalar (string) parameter */
+/* Function to get value of a scalar (string) or nameref parameter */
 
 /**/
 mod_export char *
@@ -4028,7 +4029,7 @@ strgetfn(Param pm)
     return pm->u.str ? pm->u.str : (char *) hcalloc(1);
 }
 
-/* Function to set value of a scalar (string) parameter */
+/* Function to set value of a scalar (string) or nameref parameter */
 
 /**/
 mod_export void
@@ -4037,6 +4038,7 @@ strsetfn(Param pm, char *x)
     zsfree(pm->u.str);
     pm->u.str = x;
     if (!(pm->node.flags & PM_HASHELEM) && !pm->level &&
+	(PM_TYPE(pm->node.flags) == PM_SCALAR) &&
 	((pm->node.flags & PM_NAMEDDIR) || isset(AUTONAMEDIRS))) {
 	pm->node.flags |= PM_NAMEDDIR;
 	adduserdir(pm->node.nam, x, 0, 0);
