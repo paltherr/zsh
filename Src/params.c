@@ -3997,7 +3997,8 @@ strsetfn(Param pm, char *x)
     }
     if (!(pm->node.flags & PM_HASHELEM) && !pm->level &&
 	(PM_TYPE(pm->node.flags) == PM_SCALAR) &&
-	((pm->node.flags & PM_NAMEDDIR) || isset(AUTONAMEDIRS))) {
+	((pm->node.flags & PM_NAMEDDIR) ||
+	 (isset(AUTONAMEDIRS) && x && *x == '/'))) {
 	pm->node.flags |= PM_NAMEDDIR;
 	adduserdir(pm->node.nam, x, 0, 0);
     }
