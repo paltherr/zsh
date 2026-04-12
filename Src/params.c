@@ -2930,8 +2930,6 @@ setarrvalue(Value v, char **val)
 	const int oldlen = arrlen(old), vallen = arrlen(val);
 	int newlen, i;
 
-	q = old;
-
 	if ((v->valflags & VALFLAG_INV) && unset(KSHARRAYS)) {
 	    if (v->start > 0)
 		v->start--;
@@ -2972,13 +2970,12 @@ setarrvalue(Value v, char **val)
 		memmove(new + v->start + vallen, new + v->end,
 			sizeof(char *) * (oldlen - v->end));
 	} else {
-                p = new = (char **) zalloc(sizeof(char *)
-                                           * (newlen + 1));
-		for (i = MIN(v->start, oldlen); i > 0; i--)
+	    new = (char **) zalloc(sizeof(char *) * (newlen + 1));
+	    for (p = new, q = old, i = MIN(v->start, oldlen); i > 0; i--)
+		*p++ = ztrdup(*q++);
+	    if (v->end < oldlen)
+		for (p = new + v->start + vallen, q = old + v->end; *q;)
 		    *p++ = ztrdup(*q++);
-                if (v->end < oldlen)
-                    for (p = new + v->start + vallen, q = old + v->end; *q;)
-                        *p++ = ztrdup(*q++);
 	}
 	/* Copy and give away ownership of the strings from val */
 	memcpy(new + v->start, val, sizeof(char *) * vallen);
