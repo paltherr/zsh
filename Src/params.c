@@ -2719,31 +2719,31 @@ assignstrvalue(Value v, char *val, int flags)
 		!v->pm->width)
 		v->pm->width = strlen(val);
 	} else {
-	    char *z, *x;
-            int zlen, vlen, newsize;
+	    char *old, *new;
+            int oldlen, vallen, newlen;
 
-            z = v->pm->gsu.s->getfn(v->pm);
-            zlen = strlen(z);
+            old = v->pm->gsu.s->getfn(v->pm);
+            oldlen = strlen(old);
 
 	    if ((v->valflags & VALFLAG_INV) && unset(KSHARRAYS))
 		v->start--, v->end--;
 	    if (v->start < 0) {
-		v->start += zlen;
+		v->start += oldlen;
 		if (v->start < 0)
 		    v->start = 0;
 	    }
-	    if (v->start > zlen)
-		v->start = zlen;
+	    if (v->start > oldlen)
+		v->start = oldlen;
 	    if (v->end < 0) {
-		v->end += zlen;
+		v->end += oldlen;
 		if (v->end < 0) {
 		    v->end = 0;
-		} else if (v->end >= zlen) {
-		    v->end = zlen;
+		} else if (v->end >= oldlen) {
+		    v->end = oldlen;
 		} else {
 #ifdef MULTIBYTE_SUPPORT
 		    if (isset(MULTIBYTE)) {
-			v->end += MB_METACHARLEN(z + v->end);
+			v->end += MB_METACHARLEN(old + v->end);
 		    } else {
 			v->end++;
 		    }
@@ -2754,28 +2754,28 @@ assignstrvalue(Value v, char *val, int flags)
 	    }
 	    if (v->end < v->start)
 		v->end = v->start;
-	    else if (v->end > zlen)
-		v->end = zlen;
+	    else if (v->end > oldlen)
+		v->end = oldlen;
 
-            vlen = strlen(val);
+            vallen = strlen(val);
             /* Characters preceding start index +
                characters of what is assigned +
                characters following end index */
-            newsize = v->start + vlen + (zlen - v->end);
+            newlen = v->start + vallen + (oldlen - v->end);
 
             /* Does new size differ? */
-            if (newsize != zlen ||
-		v->pm->gsu.s->setfn != strsetfn || z != v->pm->u.str) {
-                x = (char *) zalloc(newsize + 1);
-                strncpy(x, z, v->start);
-                strcpy(x + v->start, val);
-                strcat(x + v->start, z + v->end);
-                v->pm->gsu.s->setfn(v->pm, x);
+            if (newlen != oldlen ||
+		v->pm->gsu.s->setfn != strsetfn || old != v->pm->u.str) {
+                new = (char *) zalloc(newlen + 1);
+                strncpy(new, old, v->start);
+                strcpy(new + v->start, val);
+                strcat(new + v->start, old + v->end);
+                v->pm->gsu.s->setfn(v->pm, new);
             } else {
                 /* Size doesn't change, can limit actions to only
                  * overwriting bytes in already allocated string */
-		memcpy(z + v->start, val, vlen);
-                v->pm->gsu.s->setfn(v->pm, z);
+		memcpy(old + v->start, val, vallen);
+                v->pm->gsu.s->setfn(v->pm, old);
             }
             zsfree(val);
 	}
@@ -2926,8 +2926,8 @@ setarrvalue(Value v, char **val)
 	char **const old = v->pm->gsu.a->getfn(v->pm);
 	char **new;
 	char **p, **q, **r; /* index variables */
-	const int pre_assignment_length = arrlen(old);
-	int post_assignment_length;
+	const int oldlen = arrlen(old);
+	int newlen;
 	int i;
 
 	q = old;
@@ -2938,28 +2938,28 @@ setarrvalue(Value v, char **val)
 	    v->end--;
 	}
 	if (v->start < 0) {
-	    v->start += pre_assignment_length;
+	    v->start += oldlen;
 	    if (v->start < 0)
 		v->start = 0;
 	}
 	if (v->end < 0) {
-	    v->end += pre_assignment_length + 1;
+	    v->end += oldlen + 1;
 	    if (v->end < 0)
 		v->end = 0;
 	}
 	if (v->end < v->start)
 	    v->end = v->start;
 
-	post_assignment_length = v->start + arrlen(val);
-	if (v->end < pre_assignment_length) {
+	newlen = v->start + arrlen(val);
+	if (v->end < oldlen) {
 	    /* 
 	     * Allocate room for array elements between the end of the slice `v'
 	     * and the original array's end.
 	     */
-	    post_assignment_length += pre_assignment_length - v->end;
+	    newlen += oldlen - v->end;
 	}
 
-	if (pre_assignment_length == post_assignment_length
+	if (oldlen == newlen
 	    && v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr)
 	{
 	    /* v->start is 0-based */
@@ -2974,19 +2974,19 @@ setarrvalue(Value v, char **val)
 	} else {
             /* arr+=( ... )
              * arr[${#arr}+x,...]=( ... ) */
-            if (post_assignment_length > pre_assignment_length &&
-                    pre_assignment_length <= v->start &&
+            if (newlen > oldlen &&
+                    oldlen <= v->start &&
                     v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr)
             {
                 p = new = (char **) zrealloc(old, sizeof(char *)
-                                           * (post_assignment_length + 1));
+                                           * (newlen + 1));
 
-                p += pre_assignment_length; /* after old elements */
+                p += oldlen; /* after old elements */
 
                 /* Consider 1 < 0, case for a=( 1 ); a[1,..] =
                  *          1 < 1, case for a=( 1 ); a[2,..] = */
-                if (pre_assignment_length < v->start) {
-                    for (i = pre_assignment_length; i < v->start; i++) {
+                if (oldlen < v->start) {
+                    for (i = oldlen; i < v->start; i++) {
                         *p++ = ztrdup("");
                     }
                 }
@@ -3005,14 +3005,14 @@ setarrvalue(Value v, char **val)
                 v->pm->gsu.a->setfn(v->pm, new);
             } else {
                 p = new = (char **) zalloc(sizeof(char *)
-                                           * (post_assignment_length + 1));
+                                           * (newlen + 1));
                 for (i = 0; i < v->start; i++)
-                    *p++ = i < pre_assignment_length ? ztrdup(*q++) : ztrdup("");
+                    *p++ = i < oldlen ? ztrdup(*q++) : ztrdup("");
                 for (r = val; *r;) {
                     /* Give away ownership of the string */
                     *p++ = *r++;
                 }
-                if (v->end < pre_assignment_length)
+                if (v->end < oldlen)
                     for (q = old + v->end; *q;)
                         *p++ = ztrdup(*q++);
                 *p = NULL;
@@ -3020,8 +3020,8 @@ setarrvalue(Value v, char **val)
                 v->pm->gsu.a->setfn(v->pm, new);
             }
 
-	    DPUTS2(p - new != post_assignment_length, "setarrvalue: wrong allocation: %d 1= %lu",
-		   post_assignment_length, (unsigned long)(p - new));
+	    DPUTS2(p - new != newlen, "setarrvalue: wrong allocation: %d 1= %lu",
+		   newlen, (unsigned long)(p - new));
 	}
 
         /* Ownership of all strings has been
