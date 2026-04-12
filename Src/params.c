@@ -2719,11 +2719,10 @@ assignstrvalue(Value v, char *val, int flags)
 		!v->pm->width)
 		v->pm->width = strlen(val);
 	} else {
-	    char *old, *new;
-            int oldlen, vallen, newlen;
-
-            old = v->pm->gsu.s->getfn(v->pm);
-            oldlen = strlen(old);
+	    char *const old = v->pm->gsu.s->getfn(v->pm);
+	    char *new;
+            const int oldlen = strlen(old), vallen = strlen(val);
+	    int newlen;
 
 	    if ((v->valflags & VALFLAG_INV) && unset(KSHARRAYS))
 		v->start--, v->end--;
@@ -2757,25 +2756,22 @@ assignstrvalue(Value v, char *val, int flags)
 	    else if (v->end > oldlen)
 		v->end = oldlen;
 
-            vallen = strlen(val);
-            /* Characters preceding start index +
-               characters of what is assigned +
-               characters following end index */
+	    /* Chars before slice + chars from val + chars after slice */
             newlen = v->start + vallen + (oldlen - v->end);
 
             /* Does new size differ? */
-            if (newlen != oldlen ||
-		v->pm->gsu.s->setfn != strsetfn || old != v->pm->u.str) {
+            if (newlen == oldlen &&
+		v->pm->gsu.s->setfn == strsetfn && old == v->pm->u.str) {
+                /* Size doesn't change, can limit actions to only
+                 * overwriting bytes in already allocated string */
+		memcpy(old + v->start, val, vallen);
+                v->pm->gsu.s->setfn(v->pm, old);
+            } else {
                 new = (char *) zalloc(newlen + 1);
                 strncpy(new, old, v->start);
                 strcpy(new + v->start, val);
                 strcat(new + v->start, old + v->end);
                 v->pm->gsu.s->setfn(v->pm, new);
-            } else {
-                /* Size doesn't change, can limit actions to only
-                 * overwriting bytes in already allocated string */
-		memcpy(old + v->start, val, vallen);
-                v->pm->gsu.s->setfn(v->pm, old);
             }
             zsfree(val);
 	}
@@ -2924,11 +2920,9 @@ setarrvalue(Value v, char **val)
 	return;
     } else {
 	char **const old = v->pm->gsu.a->getfn(v->pm);
-	char **new;
-	char **p, **q, **r; /* index variables */
-	const int oldlen = arrlen(old);
-	int newlen;
-	int i;
+	char **new, **p, **q, **r;
+	const int oldlen = arrlen(old), vallen = arrlen(val);
+	int newlen, i;
 
 	q = old;
 
@@ -2947,17 +2941,13 @@ setarrvalue(Value v, char **val)
 	    if (v->end < 0)
 		v->end = 0;
 	}
-	if (v->end < v->start)
+	if (v->end < v->start || v->start > oldlen)
 	    v->end = v->start;
+	else if (v->end > oldlen)
+	    v->end = oldlen;
 
-	newlen = v->start + arrlen(val);
-	if (v->end < oldlen) {
-	    /* 
-	     * Allocate room for array elements between the end of the slice `v'
-	     * and the original array's end.
-	     */
-	    newlen += oldlen - v->end;
-	}
+	/* Strings before slice + strings from val + strings after slice */
+	newlen = v->start + vallen + MAX(0, oldlen - v->end);
 
 	if (oldlen == newlen
 	    && v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr)
