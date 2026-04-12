@@ -2759,10 +2759,18 @@ assignstrvalue(Value v, char *val, int flags)
 	    /* Chars before slice + chars from val + chars after slice */
             newlen = v->start + vallen + (oldlen - v->end);
 
-            /* Does new size differ? */
-            if (newlen == oldlen &&
-		v->pm->gsu.s->setfn == strsetfn && old == v->pm->u.str) {
-		new = old;
+            if (v->pm->gsu.s->setfn == strsetfn && old == v->pm->u.str) {
+		v->pm->u.str = NULL; /* Steal the old string */
+		/* If the string shrinks, move left chars after the slice */
+		if (newlen < oldlen && v->end < oldlen)
+		    memmove(old + v->start + vallen, old + v->end,
+			    oldlen - v->end);
+		/* If the string shrinks or expands, reallocate it */
+		new = oldlen == newlen ? old : (char *) zrealloc(old, newlen + 1);
+		/* If the string expands, move right chars after the slice */
+		if (newlen > oldlen && v->end < oldlen)
+		    memmove(new + v->start + vallen, new + v->end,
+			    oldlen - v->end);
             } else {
                 new = (char *) zalloc(newlen + 1);
                 strncpy(new, old, v->start);
@@ -2947,24 +2955,23 @@ setarrvalue(Value v, char **val)
 	/* Strings before slice + strings from val + strings after slice */
 	newlen = v->start + vallen + MAX(0, oldlen - v->end);
 
-	if (oldlen == newlen
-	    && v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr)
-	{
+	if (v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr) {
+	    v->pm->u.arr = NULL; /* Steal the old array */
 	    /* Free strings that are part of the slice */
 	    for (q = old + v->start, i = v->end - v->start; i > 0; i--)
 		zsfree(*q++);
-	    new = old;
+	    /* If the array shrinks, move left strings after the slice */
+	    if (newlen < oldlen && v->end < oldlen)
+		memmove(old + v->start + vallen, old + v->end,
+			sizeof(char *) * (oldlen - v->end));
+	    /* If the array shrinks or expands, reallocate it */
+	    new = oldlen == newlen ? old :
+		(char **) zrealloc(old, sizeof(char *) * (newlen + 1));
+	    /* If the array expands, move right strings after the slice */
+	    if (newlen > oldlen && v->end < oldlen)
+		memmove(new + v->start + vallen, new + v->end,
+			sizeof(char *) * (oldlen - v->end));
 	} else {
-            /* arr+=( ... )
-             * arr[${#arr}+x,...]=( ... ) */
-            if (newlen > oldlen &&
-                    oldlen <= v->start &&
-                    v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr)
-            {
-                p = new = (char **) zrealloc(old, sizeof(char *)
-                                           * (newlen + 1));
-                v->pm->u.arr = NULL;
-            } else {
                 p = new = (char **) zalloc(sizeof(char *)
                                            * (newlen + 1));
 		for (i = MIN(v->start, oldlen); i > 0; i--)
@@ -2972,7 +2979,6 @@ setarrvalue(Value v, char **val)
                 if (v->end < oldlen)
                     for (p = new + v->start + vallen, q = old + v->end; *q;)
                         *p++ = ztrdup(*q++);
-            }
 	}
 	/* Copy and give away ownership of the strings from val */
 	memcpy(new + v->start, val, sizeof(char *) * vallen);
