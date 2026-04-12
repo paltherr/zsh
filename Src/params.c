@@ -2762,18 +2762,16 @@ assignstrvalue(Value v, char *val, int flags)
             /* Does new size differ? */
             if (newlen == oldlen &&
 		v->pm->gsu.s->setfn == strsetfn && old == v->pm->u.str) {
-                /* Size doesn't change, can limit actions to only
-                 * overwriting bytes in already allocated string */
-		memcpy(old + v->start, val, vallen);
-                v->pm->gsu.s->setfn(v->pm, old);
+		new = old;
             } else {
                 new = (char *) zalloc(newlen + 1);
                 strncpy(new, old, v->start);
-                strcpy(new + v->start, val);
-                strcat(new + v->start, old + v->end);
-                v->pm->gsu.s->setfn(v->pm, new);
+                strncpy(new + v->start + vallen, old + v->end, oldlen - v->end);
             }
+	    strncpy(new + v->start, val, vallen);
             zsfree(val);
+	    new[newlen] = '\0';
+	    v->pm->gsu.s->setfn(v->pm, new);
 	}
 	break;
     case PM_INTEGER:
@@ -2920,7 +2918,7 @@ setarrvalue(Value v, char **val)
 	return;
     } else {
 	char **const old = v->pm->gsu.a->getfn(v->pm);
-	char **new, **p, **q, **r;
+	char **new, **p, **q;
 	const int oldlen = arrlen(old), vallen = arrlen(val);
 	int newlen, i;
 
@@ -2952,15 +2950,10 @@ setarrvalue(Value v, char **val)
 	if (oldlen == newlen
 	    && v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr)
 	{
-	    /* v->start is 0-based */
-	    p = old + v->start;
-	    for (r = val; *r;) {
-		/* Free previous string */
-		zsfree(*p);
-		/* Give away ownership of the string */
-		*p++ = *r++;
-	    }
-	    v->pm->gsu.a->setfn(v->pm, old);
+	    /* Free strings that are part of the slice */
+	    for (q = old + v->start, i = v->end - v->start; i > 0; i--)
+		zsfree(*q++);
+	    new = old;
 	} else {
             /* arr+=( ... )
              * arr[${#arr}+x,...]=( ... ) */
@@ -2970,53 +2963,25 @@ setarrvalue(Value v, char **val)
             {
                 p = new = (char **) zrealloc(old, sizeof(char *)
                                            * (newlen + 1));
-
-                p += oldlen; /* after old elements */
-
-                /* Consider 1 < 0, case for a=( 1 ); a[1,..] =
-                 *          1 < 1, case for a=( 1 ); a[2,..] = */
-                if (oldlen < v->start) {
-                    for (i = oldlen; i < v->start; i++) {
-                        *p++ = ztrdup("");
-                    }
-                }
-
-                for (r = val; *r;) {
-                    /* Give away ownership of the string */
-                    *p++ = *r++;
-                }
-
-                /* v->end doesn't matter:
-                 * a=( 1 2 ); a[4,100]=( a b ); echo "${(q@)a}"
-                 * 1 2 '' a b */
-                *p = NULL;
-
                 v->pm->u.arr = NULL;
-                v->pm->gsu.a->setfn(v->pm, new);
             } else {
                 p = new = (char **) zalloc(sizeof(char *)
                                            * (newlen + 1));
-                for (i = 0; i < v->start; i++)
-                    *p++ = i < oldlen ? ztrdup(*q++) : ztrdup("");
-                for (r = val; *r;) {
-                    /* Give away ownership of the string */
-                    *p++ = *r++;
-                }
+		for (i = MIN(v->start, oldlen); i > 0; i--)
+		    *p++ = ztrdup(*q++);
                 if (v->end < oldlen)
-                    for (q = old + v->end; *q;)
+                    for (p = new + v->start + vallen, q = old + v->end; *q;)
                         *p++ = ztrdup(*q++);
-                *p = NULL;
-
-                v->pm->gsu.a->setfn(v->pm, new);
             }
-
-	    DPUTS2(p - new != newlen, "setarrvalue: wrong allocation: %d 1= %lu",
-		   newlen, (unsigned long)(p - new));
 	}
-
-        /* Ownership of all strings has been
-         * given away, can plainly free */
+	/* Copy and give away ownership of the strings from val */
+	memcpy(new + v->start, val, sizeof(char *) * vallen);
 	free(val);
+	/* Fill any gap between the old array end and the slice start */
+	for (p = new + oldlen, i = v->start - oldlen; i > 0; i--)
+	    *p++ = ztrdup("");
+	new[newlen] = NULL;
+	v->pm->gsu.a->setfn(v->pm, new);
     }
 }
 
