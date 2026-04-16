@@ -417,19 +417,23 @@ F:Shouldn't the error in the trap prevent any further execution?
 >$?=0
 >KO-TRAP-ok
 >KO: KO: parameter not set
-F:BUG:The trap should run from start to end
+>ok 1
+>ok 2
 >$?=1
 >KO-trap-ok
 >KO: KO: parameter not set
-F:BUG:The trap should run from start to end
+>ok 1
+>ok 2
 >$?=1
 >KO-TRAP-KO
 >KO: KO: parameter not set
-F:BUG:The trap should run from start to KO
+>ok 1
+>KO: KO: parameter not set
 >$?=1
 >KO-trap-KO
 >KO: KO: parameter not set
-F:BUG:The trap should run from start to KO
+>ok 1
+>KO: KO: parameter not set
 >$?=1
 
    { trap 'echo This subshell is exiting' EXIT; } | cat
