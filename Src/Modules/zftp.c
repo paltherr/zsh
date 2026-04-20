@@ -496,7 +496,7 @@ zfsetparam(char *name, void *val, int flags)
     Param pm = NULL;
     int type = (flags & ZFPM_INTEGER) ? PM_INTEGER : PM_SCALAR;
 
-    if (!(pm = (Param) paramtab->getnode(paramtab, name))
+    if (!(pm = (Param) realparamtab->getnode2(realparamtab, name))
 	|| (pm->node.flags & PM_UNSET)) {
 	/*
 	 * just make it readonly when creating, in case user
@@ -530,7 +530,7 @@ zfunsetparam(char *name)
 {
     Param pm;
 
-    if ((pm = (Param) paramtab->getnode(paramtab, name))) {
+    if ((pm = (Param) realparamtab->getnode2(realparamtab, name))) {
 	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
