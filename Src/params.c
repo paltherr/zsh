@@ -945,7 +945,7 @@ createparamtable(void)
      * For native emulation we always set the variable home
      * (see setupvals()).
      */
-    pm = (Param) paramtab->getnode(paramtab, "HOME");
+    pm = (Param) realparamtab->getnode2(realparamtab, "HOME");
     if (EMULATION(EMULATE_ZSH))
     {
 	pm->node.flags &= ~PM_UNSET;
@@ -953,10 +953,10 @@ createparamtable(void)
 	    addenv(pm, home);
     } else if (!home)
 	pm->node.flags |= PM_UNSET;
-    pm = (Param) paramtab->getnode(paramtab, "LOGNAME");
+    pm = (Param) realparamtab->getnode2(realparamtab, "LOGNAME");
     if (!(pm->node.flags & PM_EXPORTED))
 	addenv(pm, pm->u.str);
-    pm = (Param) paramtab->getnode(paramtab, "SHLVL");
+    pm = (Param) realparamtab->getnode2(realparamtab, "SHLVL");
     sprintf(buf, "%d", (int)++shlvl);
     /* shlvl value in environment needs updating unconditionally */
     addenv(pm, buf);
