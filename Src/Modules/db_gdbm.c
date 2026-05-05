@@ -666,12 +666,6 @@ static Param creategdbmhash( char *name, int flags ) {
 
     /* This creates standard hash. */
     ht = pm->u.hash = newparamtable(17, name);
-    if (!pm->u.hash) {
-        paramtab->removenode(paramtab, name);
-        paramtab->freenode(&pm->node);
-        zwarnnam(name, "out of memory when allocating hash");
-        return NULL;
-    }
 
     /* Does free Param (unsetfn is called) */
     ht->freenode = freegdbmnode;
