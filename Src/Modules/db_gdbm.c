@@ -159,7 +159,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
 
-    if (!(tied_param = createhash(pmname, pmflags))) {
+    if (!(tied_param = creategdbmhash(pmname, pmflags))) {
         zwarnnam(nam, "cannot create the requested parameter %s", pmname);
 	gdbm_close(dbf);
 	return 1;
@@ -652,7 +652,7 @@ finish_(UNUSED(Module m))
  *********************/
 
 /**/
-static Param createhash( char *name, int flags ) {
+static Param creategdbmhash( char *name, int flags ) {
     Param pm;
     HashTable ht;
 
@@ -674,7 +674,7 @@ static Param createhash( char *name, int flags ) {
     }
 
     /* Does free Param (unsetfn is called) */
-    ht->freenode = myfreeparamnode;
+    ht->freenode = freegdbmnode;
 
     /* These provide special features */
     ht->getnode = ht->getnode2 = getgdbmnode;
@@ -796,7 +796,7 @@ unmetafy_zalloc(const char *to_copy, int *new_len) {
 
 /**/
 static void
-myfreeparamnode(HashNode hn)
+freegdbmnode(HashNode hn)
 {
     Param pm = (Param) hn;
 
