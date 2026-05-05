@@ -38,12 +38,6 @@
 #define PM_UPTODATE     PM_DONTIMPORT_SUID	/* Safe PM_ bit to re-use */
 #endif
 
-static Param createhash( char *name, int flags );
-static int append_tied_name( const char *name );
-static int remove_tied_name( const char *name );
-static char *unmetafy_zalloc(const char *to_copy, int *new_len);
-static void myfreeparamnode(HashNode hn);
-
 static int no_database_action = 0;
 
 /*
@@ -657,6 +651,7 @@ finish_(UNUSED(Module m))
  * Utility functions *
  *********************/
 
+/**/
 static Param createhash( char *name, int flags ) {
     Param pm;
     HashTable ht;
@@ -692,6 +687,7 @@ static Param createhash( char *name, int flags ) {
  * Adds parameter name to `zgdbm_tied`
  */
 
+/**/
 static int append_tied_name( const char *name ) {
     int old_len = arrlen(zgdbm_tied);
     char **new_zgdbm_tied = zshcalloc( (old_len+2) * sizeof(char *));
@@ -717,6 +713,7 @@ static int append_tied_name( const char *name ) {
  * Removes parameter name from `zgdbm_tied`
  */
 
+/**/
 static int remove_tied_name( const char *name ) {
     int old_len = arrlen(zgdbm_tied);
     int new_len;
@@ -772,6 +769,8 @@ static int remove_tied_name( const char *name ) {
  * - does zalloc of exact size for the new string,
  * - restores work buffer to original content, to restore strlen
  */
+
+/**/
 static char *
 unmetafy_zalloc(const char *to_copy, int *new_len) {
     char *work, *to_return;
@@ -795,6 +794,7 @@ unmetafy_zalloc(const char *to_copy, int *new_len) {
     return to_return;
 }
 
+/**/
 static void
 myfreeparamnode(HashNode hn)
 {
