@@ -185,7 +185,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     dbf_carrier->dbfile_path = ztrdup(resource_name);
 
     addmodulefd(gdbm_fdesc(dbf), FDT_INTERNAL);
-    append_tied_name(pmname);
+    append_tied_name(tied_param->node.nam);
 
     return 0;
 }
