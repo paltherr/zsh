@@ -661,9 +661,6 @@ static Param creategdbmhash( char *name, int flags ) {
         return NULL;
     }
 
-    if (pm->old)
-	pm->level = locallevel;
-
     /* This creates standard hash. */
     ht = pm->u.hash = newparamtable(17, name);
 
