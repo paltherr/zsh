@@ -3190,7 +3190,7 @@ spckword(char **s, int hist, int cmd, int ask)
 	    return;
 	ic = String;
 	d = 100;
-	scanhashtable(paramtab, 1, 0, 0, spscan, 0);
+	scanhashtable(realparamtab, 1, 0, 0, spscan, 0);
     } else if (**s == Equals) {
 	if (*t)
 	    return;
