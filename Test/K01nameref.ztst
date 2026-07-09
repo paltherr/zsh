@@ -2390,8 +2390,8 @@ F:converting from association/array to string should work here too
 >${var}       : aaa -     -    
 >
 >${refX::=ddd}: ddd - ddd - ddd
->${refX}      : ddd - ddd - var
->${var}       : ddd -     -    
+>${refX}      : ddd - ddd - ddd
+>${var}       : aaa -     -    
 
  typeset -n ref1
  setopt allexport

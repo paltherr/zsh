@@ -2140,7 +2140,9 @@ enum {
      * This is normal for associative arrays but variant behaviour for
      * normal arrays.
      */
-    ASSPM_KEY_VALUE = 1 << 4
+    ASSPM_KEY_VALUE = 1 << 4,
+    /* Named references are not followed */
+    ASSPM_NONAMEREF = 1 << 5
 };
 
 /* node for named directory hash table (nameddirtab) */
