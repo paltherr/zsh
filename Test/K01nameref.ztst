@@ -2412,11 +2412,11 @@ F:converting from association/array to string should work here too
  echo ref=$(ref=bar printenv ref)
  unfunction show
 0:reference inline assignment assigns the reference
->export var=bar
->typeset -g -n ref=var
+>typeset -g var=foo
+>typeset -g -n ref=bar
 >typeset var=foo
 >typeset -n ref=var
->var=bar
+>var=
 >ref=
 
 %clean
