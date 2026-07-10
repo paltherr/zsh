@@ -2571,6 +2571,7 @@ addvars(Estate state, Wordcode pc, int addflags)
      * is implicitly scoped.
      */
     flags = !(addflags & ADDVAR_RESTORE) ? ASSPM_WARN : 0;
+    flags |= addflags & ADDVAR_EXPORT ? ASSPM_NONAMEREF : 0;
     xtr = isset(XTRACE);
     if (xtr) {
 	printprompt4();
@@ -4481,7 +4482,7 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 	char *ss = itype_end(s, INAMESPC, 0);
 	int slen = *ss == '[' || *ss == Inbrack ? ss - s : strlen(s);
 	addlinknode(*remove_p, s = dupstring_wlen(s, slen));
-	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
+	if ((pm = (Param) realparamtab->getnode2(realparamtab, s))) {
 	    Param tpm = NULL;
 	    if (pm->env)
 		delenv(pm);
@@ -4529,7 +4530,7 @@ restore_params(LinkList restorelist, LinkList removelist)
 
     /* remove temporary parameters */
     while ((s = (char *) ugetnode(removelist))) {
-	if ((pm = (Param) paramtab->getnode(paramtab, s)) &&
+	if ((pm = (Param) realparamtab->getnode2(realparamtab, s)) &&
 	    !(pm->node.flags & PM_SPECIAL)) {
 	    pm->node.flags &= ~PM_READONLY;
 	    unsetparam_pm(pm, 0, 0);
@@ -4540,7 +4541,8 @@ restore_params(LinkList restorelist, LinkList removelist)
 	/* restore saved parameters */
 	while ((pm = (Param) ugetnode(restorelist))) {
 	    if (pm->node.flags & PM_SPECIAL) {
-		Param tpm = (Param) paramtab->getnode(paramtab, pm->node.nam);
+		Param tpm =
+		    (Param) realparamtab->getnode2(realparamtab, pm->node.nam);
 
 		DPUTS(!tpm || PM_TYPE(pm->node.flags) != PM_TYPE(tpm->node.flags) ||
 		      !(pm->node.flags & PM_SPECIAL),
@@ -4569,7 +4571,7 @@ restore_params(LinkList restorelist, LinkList removelist)
 		}
 		pm = tpm;
 	    } else {
-		paramtab->addnode(paramtab, pm->node.nam, pm);
+		realparamtab->addnode(realparamtab, pm->node.nam, pm);
 	    }
 	    if ((pm->node.flags & PM_EXPORTED) && ((s = getsparam(pm->node.nam))))
 		addenv(pm, s);
