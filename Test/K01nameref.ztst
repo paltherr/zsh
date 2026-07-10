@@ -2407,4 +2407,20 @@ F:converting from association/array to string should work here too
  typeset -Hn ref_H
 0:unsusual but legal option combinations
 
+ show() { typeset -p var ref }
+ typeset var=foo
+ typeset -n ref=var
+ ref=bar show
+ typeset -p var ref
+ echo var=$(ref=bar printenv var)
+ echo ref=$(ref=bar printenv ref)
+ unfunction show
+0:reference inline assignment assigns the reference
+>export var=bar
+>typeset -g -n ref=var
+>typeset var=foo
+>typeset -n ref=var
+>var=bar
+>ref=
+
 %clean
