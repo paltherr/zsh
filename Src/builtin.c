@@ -2292,7 +2292,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	}
 	if (!(pm->node.flags & (PM_ARRAY|PM_HASHED))) {
 	    if (pm->node.flags & PM_EXPORTED) {
-		if (!(pm->node.flags & PM_UNSET) && !pm->env && !ASG_VALUEP(asg))
+		if (!(pm->node.flags & PM_UNSET) &&
+		    !pm->env && !ASG_VALUEP(asg) && !ishidden(pm))
 		    addenv(pm, getsparam(pname));
 	    } else if (pm->env && !(pm->node.flags & PM_HASHELEM))
 		delenv(pm);

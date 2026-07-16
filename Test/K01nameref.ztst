@@ -2370,9 +2370,8 @@ F:converting from association/array to string should work here too
 0:Hidden parameters aren't exported (part 1)
 >@1: V1=A1/   V2=A2/A2
 >@2: V1=B1/   V2=B2/B2
-F:BUG@3:V1 should be "B1/  "
 F:BUG@3:V2 should be "B2/B2"
->@3: V1=B1/B1 V2=B2/C2
+>@3: V1=B1/   V2=B2/C2
 >@4: V1=A1/A1 V2=C2/C2
 
  show() {
