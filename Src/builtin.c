@@ -2272,14 +2272,14 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 			x = zarrdup(x);
 		    (*pm->gsu.a->setfn)(pm, x);
 		} else if (pm->ename && x)
-		    arrfixenv(pm->ename, x);
+		    arrfixenv(NULL, pm, x);
 	    } else if (PM_TYPE(pm->node.flags) == PM_SCALAR && pm->ename) {
 		x = *(pm->node.flags & PM_SPECIAL
 		      ? (char ***)pm->u.data
 		      : ((struct tieddata *)pm->u.data)->arrptr);
 		uniqarray(x);
 		if (x)
-		    arrfixenv(pm->node.nam, x);
+		    arrfixenv(pm, NULL, x);
 	    }
 	}
 	if (OPT_ISSET(ops,'p')) {
