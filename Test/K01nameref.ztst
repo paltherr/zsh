@@ -2349,4 +2349,56 @@ F:converting from association/array to string should work here too
 >B:16#FF
 >C:16#FF
 
+ show() {
+   printf "%2s: V1=%2s/%2s V2=%2s/%2s\n" \
+     $1 "$V1" "$(printenv V1)" "$V2" "$(printenv V2)"
+ }
+ local V1=A1
+ local -x V2=A2
+ local -n R1=V1 R2=V2
+ show @1
+ () {
+   local V1=B1
+   local -x V2=B2
+   show @2
+   export R1
+   R2=C2
+   show @3
+ }
+ show @4
+ unfunction show
+0:Hidden parameters aren't exported (part 1)
+>@1: V1=A1/   V2=A2/A2
+>@2: V1=B1/   V2=B2/B2
+F:BUG@3:V1 should be "B1/  "
+F:BUG@3:V2 should be "B2/B2"
+>@3: V1=B1/B1 V2=B2/C2
+>@4: V1=A1/A1 V2=C2/C2
+
+ show() {
+   printf "%2s: V1=%-5s/%-5s V2=%-5s/%-5s V3=%-5s/%-5s\n" \
+     $1 "$V1" "$(printenv V1)" "$V2" "$(printenv V2)" "$V3" "$(printenv V3)"
+ }
+ local -x -T V1=A1:1A v1
+ local -x -T V2=A2:2A v2
+ local -n R2=V2 R3=V3
+ local -x -T R3=A3:3A v3
+ show @1
+ () {
+   local -x V1=B1 V2=B2 V3=B3
+   show @2
+   v1=(C1 1C) R2=C2:2C v3=(C3 3C)
+   show @3
+ }
+ show @4
+ unfunction show
+0:Hidden parameters aren't exported (part 2)
+>@1: V1=A1:1A/A1:1A V2=A2:2A/A2:2A V3=A3:3A/A3:3A
+>@2: V1=B1   /B1    V2=B2   /B2    V3=B3   /B3   
+F:BUG@3:V1 should be "B1   /B1   "
+F:BUG@3:V2 should be "B2   /B2   "
+F:BUG@3:V3 should be "B3   /B3   "
+>@3: V1=B1   /C1    V2=B2   /C2    V3=B3   /C3:3C
+>@4: V1=C1:1C/C1:1C V2=C2:2C/C2:2C V3=C3:3C/C3:3C
+
 %clean
