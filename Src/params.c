@@ -2839,7 +2839,8 @@ assignstrvalue(Value v, char *val, int flags)
 	    !(v->pm->node.flags & (PM_NAMEREF | PM_HASHELEM)))) ||
 	 (v->pm->node.flags & PM_ARRAY) || v->pm->ename))
 	return;
-    export_param(v->pm);
+    if (!ishidden(v->pm))
+	export_param(v->pm);
 }
 
 /**/
