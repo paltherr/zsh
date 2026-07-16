@@ -4029,7 +4029,7 @@ arrsetfn(Param pm, char **x)
 	uniqarray(x);
     /* Arrays tied to colon-arrays may need to fix the environment */
     if (pm->ename && x)
-	arrfixenv(pm->ename, x);
+	arrfixenv(NULL, pm, x);
 }
 
 /* Function to get value of an association parameter */
@@ -4265,7 +4265,7 @@ arrvarsetfn(Param pm, char **x)
 	*dptr = x;
     if (pm->ename) {
 	if (x)
-	    arrfixenv(pm->ename, x);
+	    arrfixenv(NULL, pm, x);
 	else if (*dptr == path)
 	    pathchecked = path;
     }
@@ -4294,7 +4294,7 @@ colonarrsetfn(Param pm, char *x)
 	*dptr = colonsplit(x, pm->node.flags & PM_UNIQUE);
     else
 	*dptr = mkarray(NULL);
-    arrfixenv(pm->node.nam, *dptr);
+    arrfixenv(pm, NULL, *dptr);
     zsfree(x);
 }
 
@@ -4340,7 +4340,7 @@ tiedarrsetfn(Param pm, char *x)
     } else
 	*dptr->arrptr = NULL;
     if (pm->ename)
-	arrfixenv(pm->node.nam, *dptr->arrptr);
+	arrfixenv(pm, NULL, *dptr->arrptr);
 }
 
 /**/
@@ -5278,18 +5278,29 @@ pipestatsetfn(UNUSED(Param pm), char **x)
         numpipestats = 0;
 }
 
+/* Updates the environment string of a tied scalar parameter.
+ *
+ * pm: the tied scalar parameter or NULL
+ * apm: the tied array parameter if pm is NULL or NULL
+ * t: the tied array elements
+ */
+
 /**/
 void
-arrfixenv(char *s, char **t)
+arrfixenv(Param pm, Param apm, char **t)
 {
-    Param pm;
     int joinchar;
 
     if (t == path)
 	cmdnamtab->emptytable(cmdnamtab);
 
-    pm = (Param) paramtab->getnode(paramtab, s);
-    
+
+    if (!pm &&
+	(!(pm = (Param) realparamtab->getnode(realparamtab, apm->ename)) ||
+	 PM_TYPE(pm->node.flags) != PM_SCALAR ||
+	 !pm->ename || strcmp(pm->ename, apm->node.nam)))
+	return;
+
     /*
      * Only one level of a parameter can be exported.  Unless
      * ALLEXPORT is set, this must be global.
