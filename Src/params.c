@@ -5317,7 +5317,7 @@ arrfixenv(Param pm, Param apm, char **t)
      * Do not "fix" parameters that were not exported
      */
 
-    if (!(pm->node.flags & PM_EXPORTED))
+    if (!(pm->node.flags & PM_EXPORTED) || ishidden(pm))
 	return;
 
     if (pm->node.flags & PM_SPECIAL)
