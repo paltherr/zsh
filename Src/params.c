@@ -6465,6 +6465,15 @@ upscope(Param pm, const Param ref)
     return pm;
 }
 
+/* Return whether the parameter is hidden by a same name local paramater. */
+
+/**/
+mod_export int
+ishidden(Param pm)
+{
+    return pm != (Param) realparamtab->getnode2(realparamtab, pm->node.nam);
+}
+
 /**/
 static int
 valid_refname(char *val, int flags)
