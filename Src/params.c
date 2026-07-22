@@ -378,14 +378,13 @@ LCIPDEF("LC_TIME"),
 # endif
 #endif /* USE_LOCALE */
 
-#define IPDEF4(A,B) {{NULL,A,PM_INTEGER|PM_READONLY_SPECIAL},BR((void *)B),GSU(varint_readonly_gsu),10,0,NULL,NULL,NULL,0}
-IPDEF4("!", &lastpid),
-IPDEF4("$", &mypid),
-IPDEF4("?", &lastval),
-IPDEF4("HISTCMD", &curhist),
-IPDEF4("LINENO", &lineno),
-IPDEF4("PPID", &ppid),
-IPDEF4("ZSH_SUBSHELL", &zsh_subshell),
+ROVAR_INTPM("!", &lastpid, 0),
+ROVAR_INTPM("$", &mypid, 0),
+ROVAR_INTPM("?", &lastval, 0),
+ROVAR_INTPM("HISTCMD", &curhist, 0),
+ROVAR_INTPM("LINENO", &lineno, 0),
+ROVAR_INTPM("PPID", &ppid, 0),
+ROVAR_INTPM("ZSH_SUBSHELL", &zsh_subshell, 0),
 
 #define IPDEF5(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
 #define IPDEF5U(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
@@ -450,7 +449,7 @@ IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_TIED),
 /* All of these have sh compatible equivalents.                */
 INTPM("ARGC", NULL, argc_gsu, PM_READONLY_SPECIAL),
 IPDEF2("HISTCHARS", histchars_gsu, PM_DONTIMPORT),
-IPDEF4("status", &lastval),
+ROVAR_INTPM("status", &lastval, 0),
 IPDEF7("prompt", &prompt),
 IPDEF7("PROMPT", &prompt),
 IPDEF7("PROMPT2", &prompt2),
