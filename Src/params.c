@@ -420,16 +420,16 @@ IPDEF9("@", &pparams, NULL, PM_ARRAY|PM_READONLY_SPECIAL|PM_DONTIMPORT),
 {{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 
 #define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
-IPDEF8("CDPATH", &cdpath, "cdpath", PM_TIED),
-IPDEF8("FIGNORE", &fignore, "fignore", PM_TIED),
-IPDEF8("FPATH", &fpath, "fpath", PM_TIED),
-IPDEF8("MAILPATH", &mailpath, "mailpath", PM_TIED),
-IPDEF8("PATH", &path, "path", PM_TIED),
-IPDEF8("PSVAR", &psvar, "psvar", PM_TIED),
-IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY_SPECIAL|PM_TIED),
+TIED_STRPM("CDPATH", &cdpath, "cdpath", PM_TIED),
+TIED_STRPM("FIGNORE", &fignore, "fignore", PM_TIED),
+TIED_STRPM("FPATH", &fpath, "fpath", PM_TIED),
+TIED_STRPM("MAILPATH", &mailpath, "mailpath", PM_TIED),
+TIED_STRPM("PATH", &path, "path", PM_TIED),
+TIED_STRPM("PSVAR", &psvar, "psvar", PM_TIED),
+TIED_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY_SPECIAL|PM_TIED),
 
 /* MODULE_PATH is not imported for security reasons */
-IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_TIED),
+TIED_STRPM("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_TIED),
 
 /*
  * The following parameters are not available in sh/ksh compatibility *
@@ -445,7 +445,7 @@ VAR_STRPM("PROMPT", &prompt, 0),
 VAR_STRPM("PROMPT2", &prompt2, 0),
 VAR_STRPM("PROMPT3", &prompt3, 0),
 VAR_STRPM("PROMPT4", &prompt4, 0),
-IPDEF8("MANPATH", &manpath, "manpath", PM_TIED),
+TIED_STRPM("MANPATH", &manpath, "manpath", PM_TIED),
 IPDEF9("argv", &pparams, NULL, 0),
 IPDEF9("fignore", &fignore, "FIGNORE", PM_TIED),
 IPDEF9("cdpath", &cdpath, "CDPATH", PM_TIED),
