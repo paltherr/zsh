@@ -419,7 +419,6 @@ IPDEF9("@", &pparams, NULL, PM_ARRAY|PM_READONLY_SPECIAL|PM_DONTIMPORT),
  */
 {{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 
-#define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
 TIED_STRPM("CDPATH", &cdpath, "cdpath", PM_TIED),
 TIED_STRPM("FIGNORE", &fignore, "fignore", PM_TIED),
 TIED_STRPM("FPATH", &fpath, "fpath", PM_TIED),
@@ -471,16 +470,16 @@ PM("pipestatus", NULL, pipestatus_gsu, PM_ARRAY, 10, NULL),
  * sh emulation.  These don't link to the array versions.
  */
 static initparam special_params_sh[] = {
-IPDEF8("CDPATH", &cdpath, NULL, 0),
-IPDEF8("FIGNORE", &fignore, NULL, 0),
-IPDEF8("FPATH", &fpath, NULL, 0),
-IPDEF8("MAILPATH", &mailpath, NULL, 0),
-IPDEF8("PATH", &path, NULL, 0),
-IPDEF8("PSVAR", &psvar, NULL, 0),
-IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, NULL, PM_READONLY_SPECIAL),
+COLONARR_STRPM("CDPATH", &cdpath, 0),
+COLONARR_STRPM("FIGNORE", &fignore, 0),
+COLONARR_STRPM("FPATH", &fpath, 0),
+COLONARR_STRPM("MAILPATH", &mailpath, 0),
+COLONARR_STRPM("PATH", &path, 0),
+COLONARR_STRPM("PSVAR", &psvar, 0),
+COLONARR_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, PM_READONLY_SPECIAL),
 
 /* MODULE_PATH is not imported for security reasons */
-IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT),
+COLONARR_STRPM("MODULE_PATH", &module_path, PM_DONTIMPORT),
 
 {{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 };
