@@ -331,18 +331,17 @@ typedef struct iparam {
     PM(name, var, vararray_gsu, PM_TIED|PM_ARRAY|PM_DONTIMPORT|flags, 0, ename)
 
 static initparam special_params[] ={
-#define IPDEF1(A,B,C) {{NULL,A,PM_INTEGER|PM_SPECIAL|C},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
-IPDEF1("#", pound_gsu, PM_READONLY_SPECIAL),
-IPDEF1("ERRNO", errno_gsu, PM_UNSET),
-IPDEF1("GID", gid_gsu, PM_DONTIMPORT),
-IPDEF1("EGID", egid_gsu, PM_DONTIMPORT),
-IPDEF1("HISTSIZE", histsize_gsu, 0),
-IPDEF1("RANDOM", random_gsu, 0),
-IPDEF1("SAVEHIST", savehist_gsu, 0),
-IPDEF1("SECONDS", intseconds_gsu, 0),
-IPDEF1("UID", uid_gsu, PM_DONTIMPORT),
-IPDEF1("EUID", euid_gsu, PM_DONTIMPORT),
-IPDEF1("TTYIDLE", ttyidle_gsu, PM_READONLY_SPECIAL),
+INTPM("#", NULL, pound_gsu, PM_READONLY_SPECIAL),
+INTPM("ERRNO", NULL, errno_gsu, PM_UNSET),
+INTPM("GID", NULL, gid_gsu, PM_DONTIMPORT),
+INTPM("EGID", NULL, egid_gsu, PM_DONTIMPORT),
+INTPM("HISTSIZE", NULL, histsize_gsu, 0),
+INTPM("RANDOM", NULL, random_gsu, 0),
+INTPM("SAVEHIST", NULL, savehist_gsu, 0),
+INTPM("SECONDS", NULL, intseconds_gsu, 0),
+INTPM("UID", NULL, uid_gsu, PM_DONTIMPORT),
+INTPM("EUID", NULL, euid_gsu, PM_DONTIMPORT),
+INTPM("TTYIDLE", NULL, ttyidle_gsu, PM_READONLY_SPECIAL),
 
 #define IPDEF2(A,B,C) {{NULL,A,PM_SCALAR|PM_SPECIAL|C},BR(NULL),GSU(B),0,0,NULL,NULL,NULL,0}
 IPDEF2("USERNAME", username_gsu, PM_DONTIMPORT),
@@ -449,7 +448,7 @@ IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_TIED),
  */
 
 /* All of these have sh compatible equivalents.                */
-IPDEF1("ARGC", argc_gsu, PM_READONLY_SPECIAL),
+INTPM("ARGC", NULL, argc_gsu, PM_READONLY_SPECIAL),
 IPDEF2("HISTCHARS", histchars_gsu, PM_DONTIMPORT),
 IPDEF4("status", &lastval),
 IPDEF7("prompt", &prompt),
