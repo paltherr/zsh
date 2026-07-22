@@ -358,23 +358,22 @@ IPDEF2("KEYBOARD_HACK", keyboard_hack_gsu, PM_DONTIMPORT),
 IPDEF2("0", argzero_gsu, 0),
 
 #ifdef USE_LOCALE
-# define LCIPDEF(name) IPDEF2(name, lc_blah_gsu, PM_UNSET)
 IPDEF2("LANG", lang_gsu, PM_UNSET),
 IPDEF2("LC_ALL", lc_all_gsu, PM_UNSET),
 # ifdef LC_COLLATE
-LCIPDEF("LC_COLLATE"),
+LC_STRPM("LC_COLLATE"),
 # endif
 # ifdef LC_CTYPE
-LCIPDEF("LC_CTYPE"),
+LC_STRPM("LC_CTYPE"),
 # endif
 # ifdef LC_MESSAGES
-LCIPDEF("LC_MESSAGES"),
+LC_STRPM("LC_MESSAGES"),
 # endif
 # ifdef LC_NUMERIC
-LCIPDEF("LC_NUMERIC"),
+LC_STRPM("LC_NUMERIC"),
 # endif
 # ifdef LC_TIME
-LCIPDEF("LC_TIME"),
+LC_STRPM("LC_TIME"),
 # endif
 #endif /* USE_LOCALE */
 
