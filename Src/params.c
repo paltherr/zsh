@@ -446,17 +446,17 @@ VAR_STRPM("PROMPT3", &prompt3, 0),
 VAR_STRPM("PROMPT4", &prompt4, 0),
 TIED_STRPM("MANPATH", &manpath, "manpath", PM_TIED),
 IPDEF9("argv", &pparams, NULL, 0),
-IPDEF9("fignore", &fignore, "FIGNORE", PM_TIED),
-IPDEF9("cdpath", &cdpath, "CDPATH", PM_TIED),
-IPDEF9("fpath", &fpath, "FPATH", PM_TIED),
-IPDEF9("mailpath", &mailpath, "MAILPATH", PM_TIED),
-IPDEF9("manpath", &manpath, "MANPATH", PM_TIED),
-IPDEF9("psvar", &psvar, "PSVAR", PM_TIED),
+TIED_ARRPM("fignore", &fignore, "FIGNORE", 0),
+TIED_ARRPM("cdpath", &cdpath, "CDPATH", 0),
+TIED_ARRPM("fpath", &fpath, "FPATH", 0),
+TIED_ARRPM("mailpath", &mailpath, "MAILPATH", 0),
+TIED_ARRPM("manpath", &manpath, "MANPATH", 0),
+TIED_ARRPM("psvar", &psvar, "PSVAR", 0),
 
-IPDEF9("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_TIED|PM_READONLY_SPECIAL),
+TIED_ARRPM("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_READONLY_SPECIAL),
 
-IPDEF9("module_path", &module_path, "MODULE_PATH", PM_TIED),
-IPDEF9("path", &path, "PATH", PM_TIED),
+TIED_ARRPM("module_path", &module_path, "MODULE_PATH", 0),
+TIED_ARRPM("path", &path, "PATH", 0),
 
 /* These are known to zsh alone. */
 
