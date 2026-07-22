@@ -395,7 +395,6 @@ VAR_INTPM("OPTIND", &zoptind, PM_DONTIMPORT),
 VAR_INTPM("TRY_BLOCK_ERROR", &try_errflag, PM_DONTIMPORT),
 VAR_INTPM("TRY_BLOCK_INTERRUPT", &try_interrupt, PM_DONTIMPORT),
 
-#define IPDEF7R(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_DONTIMPORT_SUID},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 VAR_STRPM("OPTARG", &zoptarg, 0),
 VAR_STRPM("NULLCMD", &nullcmd, 0),
 VAR_STRPM("POSTEDIT", &postedit, PM_UNSET),
@@ -407,7 +406,7 @@ VAR_STRPM("PS2", &prompt2, 0),
 VAR_STRPM("RPS2", &rprompt2, PM_UNSET),
 VAR_STRPM("RPROMPT2", &rprompt2, PM_UNSET),
 VAR_STRPM("PS3", &prompt3, 0),
-IPDEF7R("PS4", &prompt4),
+VAR_STRPM("PS4", &prompt4, PM_DONTIMPORT_SUID),
 VAR_STRPM("SPROMPT", &sprompt, 0),
 
 #define IPDEF9(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
