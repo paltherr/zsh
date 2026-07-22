@@ -431,8 +431,6 @@ IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY_SP
 /* MODULE_PATH is not imported for security reasons */
 IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_TIED),
 
-#define IPDEF10(A,B) {{NULL,A,PM_ARRAY|PM_SPECIAL},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
-
 /*
  * The following parameters are not available in sh/ksh compatibility *
  * mode.
@@ -463,7 +461,7 @@ IPDEF9("path", &path, "PATH", PM_TIED),
 
 /* These are known to zsh alone. */
 
-IPDEF10("pipestatus", pipestatus_gsu),
+PM("pipestatus", NULL, pipestatus_gsu, PM_ARRAY, 10, NULL),
 
 {{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 };
