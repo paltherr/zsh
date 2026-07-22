@@ -199,8 +199,8 @@
 >local -R5 -ux var2=''
 >typeset var3
 >typeset -R5 var3
->typeset -u var3
->local -x var3
+>typeset -R5 -u var3
+>local -R5 -ux var3
 
  float f=3.14159
  typeset +m f
