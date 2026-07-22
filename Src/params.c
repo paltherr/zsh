@@ -412,11 +412,8 @@ VAR_STRPM("SPROMPT", &sprompt, 0),
 VAR_ARRPM("*", &pparams, PM_READONLY_SPECIAL),
 VAR_ARRPM("@", &pparams, PM_READONLY_SPECIAL),
 
-/*
- * This empty row indicates the end of parameters available in
- * all emulations.
- */
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+/* End of parameters available in all emulations */
+NULL_PM,
 
 TIED_STRPM("CDPATH", &cdpath, "cdpath", PM_TIED),
 TIED_STRPM("FIGNORE", &fignore, "fignore", PM_TIED),
@@ -461,7 +458,7 @@ TIED_ARRPM("path", &path, "PATH", 0),
 
 PM("pipestatus", NULL, pipestatus_gsu, PM_ARRAY, 10, NULL),
 
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+NULL_PM,
 };
 
 /*
@@ -480,7 +477,7 @@ COLONARR_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, PM_READONLY_SPECIAL),
 /* MODULE_PATH is not imported for security reasons */
 COLONARR_STRPM("MODULE_PATH", &module_path, PM_DONTIMPORT),
 
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+NULL_PM,
 };
 
 /*
