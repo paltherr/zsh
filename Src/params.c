@@ -297,9 +297,40 @@ typedef struct iparam {
 } initparam;
 #endif
 
-static initparam special_params[] ={
-#define GSU(X) BR((GsuScalar)(void *)(&(X)))
+#define GSU(X)   BR((GsuScalar)(void *)(&(X)))
 #define NULL_GSU BR((GsuScalar)(void *)NULL)
+
+#define PM(name, var, gsu, flags, base, ename) \
+    { { NULL, name, PM_SPECIAL|flags }, \
+	    BR((void *)var), GSU(gsu), base, 0, NULL, ename, NULL, 0 }
+#define NULL_PM \
+    { { NULL, NULL, 0 }, BR(NULL), NULL_GSU, 0, 0, NULL, NULL, NULL, 0 }
+
+#define STRPM(name, var, gsu, flags) \
+    PM(name, var, gsu, PM_SCALAR|flags, 0, NULL)
+#define INTPM(name, var, gsu, flags) \
+    PM(name, var, gsu, PM_INTEGER|flags, 10, NULL)
+#define ARRPM(name, var, gsu, flags) \
+    PM(name, var, gsu, PM_ARRAY|PM_DONTIMPORT|flags, 0 , NULL)
+
+#define VAR_STRPM(name, var, flags) STRPM(name, var, varscalar_gsu, flags)
+#define VAR_INTPM(name, var, flags) INTPM(name, var, varinteger_gsu, flags)
+#define VAR_ARRPM(name, var, flags) ARRPM(name, var, vararray_gsu, flags)
+
+#define ROVAR_INTPM(name, var, flags) \
+    INTPM(name, var, varint_readonly_gsu, PM_READONLY_SPECIAL|flags)
+
+#define LC_STRPM(name) \
+    STRPM(name, NULL, lc_blah_gsu, PM_UNSET)
+#define COLONARR_STRPM(name, var, flags) \
+    STRPM(name, var, colonarr_gsu, flags)
+
+#define TIED_STRPM(name, var, ename, flags) \
+    PM(name, var, colonarr_gsu, PM_TIED|PM_SCALAR|flags, 0, ename)
+#define TIED_ARRPM(name, var, ename, flags) \
+    PM(name, var, vararray_gsu, PM_TIED|PM_ARRAY|PM_DONTIMPORT|flags, 0, ename)
+
+static initparam special_params[] ={
 #define IPDEF1(A,B,C) {{NULL,A,PM_INTEGER|PM_SPECIAL|C},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
 IPDEF1("#", pound_gsu, PM_READONLY_SPECIAL),
 IPDEF1("ERRNO", errno_gsu, PM_UNSET),
@@ -474,6 +505,7 @@ IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT),
 static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
 				 PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT);
 
+#undef PM
 #undef BR
 
 #define IS_UNSET_VALUE(V) \
