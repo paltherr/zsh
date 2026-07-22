@@ -386,10 +386,9 @@ ROVAR_INTPM("LINENO", &lineno, 0),
 ROVAR_INTPM("PPID", &ppid, 0),
 ROVAR_INTPM("ZSH_SUBSHELL", &zsh_subshell, 0),
 
-#define IPDEF5U(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
 INTPM("COLUMNS", &zterm_columns, zlevar_gsu, 0),
 INTPM("LINES", &zterm_lines, zlevar_gsu, 0),
-IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu),
+INTPM("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu, PM_UNSET),
 VAR_INTPM("SHLVL", &shlvl, 0),
 VAR_INTPM("FUNCNEST", &zsh_funcnest, 0),
 
