@@ -330,135 +330,138 @@ typedef struct iparam {
 #define TIED_ARRPM(name, var, ename, flags) \
     PM(name, var, vararray_gsu, PM_TIED|PM_ARRAY|PM_DONTIMPORT|flags, 0, ename)
 
-static initparam special_params[] ={
-INTPM("#", NULL, pound_gsu, PM_READONLY_SPECIAL),
-INTPM("ERRNO", NULL, errno_gsu, PM_UNSET),
-INTPM("GID", NULL, gid_gsu, PM_DONTIMPORT),
-INTPM("EGID", NULL, egid_gsu, PM_DONTIMPORT),
-INTPM("HISTSIZE", NULL, histsize_gsu, 0),
-INTPM("RANDOM", NULL, random_gsu, 0),
-INTPM("SAVEHIST", NULL, savehist_gsu, 0),
-INTPM("SECONDS", NULL, intseconds_gsu, 0),
-INTPM("UID", NULL, uid_gsu, PM_DONTIMPORT),
-INTPM("EUID", NULL, euid_gsu, PM_DONTIMPORT),
-INTPM("TTYIDLE", NULL, ttyidle_gsu, PM_READONLY_SPECIAL),
+static initparam special_params[] = {
+    INTPM("#", NULL, pound_gsu, PM_READONLY_SPECIAL),
+    INTPM("ERRNO", NULL, errno_gsu, PM_UNSET),
+    INTPM("GID", NULL, gid_gsu, PM_DONTIMPORT),
+    INTPM("EGID", NULL, egid_gsu, PM_DONTIMPORT),
+    INTPM("HISTSIZE", NULL, histsize_gsu, 0),
+    INTPM("RANDOM", NULL, random_gsu, 0),
+    INTPM("SAVEHIST", NULL, savehist_gsu, 0),
+    INTPM("SECONDS", NULL, intseconds_gsu, 0),
+    INTPM("UID", NULL, uid_gsu, PM_DONTIMPORT),
+    INTPM("EUID", NULL, euid_gsu, PM_DONTIMPORT),
+    INTPM("TTYIDLE", NULL, ttyidle_gsu, PM_READONLY_SPECIAL),
 
-STRPM("USERNAME", NULL, username_gsu, PM_DONTIMPORT),
-STRPM("-", NULL, dash_gsu, PM_READONLY_SPECIAL),
-STRPM("histchars", NULL, histchars_gsu, PM_DONTIMPORT),
-STRPM("HOME", NULL, home_gsu, PM_UNSET),
-STRPM("TERM", NULL, term_gsu, PM_UNSET),
-STRPM("TERMINFO", NULL, terminfo_gsu, PM_UNSET),
-STRPM("TERMINFO_DIRS", NULL, terminfodirs_gsu, PM_UNSET),
-STRPM("WORDCHARS", NULL, wordchars_gsu, 0),
-STRPM("IFS", NULL, ifs_gsu, PM_DONTIMPORT),
-STRPM("_", NULL, underscore_gsu, PM_DONTIMPORT),
-STRPM("KEYBOARD_HACK", NULL, keyboard_hack_gsu, PM_DONTIMPORT),
-STRPM("0", NULL, argzero_gsu, 0),
+    STRPM("USERNAME", NULL, username_gsu, PM_DONTIMPORT),
+    STRPM("-", NULL, dash_gsu, PM_READONLY_SPECIAL),
+    STRPM("histchars", NULL, histchars_gsu, PM_DONTIMPORT),
+    STRPM("HOME", NULL, home_gsu, PM_UNSET),
+    STRPM("TERM", NULL, term_gsu, PM_UNSET),
+    STRPM("TERMINFO", NULL, terminfo_gsu, PM_UNSET),
+    STRPM("TERMINFO_DIRS", NULL, terminfodirs_gsu, PM_UNSET),
+    STRPM("WORDCHARS", NULL, wordchars_gsu, 0),
+    STRPM("IFS", NULL, ifs_gsu, PM_DONTIMPORT),
+    STRPM("_", NULL, underscore_gsu, PM_DONTIMPORT),
+    STRPM("KEYBOARD_HACK", NULL, keyboard_hack_gsu, PM_DONTIMPORT),
+    STRPM("0", NULL, argzero_gsu, 0),
 
 #ifdef USE_LOCALE
-STRPM("LANG", NULL, lang_gsu, PM_UNSET),
-STRPM("LC_ALL", NULL, lc_all_gsu, PM_UNSET),
+    STRPM("LANG", NULL, lang_gsu, PM_UNSET),
+    STRPM("LC_ALL", NULL, lc_all_gsu, PM_UNSET),
 # ifdef LC_COLLATE
-LC_STRPM("LC_COLLATE"),
+    LC_STRPM("LC_COLLATE"),
 # endif
 # ifdef LC_CTYPE
-LC_STRPM("LC_CTYPE"),
+    LC_STRPM("LC_CTYPE"),
 # endif
 # ifdef LC_MESSAGES
-LC_STRPM("LC_MESSAGES"),
+    LC_STRPM("LC_MESSAGES"),
 # endif
 # ifdef LC_NUMERIC
-LC_STRPM("LC_NUMERIC"),
+    LC_STRPM("LC_NUMERIC"),
 # endif
 # ifdef LC_TIME
-LC_STRPM("LC_TIME"),
+    LC_STRPM("LC_TIME"),
 # endif
 #endif /* USE_LOCALE */
 
-ROVAR_INTPM("!", &lastpid, 0),
-ROVAR_INTPM("$", &mypid, 0),
-ROVAR_INTPM("?", &lastval, 0),
-ROVAR_INTPM("HISTCMD", &curhist, 0),
-ROVAR_INTPM("LINENO", &lineno, 0),
-ROVAR_INTPM("PPID", &ppid, 0),
-ROVAR_INTPM("ZSH_SUBSHELL", &zsh_subshell, 0),
+    ROVAR_INTPM("!", &lastpid, 0),
+    ROVAR_INTPM("$", &mypid, 0),
+    ROVAR_INTPM("?", &lastval, 0),
+    ROVAR_INTPM("HISTCMD", &curhist, 0),
+    ROVAR_INTPM("LINENO", &lineno, 0),
+    ROVAR_INTPM("PPID", &ppid, 0),
+    ROVAR_INTPM("ZSH_SUBSHELL", &zsh_subshell, 0),
 
-INTPM("COLUMNS", &zterm_columns, zlevar_gsu, 0),
-INTPM("LINES", &zterm_lines, zlevar_gsu, 0),
-INTPM("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu, PM_UNSET),
-VAR_INTPM("SHLVL", &shlvl, 0),
-VAR_INTPM("FUNCNEST", &zsh_funcnest, 0),
+    INTPM("COLUMNS", &zterm_columns, zlevar_gsu, 0),
+    INTPM("LINES", &zterm_lines, zlevar_gsu, 0),
+    INTPM("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu, PM_UNSET),
+    VAR_INTPM("SHLVL", &shlvl, 0),
+    VAR_INTPM("FUNCNEST", &zsh_funcnest, 0),
 
-/* Don't import internal integer status variables. */
-VAR_INTPM("OPTIND", &zoptind, PM_DONTIMPORT),
-VAR_INTPM("TRY_BLOCK_ERROR", &try_errflag, PM_DONTIMPORT),
-VAR_INTPM("TRY_BLOCK_INTERRUPT", &try_interrupt, PM_DONTIMPORT),
+    /* Don't import internal integer status variables. */
+    VAR_INTPM("OPTIND", &zoptind, PM_DONTIMPORT),
+    VAR_INTPM("TRY_BLOCK_ERROR", &try_errflag, PM_DONTIMPORT),
+    VAR_INTPM("TRY_BLOCK_INTERRUPT", &try_interrupt, PM_DONTIMPORT),
 
-VAR_STRPM("OPTARG", &zoptarg, 0),
-VAR_STRPM("NULLCMD", &nullcmd, 0),
-VAR_STRPM("POSTEDIT", &postedit, PM_UNSET),
-VAR_STRPM("READNULLCMD", &readnullcmd, 0),
-VAR_STRPM("PS1", &prompt, 0),
-VAR_STRPM("RPS1", &rprompt, PM_UNSET),
-VAR_STRPM("RPROMPT", &rprompt, PM_UNSET),
-VAR_STRPM("PS2", &prompt2, 0),
-VAR_STRPM("RPS2", &rprompt2, PM_UNSET),
-VAR_STRPM("RPROMPT2", &rprompt2, PM_UNSET),
-VAR_STRPM("PS3", &prompt3, 0),
-VAR_STRPM("PS4", &prompt4, PM_DONTIMPORT_SUID),
-VAR_STRPM("SPROMPT", &sprompt, 0),
+    VAR_STRPM("OPTARG", &zoptarg, 0),
+    VAR_STRPM("NULLCMD", &nullcmd, 0),
+    VAR_STRPM("POSTEDIT", &postedit, PM_UNSET),
+    VAR_STRPM("READNULLCMD", &readnullcmd, 0),
+    VAR_STRPM("PS1", &prompt, 0),
+    VAR_STRPM("RPS1", &rprompt, PM_UNSET),
+    VAR_STRPM("RPROMPT", &rprompt, PM_UNSET),
+    VAR_STRPM("PS2", &prompt2, 0),
+    VAR_STRPM("RPS2", &rprompt2, PM_UNSET),
+    VAR_STRPM("RPROMPT2", &rprompt2, PM_UNSET),
+    VAR_STRPM("PS3", &prompt3, 0),
+    VAR_STRPM("PS4", &prompt4, PM_DONTIMPORT_SUID),
+    VAR_STRPM("SPROMPT", &sprompt, 0),
 
-VAR_ARRPM("*", &pparams, PM_READONLY_SPECIAL),
-VAR_ARRPM("@", &pparams, PM_READONLY_SPECIAL),
+    VAR_ARRPM("*", &pparams, PM_READONLY_SPECIAL),
+    VAR_ARRPM("@", &pparams, PM_READONLY_SPECIAL),
 
-/* End of parameters available in all emulations */
-NULL_PM,
+    /* End of parameters available in all emulations */
+    NULL_PM,
 
-TIED_STRPM("CDPATH", &cdpath, "cdpath", PM_TIED),
-TIED_STRPM("FIGNORE", &fignore, "fignore", PM_TIED),
-TIED_STRPM("FPATH", &fpath, "fpath", PM_TIED),
-TIED_STRPM("MAILPATH", &mailpath, "mailpath", PM_TIED),
-TIED_STRPM("PATH", &path, "path", PM_TIED),
-TIED_STRPM("PSVAR", &psvar, "psvar", PM_TIED),
-TIED_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY_SPECIAL|PM_TIED),
+    TIED_STRPM("CDPATH", &cdpath, "cdpath", PM_TIED),
+    TIED_STRPM("FIGNORE", &fignore, "fignore", PM_TIED),
+    TIED_STRPM("FPATH", &fpath, "fpath", PM_TIED),
+    TIED_STRPM("MAILPATH", &mailpath, "mailpath", PM_TIED),
+    TIED_STRPM("PATH", &path, "path", PM_TIED),
+    TIED_STRPM("PSVAR", &psvar, "psvar", PM_TIED),
+    TIED_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context",
+	       PM_READONLY_SPECIAL|PM_TIED),
 
-/* MODULE_PATH is not imported for security reasons */
-TIED_STRPM("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_TIED),
+    /* MODULE_PATH is not imported for security reasons */
+    TIED_STRPM("MODULE_PATH", &module_path, "module_path",
+	       PM_DONTIMPORT|PM_TIED),
 
-/*
- * The following parameters are not available in sh/ksh compatibility *
- * mode.
- */
+    /*
+     * The following parameters are not available in sh/ksh compatibility *
+     * mode.
+     */
 
-/* All of these have sh compatible equivalents.                */
-INTPM("ARGC", NULL, argc_gsu, PM_READONLY_SPECIAL),
-STRPM("HISTCHARS", NULL, histchars_gsu, PM_DONTIMPORT),
-ROVAR_INTPM("status", &lastval, 0),
-VAR_STRPM("prompt", &prompt, 0),
-VAR_STRPM("PROMPT", &prompt, 0),
-VAR_STRPM("PROMPT2", &prompt2, 0),
-VAR_STRPM("PROMPT3", &prompt3, 0),
-VAR_STRPM("PROMPT4", &prompt4, 0),
-TIED_STRPM("MANPATH", &manpath, "manpath", PM_TIED),
-VAR_ARRPM("argv", &pparams, 0),
-TIED_ARRPM("fignore", &fignore, "FIGNORE", 0),
-TIED_ARRPM("cdpath", &cdpath, "CDPATH", 0),
-TIED_ARRPM("fpath", &fpath, "FPATH", 0),
-TIED_ARRPM("mailpath", &mailpath, "MAILPATH", 0),
-TIED_ARRPM("manpath", &manpath, "MANPATH", 0),
-TIED_ARRPM("psvar", &psvar, "PSVAR", 0),
+    /* All of these have sh compatible equivalents. */
+    INTPM("ARGC", NULL, argc_gsu, PM_READONLY_SPECIAL),
+    STRPM("HISTCHARS", NULL, histchars_gsu, PM_DONTIMPORT),
+    ROVAR_INTPM("status", &lastval, 0),
+    VAR_STRPM("prompt", &prompt, 0),
+    VAR_STRPM("PROMPT", &prompt, 0),
+    VAR_STRPM("PROMPT2", &prompt2, 0),
+    VAR_STRPM("PROMPT3", &prompt3, 0),
+    VAR_STRPM("PROMPT4", &prompt4, 0),
+    TIED_STRPM("MANPATH", &manpath, "manpath", PM_TIED),
+    VAR_ARRPM("argv", &pparams, 0),
+    TIED_ARRPM("fignore", &fignore, "FIGNORE", 0),
+    TIED_ARRPM("cdpath", &cdpath, "CDPATH", 0),
+    TIED_ARRPM("fpath", &fpath, "FPATH", 0),
+    TIED_ARRPM("mailpath", &mailpath, "MAILPATH", 0),
+    TIED_ARRPM("manpath", &manpath, "MANPATH", 0),
+    TIED_ARRPM("psvar", &psvar, "PSVAR", 0),
 
-TIED_ARRPM("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_READONLY_SPECIAL),
+    TIED_ARRPM("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT",
+	       PM_READONLY_SPECIAL),
 
-TIED_ARRPM("module_path", &module_path, "MODULE_PATH", 0),
-TIED_ARRPM("path", &path, "PATH", 0),
+    TIED_ARRPM("module_path", &module_path, "MODULE_PATH", 0),
+    TIED_ARRPM("path", &path, "PATH", 0),
 
-/* These are known to zsh alone. */
+    /* These are known to zsh alone. */
 
-PM("pipestatus", NULL, pipestatus_gsu, PM_ARRAY, 10, NULL),
+    PM("pipestatus", NULL, pipestatus_gsu, PM_ARRAY, 10, NULL),
 
-NULL_PM,
+    NULL_PM,
 };
 
 /*
@@ -466,18 +469,18 @@ NULL_PM,
  * sh emulation.  These don't link to the array versions.
  */
 static initparam special_params_sh[] = {
-COLONARR_STRPM("CDPATH", &cdpath, 0),
-COLONARR_STRPM("FIGNORE", &fignore, 0),
-COLONARR_STRPM("FPATH", &fpath, 0),
-COLONARR_STRPM("MAILPATH", &mailpath, 0),
-COLONARR_STRPM("PATH", &path, 0),
-COLONARR_STRPM("PSVAR", &psvar, 0),
-COLONARR_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, PM_READONLY_SPECIAL),
+    COLONARR_STRPM("CDPATH", &cdpath, 0),
+    COLONARR_STRPM("FIGNORE", &fignore, 0),
+    COLONARR_STRPM("FPATH", &fpath, 0),
+    COLONARR_STRPM("MAILPATH", &mailpath, 0),
+    COLONARR_STRPM("PATH", &path, 0),
+    COLONARR_STRPM("PSVAR", &psvar, 0),
+    COLONARR_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, PM_READONLY_SPECIAL),
 
-/* MODULE_PATH is not imported for security reasons */
-COLONARR_STRPM("MODULE_PATH", &module_path, PM_DONTIMPORT),
+    /* MODULE_PATH is not imported for security reasons */
+    COLONARR_STRPM("MODULE_PATH", &module_path, PM_DONTIMPORT),
 
-NULL_PM,
+    NULL_PM,
 };
 
 /*
