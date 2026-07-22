@@ -386,13 +386,12 @@ ROVAR_INTPM("LINENO", &lineno, 0),
 ROVAR_INTPM("PPID", &ppid, 0),
 ROVAR_INTPM("ZSH_SUBSHELL", &zsh_subshell, 0),
 
-#define IPDEF5(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
 #define IPDEF5U(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
-IPDEF5("COLUMNS", &zterm_columns, zlevar_gsu),
-IPDEF5("LINES", &zterm_lines, zlevar_gsu),
+INTPM("COLUMNS", &zterm_columns, zlevar_gsu, 0),
+INTPM("LINES", &zterm_lines, zlevar_gsu, 0),
 IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu),
-IPDEF5("SHLVL", &shlvl, varinteger_gsu),
-IPDEF5("FUNCNEST", &zsh_funcnest, varinteger_gsu),
+VAR_INTPM("SHLVL", &shlvl, 0),
+VAR_INTPM("FUNCNEST", &zsh_funcnest, 0),
 
 /* Don't import internal integer status variables. */
 #define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
