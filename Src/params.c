@@ -409,9 +409,8 @@ VAR_STRPM("PS3", &prompt3, 0),
 VAR_STRPM("PS4", &prompt4, PM_DONTIMPORT_SUID),
 VAR_STRPM("SPROMPT", &sprompt, 0),
 
-#define IPDEF9(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
-IPDEF9("*", &pparams, NULL, PM_ARRAY|PM_READONLY_SPECIAL|PM_DONTIMPORT),
-IPDEF9("@", &pparams, NULL, PM_ARRAY|PM_READONLY_SPECIAL|PM_DONTIMPORT),
+VAR_ARRPM("*", &pparams, PM_READONLY_SPECIAL),
+VAR_ARRPM("@", &pparams, PM_READONLY_SPECIAL),
 
 /*
  * This empty row indicates the end of parameters available in
@@ -445,7 +444,7 @@ VAR_STRPM("PROMPT2", &prompt2, 0),
 VAR_STRPM("PROMPT3", &prompt3, 0),
 VAR_STRPM("PROMPT4", &prompt4, 0),
 TIED_STRPM("MANPATH", &manpath, "manpath", PM_TIED),
-IPDEF9("argv", &pparams, NULL, 0),
+VAR_ARRPM("argv", &pparams, 0),
 TIED_ARRPM("fignore", &fignore, "FIGNORE", 0),
 TIED_ARRPM("cdpath", &cdpath, "CDPATH", 0),
 TIED_ARRPM("fpath", &fpath, "FPATH", 0),
@@ -489,8 +488,7 @@ COLONARR_STRPM("MODULE_PATH", &module_path, PM_DONTIMPORT),
  * and $@, this is not readonly.  This parameter is not directly
  * visible in user space.
  */
-static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
-				 PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT);
+static initparam argvparam_pm = VAR_ARRPM("", &pparams, 0);
 
 #undef PM
 #undef BR
