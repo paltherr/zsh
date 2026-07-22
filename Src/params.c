@@ -393,10 +393,9 @@ VAR_INTPM("SHLVL", &shlvl, 0),
 VAR_INTPM("FUNCNEST", &zsh_funcnest, 0),
 
 /* Don't import internal integer status variables. */
-#define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
-IPDEF6("OPTIND", &zoptind, varinteger_gsu),
-IPDEF6("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
-IPDEF6("TRY_BLOCK_INTERRUPT", &try_interrupt, varinteger_gsu),
+VAR_INTPM("OPTIND", &zoptind, PM_DONTIMPORT),
+VAR_INTPM("TRY_BLOCK_ERROR", &try_errflag, PM_DONTIMPORT),
+VAR_INTPM("TRY_BLOCK_INTERRUPT", &try_interrupt, PM_DONTIMPORT),
 
 #define IPDEF7(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 #define IPDEF7R(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_DONTIMPORT_SUID},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
