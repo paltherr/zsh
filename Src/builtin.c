@@ -2104,9 +2104,9 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	}
 	tc = 1;
 	if (OPT_MINUS(ops,'p'))
-	    usepm = (on & pm->node.flags);
+	    usepm = !!(on & pm->node.flags);
 	else if (OPT_PLUS(ops,'p'))
-	    usepm = (off & pm->node.flags);
+	    usepm = !!(off & pm->node.flags);
 	else
 	    usepm = 0;
     }
@@ -2117,9 +2117,9 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	/* keep the parameter if just switching between floating types */
 	if ((tc = chflags && chflags != (PM_EFLOAT|PM_FFLOAT))) {
 	    if (OPT_MINUS(ops,'p'))
-		usepm = (on & pm->node.flags);
+		usepm = !!(on & pm->node.flags);
 	    else if (OPT_PLUS(ops,'p'))
-		usepm = (off & pm->node.flags);
+		usepm = !!(off & pm->node.flags);
 	    else
 		usepm = 0;
 	}
