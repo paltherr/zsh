@@ -3116,15 +3116,6 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	}
 
 	if (on & PM_NAMEREF) {
-	    if (asg->value.scalar &&
-		((pm = (Param)paramtab->getnode(paramtab, asg->value.scalar)) &&
-		 (pm->node.flags & PM_NAMEREF))) {
-		if (pm->node.flags & PM_SPECIAL) {
-		    zwarnnam(name, "%s: invalid reference", pm->node.nam);
-		    returnval = 1;
-		    continue;
-		}
-	    }
 	    if (hn) {
 		/* namerefs always start over fresh */
 		if (((Param)hn)->level >= locallevel ||

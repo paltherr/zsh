@@ -477,15 +477,15 @@ F:Here ptr1 points to global ptr2 so assignment succeeds
    setopt localoptions errreturn
    private -n ptr2
    typeset -n ptr1=ptr2 2>&1
-   echo NOT REACHED
    ptr1=val
    ptr1=foo
    typeset -p ptr1 ptr2 val
  }
  unset val
 0:up-reference for private namerefs, end is unset and in scope but private
-F:Should we allow "public" namerefs to private parameters?
->(anon):typeset:3: ptr2: invalid reference
+>typeset -n ptr1=ptr2
+>typeset -hn ptr2=val
+>typeset -g val=foo
 
  () {
    typeset ptr2=foo
@@ -494,13 +494,12 @@ F:Should we allow "public" namerefs to private parameters?
      setopt localoptions errreturn
      private -n ptr2
      typeset -n ptr1=ptr2 2>&1
-     echo NOT REACHED
      typeset -p ptr1 ptr2
    }
  }
-1:regression test for invalid reference detection
-F:Should we allow "public" namerefs to private parameters?
->(anon):typeset:3: ptr2: invalid reference
+0:regression test for invalid reference detection
+>typeset -n ptr1=ptr2
+>typeset -hn ptr2
 
  () {
    private x=1
