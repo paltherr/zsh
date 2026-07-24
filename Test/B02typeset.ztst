@@ -1226,10 +1226,8 @@ F:This is a bug, the non -h variable should not hide the autoload variable
 >(anon):typeset: SRANDOM: can't change type of autoloaded parameter
 >(anon):typeset: SRANDOM: can't change type of autoloaded parameter
 >z=SRANDOM (zsh/random)
-F:BUG:"typeset -g -n SRANDOM" should trigger a "can't change type" error and not load SRANDOM
->(anon): invalid variable name: zsh/random
->z=
->typeset -g -n SRANDOM=''
+>(anon):typeset: SRANDOM: can't change type of autoloaded parameter
+>z=SRANDOM (zsh/random)
 >z=SRANDOM (zsh/random)
 
  zmodload -u zsh/random
@@ -1250,8 +1248,7 @@ F:BUG:"typeset -g -n SRANDOM" should trigger a "can't change type" error and not
 >(anon):typeset: EUID: can't change type of a special parameter
 >(anon):typeset: HOME: can't change type of a special parameter
 >(anon):typeset: HOME: can't change type of a special parameter
-F:BUG:"typeset -g -n HOME" should trigger a "can't change type" error
->(anon):typeset: HOME: can't change parameter attribute
+>(anon):typeset: HOME: can't change type of a special parameter
 >typeset -g -i10 EUID=$EUID
 >export HOME=$HOME
 
@@ -1264,7 +1261,7 @@ F:BUG:"typeset -g -n HOME" should trigger a "can't change type" error
 >(anon):typeset: EUID: can't change type of a special parameter
 >(anon):typeset: HOME: can't change type of a special parameter
 >(anon):typeset: HOME: can't change type of a special parameter
-F:BUG:"typeset -n HOME" should trigger a "can't change type" error
+>(anon):typeset: HOME: can't change type of a special parameter
 >typeset -g -i10 EUID=$EUID
 >export HOME=$HOME
 
@@ -1292,7 +1289,7 @@ F:BUG:"typeset -n HOME" should trigger a "can't change type" error
  check "" str s
  check -i int 1
  check -n ref v
-1:Non +r parameter definition can't change/replace readonly parameter
+0:Non +r parameter definition can't change/replace readonly parameter
 >Testing "local  str=s<N>"
 >typeset -r str=s1
 >check:3: read-only variable: str
@@ -1311,8 +1308,7 @@ F:BUG:"typeset -n HOME" should trigger a "can't change type" error
 F:"typeset -r ref=v2" succeeds because it dereferences "ref" and assigns "v1" with "v2"
 >check:local:4: ref: read-only reference
 >check:local:5: ref: read-only reference
-F:BUG:"typeset -n +r ref=v5" should succeed
->check:6: read-only variable: v1
+>typeset -n ref=v5
 
  () {
    typeset -F f1=nan f2=inf f3=-inf

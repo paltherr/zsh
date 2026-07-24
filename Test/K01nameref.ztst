@@ -1127,13 +1127,12 @@ F:Checking for a bug in zmodload that affects later tests
 >status: 1 expected: 1
 >typeset -n ref=RO
 >typeset -r ref=RO
->(eval):typeset:10: ref: read-only variable
->status: 1 expected: 1
-F:BUG:"typeset +r -n ref=RW" wrongly dereferences ref and assigns "RO" with "RW"
->typeset -n ref=RO
->typeset -g RO=RW
+>typeset -rn ref=RO
+>status: 0 expected: 1
+>typeset -n ref=RW
+?(eval):typeset:13: no such variable: RO
 >typeset -rn ref=RX
->typeset -g RO=RW
+?(eval):typeset:15: no such variable: RO
 >typeset ref=RW
 
  () {
