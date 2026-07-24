@@ -1107,13 +1107,13 @@ F:Checking for a bug in zmodload that affects later tests
  unset -n ref
  typeset -rn ref=RO
  typeset -p ref
- (typeset -n ref=RW)
+ (typeset -n ref=RW 2>&1 && typeset -p ref)
  print status: $? expected: 1
  typeset +r -n ref
  typeset -p ref
  typeset -r +n ref
  typeset -p ref
- (typeset -rn ref)
+ (typeset -rn ref 2>&1 && typeset -p ref)
  print status: $? expected: 1
  typeset +r -n ref=RW	# Assignment occurs after type change,
  typeset -p ref RO	# so RO=RW here.  Potentially confusing.
@@ -1123,12 +1123,13 @@ F:Checking for a bug in zmodload that affects later tests
  typeset -p ref
 0:add and remove readonly attribute with references
 >typeset -rn ref=RO
-*?*: ref: read-only reference
+>(eval):typeset:4: ref: read-only reference
 >status: 1 expected: 1
 >typeset -n ref=RO
 >typeset -r ref=RO
-*?*: ref: read-only variable
+>(eval):typeset:10: ref: read-only variable
 >status: 1 expected: 1
+F:BUG:"typeset +r -n ref=RW" wrongly dereferences ref and assigns "RO" with "RW"
 >typeset -n ref=RO
 >typeset -g RO=RW
 >typeset -rn ref=RX
