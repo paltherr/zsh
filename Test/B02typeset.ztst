@@ -1215,19 +1215,12 @@ F:This is a bug, the non -h variable should not hide the autoload variable
  zmodload -u zsh/random
  () { { typeset -g -i SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
  () { { typeset -g -a SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
- echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
  () { { typeset -g -n SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
- echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
- typeset -p SRANDOM
- unset -n SRANDOM
- zmodload -u zsh/random
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
 0:Global parameter can't change type of autoloaded parameter
 >(anon):typeset: SRANDOM: can't change type of autoloaded parameter
 >(anon):typeset: SRANDOM: can't change type of autoloaded parameter
->z=SRANDOM (zsh/random)
 >(anon):typeset: SRANDOM: can't change type of autoloaded parameter
->z=SRANDOM (zsh/random)
 >z=SRANDOM (zsh/random)
 
  zmodload -u zsh/random

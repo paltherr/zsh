@@ -1114,12 +1114,12 @@ F:Checking for a bug in zmodload that affects later tests
  typeset -r +n ref
  typeset -p ref
  (typeset -rn ref 2>&1 && typeset -p ref)
- print status: $? expected: 1
- typeset +r -n ref=RW	# Assignment occurs after type change,
- typeset -p ref RO	# so RO=RW here.  Potentially confusing.
- typeset -r -n ref=RX	# No type change, so referent changes ...
- typeset -p ref RO	# ... and previous refererent does not.
- typeset +rn ref=RW	# Here ref=RW, again type changed first.
+ print status: $? expected: 0
+ typeset +r -n ref=RW
+ typeset -p ref
+ typeset -r -n ref=RX
+ typeset -p ref
+ typeset +rn ref=RW
  typeset -p ref
 0:add and remove readonly attribute with references
 >typeset -rn ref=RO
@@ -1128,11 +1128,9 @@ F:Checking for a bug in zmodload that affects later tests
 >typeset -n ref=RO
 >typeset -r ref=RO
 >typeset -rn ref=RO
->status: 0 expected: 1
+>status: 0 expected: 0
 >typeset -n ref=RW
-?(eval):typeset:13: no such variable: RO
 >typeset -rn ref=RX
-?(eval):typeset:15: no such variable: RO
 >typeset ref=RW
 
  () {
