@@ -2763,6 +2763,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      */
     if (!subexp || aspar) {
 	char *ov = val;
+	char *ie = itype_end(subexp ? ov : s, inbrace ? INAMESPC : IIDENT, 0);
+	int nobracks = *ie != '[' && *ie != Inbrack;
 	int scanflags = hkeys | hvals;
 	if (arrasg)
 	    scanflags |= SCANPM_ASSIGNING;
@@ -2856,6 +2858,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    } else
 		val = dupstring("");
 
+	    v = NULL;
+	    isarr = 0;
+	}
+	if (EMULATION(EMULATE_KSH) && (hkeys & SCANPM_WANTKEYS) && nobracks &&
+	    v && v->pm && ((v->pm->node.flags & PM_DECLARED) ||
+			   !(v->pm->node.flags & PM_UNSET)) ) {
+	    val = dupstring(v->pm->node.nam);
+	    vunset = 0;
 	    v = NULL;
 	    isarr = 0;
 	}

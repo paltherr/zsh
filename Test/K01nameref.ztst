@@ -2406,15 +2406,15 @@ F:converting from association/array to string should work here too
 >bb - bb - bb
 >aa bb cc - aa bb cc - aa bb cc
 >
->abc - abc - abc
+>str0 - str0 - str0
 >b - b - b
 >bc - bc - bc
 >abc - abc - abc
->aa - aa - aa
+>arr0 - arr0 - arr0
 >1 - 1 - 1
 >(eval):6: invalid subscript - (eval):6: invalid subscript - (eval):6: invalid subscript
 >aa bb cc - aa bb cc - aa bb cc
->aa - aa - aa
+>hsh0 - hsh0 - hsh0
 >1 - 1 - 1
 >0 1 2 - 0 1 2 - 0 1 2
 
