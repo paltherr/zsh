@@ -99,8 +99,8 @@ F:Braces are required
 0:namerefs with namespaces
 F:ksh expands "${!.k02.ref}" to ".k02.ref" but ("${!ref}" when in namespace "k02") to "array"
 F:the former looks bogus; expanding to ".k02.array" looks more logical/consistent
->characters
->characters
+>.k02.array
+>.k02.array
 >.k02.array
 F:ksh expands "${.k02.ref}" to ".k02.array" but ("${ref}" when in namespace "k02") to "characters"
 F:the former looks bogus; expanding to "characters" looks more logical/consistent
