@@ -30,7 +30,12 @@
 #include "zsh.mdh"
 #include "loop.pro"
 
-/* # of nested loops we are in */
+/* # of nested loops we are in started in ancestor subshells */
+
+/**/
+int ancestor_loops;
+
+/* # of nested loops we are in started in the current subshell */
  
 /**/
 int loops;

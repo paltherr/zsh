@@ -33,10 +33,13 @@
   for x in a b c; do
     ( echo $x:before; continue 2>&1; echo $x:after )
   done
-0:continue in subshell
+1:continue in subshell
 >a:before
+>(eval):continue:2: not in same subshell as first enclosing loop
 >b:before
+>(eval):continue:2: not in same subshell as first enclosing loop
 >c:before
+>(eval):continue:2: not in same subshell as first enclosing loop
 
   for outer in 0 1 2 3; do
     print outer $outer

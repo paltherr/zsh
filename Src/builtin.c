@@ -5823,7 +5823,9 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	    return 1;
 	}
 	if (!loops) {   /* break/continue only permitted in loops */
-	    zerrnam(name, "not in for, while, until, select, or repeat loop");
+	    zerrnam(name, ancestor_loops
+		    ? "not in same subshell as first enclosing loop"
+		    : "not in for, while, until, select, or repeat loop");
 	    return 1;
 	}
 	contflag = func == BIN_CONTINUE;
