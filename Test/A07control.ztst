@@ -37,16 +37,136 @@
 1:continue outside loop
 ?fn:continue:1: not in for, while, until, select, or repeat loop
 
-  for x in a b c; do
-    ( echo $x:before; continue 2>&1; echo $x:after )
+  local cmd script=()
+  for cmd in "break 2" "break 3" "break 4" "continue 2" "continue 3" "continue 4"; do
+    script+='
+      echo "Testing \"'$cmd'\":"
+      for X in A B; do
+        for Y in p q; do
+          for Z in 1 2; do
+            echo "'$cmd': $X$Y$Z before"
+            '$cmd' 2>&1
+            echo "'$cmd': $X$Y$Z after"
+          done
+          echo "'$cmd': $X$Y- after"
+        done
+        echo "'$cmd': $X-- after"
+      done
+      echo "'$cmd': --- after"
+    '
   done
-1:continue in subshell
->a:before
->(eval):continue:2: not in same subshell as first enclosing loop
->b:before
->(eval):continue:2: not in same subshell as first enclosing loop
->c:before
->(eval):continue:2: not in same subshell as first enclosing loop
+  $ZTST_testdir/../Src/zsh -fc "$script"
+0:break/continue beneath, at, and beyond the outermost loop
+>Testing "break 2":
+>break 2: Ap1 before
+>break 2: A-- after
+>break 2: Bp1 before
+>break 2: B-- after
+>break 2: --- after
+>Testing "break 3":
+>break 3: Ap1 before
+>break 3: --- after
+>Testing "break 4":
+>break 4: Ap1 before
+>break 4: --- after
+>Testing "continue 2":
+>continue 2: Ap1 before
+>continue 2: Aq1 before
+>continue 2: A-- after
+>continue 2: Bp1 before
+>continue 2: Bq1 before
+>continue 2: B-- after
+>continue 2: --- after
+>Testing "continue 3":
+>continue 3: Ap1 before
+>continue 3: Bp1 before
+>continue 3: --- after
+>Testing "continue 4":
+>continue 4: Ap1 before
+>continue 4: Bp1 before
+>continue 4: --- after
+
+  local cmd X
+  for cmd in "break" "continue"; do
+    echo "Testing \"$cmd\":"
+    for X in A B; do
+      (
+        echo "$cmd: $X before"
+        $cmd 2>&1;
+        echo "$cmd: $X after1"
+      )
+      echo "$cmd: $X after2"
+    done
+  done
+0:break/continue in subshell
+>Testing "break":
+>break: A before
+>(eval):break:7: not in same subshell as first enclosing loop
+>break: A after2
+>break: B before
+>(eval):break:7: not in same subshell as first enclosing loop
+>break: B after2
+>Testing "continue":
+>continue: A before
+>(eval):continue:7: not in same subshell as first enclosing loop
+>continue: A after2
+>continue: B before
+>(eval):continue:7: not in same subshell as first enclosing loop
+>continue: B after2
+
+  local cmd X
+  for cmd in "break 1" "break 2" "break 3" "continue 1" "continue 2" "continue 3"; do
+    echo "Testing \"$cmd\":"
+    for X in A; do
+      (
+        for Y in p q; do
+          for Z in 1 2; do
+            echo "$cmd: $X$Y$Z before"
+            eval $cmd 2>&1
+            echo "$cmd: $X$Y$Z after"
+          done
+          echo "$cmd: $X$Y- after"
+        done
+        echo "$cmd: $X-- after1"
+      )
+      echo "$cmd: $X-- after2"
+    done
+  done
+0:break/continue beneath, at, and beyond the outermost same-subshell loop
+>Testing "break 1":
+>break 1: Ap1 before
+>break 1: Ap- after
+>break 1: Aq1 before
+>break 1: Aq- after
+>break 1: A-- after1
+>break 1: A-- after2
+>Testing "break 2":
+>break 2: Ap1 before
+>break 2: A-- after1
+>break 2: A-- after2
+>Testing "break 3":
+>break 3: Ap1 before
+>break 3: A-- after1
+>break 3: A-- after2
+>Testing "continue 1":
+>continue 1: Ap1 before
+>continue 1: Ap2 before
+>continue 1: Ap- after
+>continue 1: Aq1 before
+>continue 1: Aq2 before
+>continue 1: Aq- after
+>continue 1: A-- after1
+>continue 1: A-- after2
+>Testing "continue 2":
+>continue 2: Ap1 before
+>continue 2: Aq1 before
+>continue 2: A-- after1
+>continue 2: A-- after2
+>Testing "continue 3":
+>continue 3: Ap1 before
+>continue 3: Aq1 before
+>continue 3: A-- after1
+>continue 3: A-- after2
 
   for outer in 0 1 2 3; do
     print outer $outer
