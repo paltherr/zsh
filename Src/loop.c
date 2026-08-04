@@ -36,17 +36,17 @@
 int ancestor_loops;
 
 /* # of nested loops we are in started in the current subshell */
- 
+
 /**/
 int loops;
- 
+
 /* whether to continue instead of break on the last break level */
- 
+
 /**/
 mod_export int contflag;
- 
+
 /* # of break levels */
- 
+
 /**/
 mod_export volatile int breaks;
 
