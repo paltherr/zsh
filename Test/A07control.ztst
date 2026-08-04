@@ -30,6 +30,23 @@
 1:continue outside loop
 ?fn:continue:1: not in for, while, until, select, or repeat loop
 
+  $ZTST_testdir/../Src/zsh -fc '
+    for x in a b c; do
+      for y in d e f; do
+        echo "$x$y:before"
+        continue 3
+        echo "$x$y:after"
+      done
+      echo "$x-:after"
+    done
+    echo "--:after"
+  '
+0:continue beyond all enclosing loops
+>ad:before
+>bd:before
+>cd:before
+>--:after
+
   for x in a b c; do
     ( echo $x:before; continue 2>&1; echo $x:after )
   done
@@ -40,6 +57,37 @@
 >(eval):continue:2: not in same subshell as first enclosing loop
 >c:before
 >(eval):continue:2: not in same subshell as first enclosing loop
+
+  for x in a b c; do
+    (
+      for y in d e f; do
+        echo "$x$y:before"
+        continue 2 2>&1
+        echo "$x$y:after"
+      done
+      echo "$x-:after1"
+    )
+    echo "$x-:after2"
+  done
+  echo "--:after"
+0:continue beyond all enclosing loops
+>ad:before
+>ae:before
+>af:before
+>a-:after1
+>a-:after2
+>bd:before
+>be:before
+>bf:before
+>b-:after1
+>b-:after2
+>cd:before
+>ce:before
+>cf:before
+>c-:after1
+>c-:after2
+>--:after
+
 
   for outer in 0 1 2 3; do
     print outer $outer
