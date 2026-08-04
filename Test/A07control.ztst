@@ -41,11 +41,9 @@
     done
     echo "--:after"
   '
-0:continue beyond all enclosing loops
+1:continue beyond all enclosing loops
 >ad:before
->bd:before
->cd:before
->--:after
+?zsh:continue:5: not in 3 for, while, until, select, or repeat loops
 
   for x in a b c; do
     ( echo $x:before; continue 2>&1; echo $x:after )
@@ -72,19 +70,13 @@
   echo "--:after"
 0:continue beyond all enclosing loops
 >ad:before
->ae:before
->af:before
->a-:after1
+>(eval):continue:5: not in same subshell as first 2 enclosing loops
 >a-:after2
 >bd:before
->be:before
->bf:before
->b-:after1
+>(eval):continue:5: not in same subshell as first 2 enclosing loops
 >b-:after2
 >cd:before
->ce:before
->cf:before
->c-:after1
+>(eval):continue:5: not in same subshell as first 2 enclosing loops
 >c-:after2
 >--:after
 
