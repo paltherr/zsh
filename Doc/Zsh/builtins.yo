@@ -2033,37 +2033,6 @@ To initialize a parameter var(param) to a command output and mark it readonly,
 use tt(typeset -r )var(param) or tt(readonly )var(param) after the parameter
 assignment statement.
 
-cindex(named reference)
-cindex(reference, named)
-The flag tt(-n) creates a em(named reference) to another parameter.
-The second parameter need not exist at the time the reference is
-created.  Only the tt(-H), tt(-g), tt(-h), and tt(-r) flags may be used
-in conjunction with tt(-n), having their usual meanings.  The tt(-u)
-flag is special and may be applied to alter the scope of the reference.
-The var(name) so created may not be an array element nor use
-a subscript, but the var(value) assigned may be any valid parameter
-name, but not a subscripted array (or associative array) element nor
-an array slice.  It is an error for a named reference to refer
-to itself, even indirectly through a chain of references.  When tt(-u)
-is applied to a named reference, the parameter identified by var(value)
-is always found in the calling function scope rather than the current
-local scope.  In this case, if there is no such parameter in the calling
-scope, assignments to the named reference may fail, setting tt($?) to 1.
-See sectref(Parameter Expansion)(zshexpn) and
-sectref(Named References)(zshparam) for details of the
-behavior of named references.
-
-Local function scoping rules for `tt(typeset)' do apply with `tt(-n)',
-so a declaration within a function persists only until the end of the
-function unless `tt(-g -n)' is specified, and any local parameter (of
-any type) with the same var(name) supplants a named reference from a
-surrounding scope.
-
-A scalar parameter, including an existing named reference, may be
-converted to a new named reference by `tt(typeset -n )var(name)', so
-the `tt(-p)' option must be included to display the value of a
-specific named reference var(name).
-
 If no attribute flags are given, and either no var(name) arguments are
 present or the flag tt(+m) is used, then each parameter name printed is
 preceded by a list of the attributes of that parameter (tt(array),
@@ -2089,6 +2058,23 @@ the uniqueness attribute, whereas `tt(typeset -f -U PLUS())' displays the
 names of all autoloadable functions.  If tt(PLUS()) is the only option,
 then type information (array, readonly, etc.) is also printed for each
 parameter, in the same manner as `tt(typeset +m "*")'.
+)
+item(tt(-f))(
+The names refer to functions rather than parameters.  No assignments
+can be made, and the only other valid flags are tt(-t), tt(-T), tt(-k),
+tt(-u), tt(-U) and tt(-z).  The flag tt(-t) turns on execution tracing
+for this function; the flag tt(-T) does the same, but turns off tracing
+for any named (not anonymous) function called from the present one,
+unless that function also
+has the tt(-t) or tt(-T) flag.  The tt(-u) and tt(-U) flags cause the
+function to be marked for autoloading; tt(-U) also causes alias
+expansion to be suppressed when the function is loaded.  See the
+description of the `tt(autoload)' builtin for details.
+
+Note that the builtin tt(functions) provides the same basic capabilities
+as tt(typeset -f) but gives access to a few extra options; tt(autoload)
+gives further additional options for the case tt(typeset -fu) and
+tt(typeset -fU).
 )
 item(tt(-g))(
 The tt(-g) (global) means that any resulting parameter will not be
@@ -2172,17 +2158,87 @@ is preserved but no attribute other than export will be preserved.
 )
 enditem()
 
-Attribute flags that transform the final value (tt(-L), tt(-R), tt(-Z),
-tt(-l), tt(-u)) are only applied to the expanded value at the point
-of a parameter expansion expression using `tt($)'.  They are not applied
-when a parameter is retrieved internally by the shell for any purpose. 
-
-The following attribute flags may be specified:
+The following type attribute flags control the internal representation
+of the parameters.  Each parameter can have at most one type attribute.
+Parameters with no type attribute use an internal string representation.
 
 startitem()
+item(tt(-i) [ var(n) ])(
+Use an internal integer representation.  If var(n) is nonzero it
+defines the output arithmetic base, otherwise it is determined by the
+first assignment.  Bases from 2 to 36 inclusive are allowed.
+)
+item(tt(-E) [ var(n) ])(
+Use an internal double-precision floating point representation.  On output
+the variable will be converted to scientific notation.  If var(n) is
+nonzero it defines the number of significant figures to display; the
+default is ten.
+)
+item(tt(-F) [ var(n) ])(
+Use an internal double-precision floating point representation.  On output
+the variable will be converted to fixed-point decimal notation.  If var(n)
+is nonzero it defines the number of digits to display after the decimal
+point; the default is ten.
+)
+item(tt(-a))(
+Create an array parameter.  It may be assigned to in the tt(typeset)
+statement only if the reserved word form of tt(typeset) is enabled
+(as it is by default).  When displaying, both normal and associative
+arrays are shown.
+)
 item(tt(-A))(
-The names refer to associative array parameters; see
-sectref(Array Parameters)(zshparam).
+Create an associative array parameter;
+see sectref(Array Parameters)(zshparam).
+)
+item(tt(-n))(
+cindex(named reference)
+cindex(reference, named)
+Create a em(named reference) to another parameter.
+The referred parameter need not exist at the time the reference is
+created.  Only the tt(-H), tt(-g), tt(-h), and tt(-r) flags may be used
+in conjunction with tt(-n), having their usual meanings.  The tt(-u)
+flag is special and may be applied to alter the scope of the reference.
+The var(name) so created may not be an array element nor use
+a subscript, but the var(value) assigned may be any valid parameter
+name, but not a subscripted array (or associative array) element nor
+an array slice.  It is an error for a named reference to refer
+to itself, even indirectly through a chain of references.  When tt(-u)
+is applied to a named reference, the parameter identified by var(value)
+is always found in the calling function scope rather than the current
+local scope.  In this case, if there is no such parameter in the calling
+scope, assignments to the named reference may fail, setting tt($?) to 1.
+See sectref(Parameter Expansion)(zshexpn) and
+sectref(Named References)(zshparam) for details of the
+behavior of named references.
+
+Local function scoping rules for `tt(typeset)' do apply with `tt(-n)',
+so a declaration within a function persists only until the end of the
+function unless `tt(-g -n)' is specified, and any local parameter (of
+any type) with the same var(name) supplants a named reference from a
+surrounding scope.
+
+A scalar parameter, including an existing named reference, may be
+converted to a new named reference by `tt(typeset -n )var(name)', so
+the `tt(-p)' option must be included to display the value of a
+specific named reference var(name).
+)
+enditem()
+
+The following additional attribute flags may be specified.  Attribute
+flags that transform the final value (tt(-l), tt(-u), tt(-L), tt(-R),
+tt(-Z)) are only applied to the expanded value at the point of a
+parameter expansion expression using `tt($)'.  They are not applied
+when a parameter is retrieved internally by the shell for any purpose.
+
+startitem()
+item(tt(-l))(
+Convert the result to lower case whenever the parameter is expanded.
+The value is em(not) converted when assigned.
+)
+item(tt(-u))(
+Convert the result to upper case whenever the parameter is expanded.
+The value is em(not) converted when assigned.
+This flag has different meanings when used with tt(-f) or tt(-n); see above.
 )
 item(tt(-L) [ var(n) ])(
 Left justify and remove leading blanks from the value when the parameter
@@ -2211,6 +2267,14 @@ when the parameter is expanded, the field is left filled with
 blanks or truncated from the end.  May not be combined with the tt(-Z)
 flag.
 )
+item(tt(-Z) [ var(n) ])(
+Specially handled if set along with the tt(-L) flag.
+Otherwise, similar to tt(-R), except that leading zeros are used for
+padding instead of blanks if the first non-blank character is a digit.
+Numeric parameters are specially handled: they are always eligible
+for padding with zeroes, and the zeroes are inserted at an appropriate
+place in the output.
+)
 item(tt(-U))(
 For arrays (but not for associative arrays), keep only the first
 occurrence of each duplicated value.  This may also be set for tied
@@ -2221,38 +2285,6 @@ variables with shared values it is therefore recommended to set the flag
 for all interfaces, e.g. `tt(typeset -U PATH path)'.
 
 This flag has a different meaning when used with tt(-f); see below.
-)
-item(tt(-Z) [ var(n) ])(
-Specially handled if set along with the tt(-L) flag.
-Otherwise, similar to tt(-R), except that leading zeros are used for
-padding instead of blanks if the first non-blank character is a digit.
-Numeric parameters are specially handled: they are always eligible
-for padding with zeroes, and the zeroes are inserted at an appropriate
-place in the output.
-)
-item(tt(-a))(
-The names refer to array parameters.  An array parameter may be
-created this way, but it may be assigned to in the tt(typeset)
-statement only if the reserved word form of tt(typeset) is enabled
-(as it is by default).  When displaying, both normal and associative
-arrays are shown.
-)
-item(tt(-f))(
-The names refer to functions rather than parameters.  No assignments
-can be made, and the only other valid flags are tt(-t), tt(-T), tt(-k),
-tt(-u), tt(-U) and tt(-z).  The flag tt(-t) turns on execution tracing
-for this function; the flag tt(-T) does the same, but turns off tracing
-for any named (not anonymous) function called from the present one,
-unless that function also
-has the tt(-t) or tt(-T) flag.  The tt(-u) and tt(-U) flags cause the
-function to be marked for autoloading; tt(-U) also causes alias
-expansion to be suppressed when the function is loaded.  See the
-description of the `tt(autoload)' builtin for details.
-
-Note that the builtin tt(functions) provides the same basic capabilities
-as tt(typeset -f) but gives access to a few extra options; tt(autoload)
-gives further additional options for the case tt(typeset -fu) and
-tt(typeset -fU).
 )
 item(tt(-h))(
 Hide: only useful for special parameters (those marked `<S>' in the table in
@@ -2281,27 +2313,6 @@ default for the parameters in the tt(zsh/parameter) and tt(zsh/mapfile)
 modules.  Note, however, that unlike the tt(-h) flag this is also useful
 for non-special parameters.
 )
-item(tt(-i) [ var(n) ])(
-Use an internal integer representation.  If var(n) is nonzero it
-defines the output arithmetic base, otherwise it is determined by the
-first assignment.  Bases from 2 to 36 inclusive are allowed.
-)
-item(tt(-E) [ var(n) ])(
-Use an internal double-precision floating point representation.  On output
-the variable will be converted to scientific notation.  If var(n) is
-nonzero it defines the number of significant figures to display; the
-default is ten.
-)
-item(tt(-F) [ var(n) ])(
-Use an internal double-precision floating point representation.  On output
-the variable will be converted to fixed-point decimal notation.  If var(n)
-is nonzero it defines the number of digits to display after the decimal
-point; the default is ten.
-)
-item(tt(-l))(
-Convert the result to lower case whenever the parameter is expanded.
-The value is em(not) converted when assigned.
-)
 item(tt(-r))(
 The given var(name)s are marked readonly.  Note that if var(name) is a
 special parameter, the readonly attribute can be turned on, but cannot then
@@ -2327,11 +2338,6 @@ Tags the named parameters.  Tags only exist to flag the parameter for
 the user's own purposes --- the list of tagged parameters can be queried
 using `tt(typeset -t)'.  Tags have no other use.  Note that the tt(-t)
 flag has a different meaning when used with tt(-f); see above.
-)
-item(tt(-u))(
-Convert the result to upper case whenever the parameter is expanded.
-The value is em(not) converted when assigned.
-This flag has different meanings when used with tt(-f) or tt(-n); see above.
 )
 item(tt(-x))(
 Mark for automatic export to the environment of subsequently
