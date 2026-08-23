@@ -5810,7 +5810,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 		     : "not in %d for, while, until, select, or repeat loops",
 		     num);
 	}
-	contflag = func == BIN_CONTINUE;
+	contflag = func == BIN_CONTINUE && num <= loops;
 	breaks = minimum(num, loops);
 	break;
     case BIN_RETURN:
