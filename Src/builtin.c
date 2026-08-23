@@ -5798,11 +5798,17 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	    zerrnam(name, "argument is not positive: %d", num);
 	    return 1;
 	}
-	if (!loops) {   /* break/continue only permitted in loops */
+	if (!loops) {
 	    zerrnam(name, ancestor_loops
 		    ? "not in same subshell as first enclosing loop"
 		    : "not in for, while, until, select, or repeat loop");
 	    return 1;
+	}
+	if (num > loops) {
+	    zwarnnam(name, ancestor_loops
+		     ? "not in same subshell as first %d enclosing loops"
+		     : "not in %d for, while, until, select, or repeat loops",
+		     num);
 	}
 	contflag = func == BIN_CONTINUE;
 	breaks = minimum(num, loops);

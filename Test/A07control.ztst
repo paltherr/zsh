@@ -68,6 +68,7 @@
 >break 3: --- after
 >Testing "break 4":
 >break 4: Ap1 before
+>zsh:break:35: not in 4 for, while, until, select, or repeat loops
 >break 4: --- after
 >Testing "continue 2":
 >continue 2: Ap1 before
@@ -83,7 +84,9 @@
 >continue 3: --- after
 >Testing "continue 4":
 >continue 4: Ap1 before
+>zsh:continue:77: not in 4 for, while, until, select, or repeat loops
 >continue 4: Bp1 before
+>zsh:continue:77: not in 4 for, while, until, select, or repeat loops
 >continue 4: --- after
 
   local cmd X
@@ -146,6 +149,7 @@
 >break 2: A-- after2
 >Testing "break 3":
 >break 3: Ap1 before
+>(eval):break:1: not in same subshell as first 3 enclosing loops
 >break 3: A-- after1
 >break 3: A-- after2
 >Testing "continue 1":
@@ -164,7 +168,9 @@
 >continue 2: A-- after2
 >Testing "continue 3":
 >continue 3: Ap1 before
+>(eval):continue:1: not in same subshell as first 3 enclosing loops
 >continue 3: Aq1 before
+>(eval):continue:1: not in same subshell as first 3 enclosing loops
 >continue 3: A-- after1
 >continue 3: A-- after2
 
