@@ -1918,14 +1918,19 @@ cindex(parameters, setting)
 cindex(parameters, declaring)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
 xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(AHUaghlmrtux) ] \
-[ {tt(PLUS())|tt(-)}tt(EFLRZip) [ var(n) ] ])
-xitem(SPACES()[ tt(+) ] [ var(name)[tt(=)var(value)] ... ])
-xitem(tt(typeset ){tt(PLUS())|tt(-)}tt(n) [ tt(-g) ] \
-[ {tt(PLUS())|tt(-)}tt(r) ] [ var(name)[tt(=)var(value)] ... ])
+[ {tt(PLUS())|tt(-)}tt(EFLRZip) [ var(n) ] ] \
+[ tt(+) ] [ var(name)[tt(=)var(value)] ... ])
+xitem(tt(typeset ){tt(PLUS())|tt(-)}tt(n) [ {tt(PLUS())|tt(-)}tt(Hghru) ] \
+[ {tt(PLUS())|tt(-)}tt(p) [ var(n) ] ] \
+[ tt(+) ] [ var(name)[tt(=)var(value)] ... ])
 xitem(tt(typeset )tt(-T) [ {tt(PLUS())|tt(-)}tt(Uglrux) ] [ {tt(PLUS())|tt(-)}tt(LRZp) [ var(n) ] ])
 xitem(SPACES()[ tt(+) | var(SCALAR)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])
 item(tt(typeset) tt(-f) [ {tt(PLUS())|tt(-)}tt(TUkmtuz) ] [ tt(+) ] [ var(name) ... ])(
 Set or display attributes and values for shell parameters.
+
+The type attribute flag tt(-n) and the control flags tt(-T) and tt(-f)
+change the set of valid additional flags as well as the meaning of
+some of them, see below the description of tt(-n), tt(-T) and tt(-f).
 
 Except as noted below for control flags that change the behavior,
 a parameter is created for each var(name) that does not already refer
@@ -2124,7 +2129,7 @@ would cause errors.  However, these parameters are printed when they
 have been made local to the scope where `tt(typeset -p)' is run.
 )
 item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])(
-This flag has a different meaning when used with tt(-f); see below.
+This flag has a different meaning when used with tt(-f); see above.
 Otherwise the tt(-T) option requires zero, two, or three arguments to be
 present.  With no arguments, the list of parameters created in this
 fashion is shown.  With two or three arguments, the first two are the name
@@ -2210,17 +2215,6 @@ scope, assignments to the named reference may fail, setting tt($?) to 1.
 See sectref(Parameter Expansion)(zshexpn) and
 sectref(Named References)(zshparam) for details of the
 behavior of named references.
-
-Local function scoping rules for `tt(typeset)' do apply with `tt(-n)',
-so a declaration within a function persists only until the end of the
-function unless `tt(-g -n)' is specified, and any local parameter (of
-any type) with the same var(name) supplants a named reference from a
-surrounding scope.
-
-A scalar parameter, including an existing named reference, may be
-converted to a new named reference by `tt(typeset -n )var(name)', so
-the `tt(-p)' option must be included to display the value of a
-specific named reference var(name).
 )
 enditem()
 
@@ -2284,7 +2278,7 @@ and the type of the variable being assigned to is determinative; for
 variables with shared values it is therefore recommended to set the flag
 for all interfaces, e.g. `tt(typeset -U PATH path)'.
 
-This flag has a different meaning when used with tt(-f); see below.
+This flag has a different meaning when used with tt(-f); see above.
 )
 item(tt(-h))(
 Hide: only useful for special parameters (those marked `<S>' in the table in
