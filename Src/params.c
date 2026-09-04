@@ -577,13 +577,15 @@ newparamtable(int size, char const *name)
 
 /**/
 static Param
-loadparamnode(HashTable ht, Param pm, const char *nam)
+loadparamnode(Param pm)
 {
     if (pm && (pm->node.flags & PM_AUTOLOAD) && pm->u.str) {
+	DPUTS(paramtab != realparamtab, "BUG: loadparamnode: paramtab != realparamtab");
 	int level = pm->level;
+	char *nam = dupstring(pm->node.nam);
 	char *mn = dupstring(pm->u.str);
 	(void)ensurefeature(mn, "p:", nam);
-	pm = (Param)gethashnode2(ht, nam);
+	pm = (Param)gethashnode2(paramtab, nam);
 	while (pm && pm->level > level)
 	    pm = pm->old;
 	if (pm && (pm->level != level || (pm->node.flags & PM_AUTOLOAD)))
@@ -605,7 +607,7 @@ loadparamnode(HashTable ht, Param pm, const char *nam)
 static HashNode
 getparamnode(HashTable ht, const char *nam)
 {
-    Param pm = loadparamnode(ht, (Param)gethashnode2(ht, nam), nam);
+    Param pm = loadparamnode((Param)gethashnode2(ht, nam));
     if (pm && ht == realparamtab && !(pm->node.flags & PM_UNSET))
 	pm = resolve_nameref(pm);
     return (HashNode)pm;
@@ -6406,7 +6408,7 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 	return pm;
     queue_signals();
     if ((pm = (Param)gethashnode2(realparamtab, refname))) {
-	if ((pm = loadparamnode(paramtab, upscope(pm, ref), refname)) &&
+	if ((pm = loadparamnode(upscope(pm, ref))) &&
 	    pm != stop && !(pm->node.flags & PM_UNSET))
 	    pm = resolve_nameref_rec(pm, stop, keep_lastref);
     } else if (idigit(*refname)) {
@@ -6469,7 +6471,7 @@ setscope(Param pm)
 	/* Compute pm->base */
 	if (!(pm->node.flags & PM_UPPER) && refname &&
 	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
-	    (basepm = (Param)loadparamnode(realparamtab, basepm, refname)) &&
+	    (basepm = (Param)loadparamnode(basepm)) &&
 	    (basepm != pm || !basepm->old || (basepm = basepm->old))) {
 	    setscope_base(pm, basepm->level);
 	}
