@@ -6370,7 +6370,7 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 	int ppar = zstrtol(refname, NULL, 10);
 	if (ppar >= argnparams_size) {
 	    size_t old_size = argnparams_size;
-	    size_t new_size = argnparams_size = maximum(2 * old_size, ppar);
+	    size_t new_size = argnparams_size = maximum(2 * old_size, ppar + 1);
 	    argnparams = zrealloc(argnparams, new_size * sizeof(Param));
 	    memset(argnparams + old_size, 0,
 		   (new_size - old_size) * sizeof(Param));
