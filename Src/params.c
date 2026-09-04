@@ -611,6 +611,36 @@ getparamnode(HashTable ht, const char *nam)
     return (HashNode)pm;
 }
 
+/* Returns whether the parameter is set. */
+
+/**/
+mod_export int
+isset_pm(Param pm)
+{
+    return pm &&
+	(!(pm->node.flags & PM_UNSET) || (pm->node.flags & PM_DECLARED));
+}
+
+/* Returns the parameter if it is set, otherwise NULL. */
+
+/**/
+mod_export Param
+asset_pm(Param pm)
+{
+    return isset_pm(pm) ? pm : NULL;
+}
+
+/* Returns whether the parameter is a placeholder reference. */
+
+/**/
+mod_export int
+isplaceholderref(Param pm)
+{
+    char *refname;
+    return pm && (pm->node.flags & PM_NAMEREF) &&
+	(!(refname = GETREFNAME(pm)) || !*refname);
+}
+
 /* Copy a parameter hash table */
 
 static HashTable outtable;
