@@ -6640,7 +6640,7 @@ setscope(Param pm)
 	/* Check for self references */
 	if (refname && *refname && basepm != pm) {
 	    dont_queue_signals();	/* Prevent unkillable loops */
-	    basepm = resolve_nameref_rec(pm, pm, 0);
+	    basepm = resolveparamref_rec(pm, 0, NULL, pm);
 	    restore_queue_signals(q);
 	}
 	if (pm == basepm) {
