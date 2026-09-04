@@ -2027,6 +2027,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	       int on, int off, int roff, Asgment asg, Param altpm,
 	       Options ops, int joinchar)
 {
+    DPUTS(paramtab != realparamtab, "BUG: typeset_single: paramtab != realparamtab");
     int usepm, tc, keeplocal = 0, newspecial = NS_NONE, readonly, dont_set = 0;
     char *subscript;
 
@@ -2667,6 +2668,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 mod_export int
 bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 {
+    DPUTS(paramtab != realparamtab, "BUG: bin_typeset: paramtab != realparamtab");
     Param pm;
     Asgment asg;
     Patprog pprog;
@@ -3795,6 +3797,7 @@ mkautofn(Shfunc shf)
 int
 bin_unset(char *name, char **argv, Options ops, int func)
 {
+    DPUTS(paramtab != realparamtab, "BUG: bin_unset: paramtab != realparamtab");
     Param pm, next;
     Patprog pprog;
     char *s;
