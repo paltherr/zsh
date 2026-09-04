@@ -2960,6 +2960,8 @@ assignstrvalue(Value v, char *val, int flags)
 	    new[newlen] = '\0';
 	    v->pm->gsu.s->setfn(v->pm, new);
 	}
+	if (v->pm->node.flags & PM_NAMEREF)
+	    setscope(v->pm);
 	break;
     case PM_INTEGER:
 	if (val) {
@@ -3019,7 +3021,6 @@ assignstrvalue(Value v, char *val, int flags)
         }
 	break;
     }
-    setscope(v->pm);
     if (errflag ||
 	((!v->pm->env && !(v->pm->node.flags & PM_EXPORTED) &&
 	  !(isset(ALLEXPORT) &&
@@ -6552,14 +6553,11 @@ setloopvar(char *name, char *value)
 static void
 setscope(Param pm)
 {
-    queue_signals();
-    if (pm->node.flags & PM_NAMEREF) {
 	Param basepm = NULL;
 	char *refname = GETREFNAME(pm);
-	int q = queue_signal_level();
-
+	queue_signals();
 	/* Compute pm->base */
-	if (!(pm->node.flags & PM_UPPER) && refname &&
+	if (!(pm->node.flags & PM_UPPER) && refname && *refname &&
 	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
 	    (basepm = loadparam_pm(basepm)) &&
 	    (basepm != pm || !basepm->old || (basepm = basepm->old))) {
@@ -6574,18 +6572,10 @@ setscope(Param pm)
 		zwarn("reference %s in enclosing scope set to local variable %s",
 		      pm->node.nam, refname);
 	}
-
-	/* Check for self references */
-	if (refname && *refname && basepm != pm) {
-	    dont_queue_signals();	/* Prevent unkillable loops */
-	    basepm = resolveparamref_rec(pm, 0, NULL, pm);
-	    restore_queue_signals(q);
-	}
-	if (pm == basepm) {
+	if (basepm == pm || resolveparamref_rec(pm, 0, NULL, pm) == pm) {
 	    zerr("%s: invalid self reference", refname);
 	    unsetparam_pm(pm, 0, 1);
 	}
-    }
     unqueue_signals();
 }
 
