@@ -2033,17 +2033,18 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 
     if (pm && (pm->node.flags & PM_NAMEREF) && !((off|on) & PM_NAMEREF) &&
 	(pm->level == locallevel || !(on & PM_LOCAL))) {
-	if ((pm = resolve_nameref(pm)))
-	    pname = pm->node.nam;
-	if (pm && (pm->node.flags & PM_NAMEREF) &&
-	    (!(pm->node.flags & PM_UNSET) || (pm->node.flags & PM_DECLARED)) &&
+	Param lastref;
+	pm = resolveparamref_pm(pm, 1, &lastref);
+	if (!pm && isplaceholderref(lastref) && (pm = lastref) &&
 	    (on & ~(PM_NAMEREF|PM_LOCAL|PM_READONLY))) {
 	    /* Changing type of PM_SPECIAL|PM_AUTOLOAD is a fatal error.  *
 	     * Should this be a fatal error as well, rather than warning? */
 	    zwarnnam(cname, "%s: can't change type of a named reference",
-		     pname);
+		     lastref->node.nam);
 	    return NULL;
 	}
+	if (pm)
+	    pname = pm->node.nam;
     }
 
     /*
