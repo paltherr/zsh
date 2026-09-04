@@ -3823,8 +3823,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
 			next = (Param) pm->node.next;
 			if (pattry(pprog, pm->node.nam)) {
 			    if (OPT_ISSET(ops,'n') ||
-				((pm = resolve_nameref(pm)) &&
-				 !(pm->node.flags & PM_NAMEREF)))
+				(pm = resolveparam_pm(pm, 0)))
 				unsetparam_pm(pm, 0, 1);
 			    match++;
 			}
@@ -3863,18 +3862,18 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    returnval = 1;
 	    continue;
 	}
-	pm = (Param) (paramtab == realparamtab ?
-		      /* getnode2() to avoid autoloading */
-		      paramtab->getnode2(paramtab, s) :
-		      paramtab->getnode(paramtab, s));
-	/*
-	 * Unsetting an unset variable is not an error.
-	 * This appears to be reasonably standard behaviour.
-	 */
-	if (!pm)
-	    continue;
-	else if (ss) {
-	    if ((pm->node.flags & PM_NAMEREF) && !(pm = resolve_nameref(pm))) {
+	pm = getparam(s);
+	if (!ss) {
+	    pm = asset_pm(OPT_ISSET(ops,'n') ? pm : resolveparam_pm(pm, 0));
+	    /*
+	     * Unsetting a nonexistent or unset variable is not an error.
+	     * This appears to be reasonably standard behaviour.
+	     */
+	    if (pm && unsetparam_pm(pm, 0, 1))
+		returnval = 1;
+	} else {
+	    *ss = '[';
+	    if (!(pm = asset_pm(resolveparam_pm(pm, 1)))) {
 		/* warning? */
 		continue;
 	    }
@@ -3893,7 +3892,6 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		vbuf.start = 0;
 		vbuf.end = -1;
 		vbuf.arr = 0;
-		*ss = '[';
 		if (getindex(&ss, &vbuf, SCANPM_ASSIGNING) == 0 &&
 		    vbuf.pm && !(vbuf.pm->node.flags & PM_UNSET)) {
 		    if (PM_TYPE(pm->node.flags) == PM_SCALAR) {
@@ -3913,16 +3911,12 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		returnval = errflag;
 		errflag &= ~ERRFLAG_ERROR;
 	    } else {
+		*ss = 0;
 		zerrnam(name, "%s: invalid element for unset", s);
 		returnval = 1;
+		*ss = '[';
 	    }
-	} else if (OPT_ISSET(ops,'n') ||
-		   ((pm = resolve_nameref(pm)) &&
-		    !(pm->node.flags & PM_NAMEREF)))
-	    if (unsetparam_pm(pm, 0, 1))
-		returnval = 1;
-	if (ss)
-	    *ss = '[';
+	}
     }
     unqueue_signals();
     return returnval;
