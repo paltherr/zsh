@@ -6541,51 +6541,6 @@ printparamnode(HashNode hn, int printflags)
 }
 
 /**/
-mod_export Param
-resolve_nameref(Param pm)
-{
-    return resolve_nameref_rec(pm, NULL, 0);
-}
-
-/**/
-static Param
-resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
-{
-    DPUTS(paramtab != realparamtab, "BUG: resolve_nameref_rec: paramtab != realparamtab");
-    Param ref = pm;
-    char *refname;
-    if (!pm || !(pm->node.flags & PM_NAMEREF) || (pm->node.flags & PM_UNSET)
-	|| !(refname = GETREFNAME(pm)) || !*refname)
-	return pm;
-    queue_signals();
-    if ((pm = (Param)gethashnode2(realparamtab, refname))) {
-	if ((pm = loadparamnode(upscope(pm, ref))) &&
-	    pm != stop && !(pm->node.flags & PM_UNSET))
-	    pm = resolve_nameref_rec(pm, stop, keep_lastref);
-    } else if (idigit(*refname)) {
-	int ppar = zstrtol(refname, NULL, 10);
-	if (ppar >= argnparams_size) {
-	    size_t old_size = argnparams_size;
-	    size_t new_size = argnparams_size = maximum(2 * old_size, ppar + 1);
-	    argnparams = zrealloc(argnparams, new_size * sizeof(Param));
-	    memset(argnparams + old_size, 0,
-		   (new_size - old_size) * sizeof(Param));
-	}
-	if (!(pm = argnparams[ppar])) {
-	    pm = argnparams[ppar] = zshcalloc(sizeof(*pm));
-	    pm->node.nam = zalloc(snprintf(NULL, 0, "%d", ppar) + 1);
-	    sprintf(pm->node.nam, "%d", ppar);
-	    pm->node.flags = PM_SCALAR | PM_SPECIAL;
-	    pm->u.val = ppar;
-	    pm->gsu.s = &argn_gsu;
-	}
-    } else if (keep_lastref)
-	pm = ref;
-    unqueue_signals();
-    return pm;
-}
-
-/**/
 mod_export void
 setloopvar(char *name, char *value)
 {
