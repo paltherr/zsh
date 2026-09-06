@@ -4264,7 +4264,7 @@ arrhashsetfn(Param pm, char **val, int flags)
      * since that could cause trouble for special hashes.  This way, *
      * it's up to pm->gsu.h->setfn() what to do.                     */
     int alen = 0;
-    HashTable opmtab = paramtab, ht = 0;
+    HashTable ht = 0;
     char **aptr;
     Value v = (Value) hcalloc(sizeof *v);
     v->end = -1;
@@ -4280,10 +4280,10 @@ arrhashsetfn(Param pm, char **val, int flags)
 	return;
     }
     if (flags & ASSPM_AUGMENT) {
-	ht = paramtab = pm->gsu.h->getfn(pm);
+	ht = pm->gsu.h->getfn(pm);
     }
-    if (alen && (!(flags & ASSPM_AUGMENT) || !paramtab)) {
-	ht = paramtab = newparamtable(17, pm->node.nam);
+    if (alen && (!(flags & ASSPM_AUGMENT) || !ht)) {
+	ht = newparamtable(17, pm->node.nam);
     }
     for (aptr = val; *aptr; ) {
 	int eltflags = 0;
@@ -4301,18 +4301,17 @@ arrhashsetfn(Param pm, char **val, int flags)
 	    zsfree(*aptr++);
 	}
 	/* The parameter name is ztrdup'd... */
-	v->pm = createparam(*aptr, PM_SCALAR|PM_UNSET);
+	v->pm = createparam_ht(ht, *aptr, PM_SCALAR|PM_UNSET);
 	/*
 	 * createparam() doesn't return anything if the parameter
 	 * already existed.
 	 */
 	if (!v->pm)
-	    v->pm = (Param) paramtab->getnode(paramtab, *aptr);
+	    v->pm = (Param) ht->getnode(ht, *aptr);
 	zsfree(*aptr++);
 	/* ...but we can use the value without copying. */
 	assignstrvalue(v, *aptr++, eltflags);
     }
-    paramtab = opmtab;
     pm->gsu.h->setfn(pm, ht);
     free(val);		/* not freearray() */
 }
