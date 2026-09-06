@@ -1146,10 +1146,10 @@ deleteparamdef(Paramdef d)
 	if (!searchpm)
 	    return 1;
 
-	realparamtab->removenode(realparamtab, pm->node.nam);
+	paramtab->removenode(paramtab, pm->node.nam);
 	prevpm->old = searchpm->old;
 	searchpm->old = pm;
-	realparamtab->addnode(realparamtab, searchpm->node.nam, searchpm);
+	paramtab->addnode(paramtab, searchpm->node.nam, searchpm);
 
 	pm = searchpm;
     }
@@ -2759,7 +2759,7 @@ bin_zmodload_auto(char *nam, char **args, Options ops)
     } else if (OPT_ISSET(ops,'p')) {
 	if (!*args) {
 	    /* list autoloaded parameters */
-	    scanhashtable(realparamtab, 1, 0, 0, printautoparams,
+	    scanhashtable(paramtab, 1, 0, 0, printautoparams,
 			  OPT_ISSET(ops,'L'));
 	    return 0;
 	}

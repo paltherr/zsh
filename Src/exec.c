@@ -4573,7 +4573,7 @@ restore_params(LinkList restorelist, LinkList removelist)
 		}
 		pm = tpm;
 	    } else {
-		realparamtab->addnode(realparamtab, pm->node.nam, pm);
+		paramtab->addnode(paramtab, pm->node.nam, pm);
 	    }
 	    if ((pm->node.flags & PM_EXPORTED) && ((s = getsparam(pm->node.nam))))
 		addenv(pm, s);

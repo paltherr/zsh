@@ -131,8 +131,8 @@ scanpmparameters(UNUSED(HashTable ht), ScanFunc func, int flags)
     pm.node.flags = PM_SCALAR | PM_READONLY;
     pm.gsu.s = &nullsetscalar_gsu;
 
-    for (i = 0; i < realparamtab->hsize; i++)
-	for (hn = realparamtab->nodes[i]; hn; hn = hn->next) {
+    for (i = 0; i < paramtab->hsize; i++)
+	for (hn = paramtab->nodes[i]; hn; hn = hn->next) {
 	    if (((Param)hn)->node.flags & PM_UNSET)
 		continue;
 	    pm.node.nam = hn->nam;
@@ -1125,8 +1125,8 @@ scanpmmodules(UNUSED(HashTable ht), ScanFunc func, int flags)
 	    addlinknode(done, pm.node.nam);
 	    func(&pm.node, flags);
 	}
-    for (i = 0; i < realparamtab->hsize; i++)
-	for (hn = realparamtab->nodes[i]; hn; hn = hn->next) {
+    for (i = 0; i < paramtab->hsize; i++)
+	for (hn = paramtab->nodes[i]; hn; hn = hn->next) {
 	    if ((((Param) hn)->node.flags & PM_AUTOLOAD) &&
 		!linknodebystring(done, ((Param) hn)->u.str)) {
 		pm.node.nam = ((Param) hn)->u.str;

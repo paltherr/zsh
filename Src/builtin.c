@@ -677,12 +677,12 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     if (!arrayname)
     {
 	if (!hadopt && !*args)
-	    scanhashtable(realparamtab, 1, 0, 0, realparamtab->printnode,
+	    scanhashtable(paramtab, 1, 0, 0, paramtab->printnode,
 			  hadplus ? PRINT_NAMEONLY : 0);
 
 	if (array) {
 	    /* display arrays */
-	    scanhashtable(realparamtab, 1, PM_ARRAY, 0, realparamtab->printnode,
+	    scanhashtable(paramtab, 1, PM_ARRAY, 0, paramtab->printnode,
 			  hadplus ? PRINT_NAMEONLY : 0);
 	}
 	if (!*args && !hadend) {
@@ -2250,10 +2250,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	if (!on && !roff && !ASG_VALUEP(asg)) {
 	    int with_ns = OPT_ISSET(ops,'m') ? PRINT_WITH_NAMESPACE : 0;
 	    if (OPT_ISSET(ops,'p'))
-		realparamtab->printnode(&pm->node, PRINT_TYPESET|with_ns);
+		paramtab->printnode(&pm->node, PRINT_TYPESET|with_ns);
 	    else if (!OPT_ISSET(ops,'g') &&
 		     (unset(TYPESETSILENT) || OPT_ISSET(ops,'m')))
-		realparamtab->printnode(&pm->node, PRINT_INCLUDEVALUE|with_ns);
+		paramtab->printnode(&pm->node, PRINT_INCLUDEVALUE|with_ns);
 	    return pm;
 	}
 	if ((pm->node.flags & PM_READONLY) && !(off & PM_READONLY) &&
@@ -2286,8 +2286,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    }
 	}
 	if (OPT_ISSET(ops,'p')) {
-	    realparamtab->printnode(&pm->node,
-				    PRINT_TYPESET|PRINT_WITH_NAMESPACE);
+	    paramtab->printnode(&pm->node, PRINT_TYPESET|PRINT_WITH_NAMESPACE);
 	    return pm;
 	}
 	/*
@@ -2801,8 +2800,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	     */
 	    exclude = (PM_ARRAY|PM_HASHED) & ~(on|roff);
 	}
-	scanhashtable(realparamtab, 1, on|roff, exclude,
-		      realparamtab->printnode, printflags);
+	scanhashtable(paramtab, 1, on|roff, exclude, paramtab->printnode, printflags);
 	unqueue_signals();
 	return 0;
     }
@@ -3076,8 +3074,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 		continue;
 	    }
 	    if (OPT_PLUS(ops,'m') && !ASG_VALUEP(asg)) {
-		scanmatchtable(realparamtab, pprog, 1, on|roff, 0,
-			       realparamtab->printnode, printflags);
+		scanmatchtable(paramtab, pprog, 1, on|roff, 0,
+			       paramtab->printnode, printflags);
 		continue;
 	    }
 	    /*
@@ -3088,8 +3086,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	     * so we need to store the parameters to alter on a separate
 	     * list for later use.
 	     */
-	    for (i = 0; i < realparamtab->hsize; i++) {
-		for (pm = (Param) realparamtab->nodes[i]; pm;
+	    for (i = 0; i < paramtab->hsize; i++) {
+		for (pm = (Param) paramtab->nodes[i]; pm;
 		     pm = (Param) pm->node.next) {
 		    if (pm->node.flags & PM_UNSET)
 			continue;
@@ -3113,7 +3111,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	pm = getparam(asg->name);
 	if (OPT_ISSET(ops,'p')) {
 	    if (pm)
-		realparamtab->printnode((HashNode) pm, printflags);
+		paramtab->printnode((HashNode) pm, printflags);
 	    else {
 		zwarnnam(name, "no such variable: %s", asg->name);
 		returnval = 1;
@@ -3806,8 +3804,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    tokenize(s);
 	    if ((pprog = patcompile(s, PAT_STATIC, NULL))) {
 		/* Go through the parameter table, and unset any matches */
-		for (i = 0; i < realparamtab->hsize; i++) {
-		    for (pm = (Param) realparamtab->nodes[i]; pm; pm = next) {
+		for (i = 0; i < paramtab->hsize; i++) {
+		    for (pm = (Param) paramtab->nodes[i]; pm; pm = next) {
 			/* record pointer to next, since we may free this one */
 			next = (Param) pm->node.next;
 			if (pattry(pprog, pm->node.nam)) {

@@ -1347,7 +1347,7 @@ makecompparams(void)
 {
     Param cpm;
 
-    addcompparams(realparamtab, comprparams, comprpms);
+    addcompparams(paramtab, comprparams, comprpms);
 
     if (!(cpm = createparam(
 	      COMPSTATENAME,

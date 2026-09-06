@@ -539,16 +539,10 @@ static size_t argnparams_size;
 static LinkList *scoperefs = NULL;
 static int scoperefs_num = 0;
 
-/* "parameter table" - hash table containing the parameters
- *
- * realparamtab always points to the shell's global table.  paramtab is sometimes
- * temporarily changed to point at another table, while dealing with the keys
- * of an associative array (for example, see makecompparams() which initializes
- * the associative array ${compstate}).
- */
- 
+/* "parameter table" - hash table containing the parameters */
+
 /**/
-mod_export HashTable realparamtab;
+mod_export HashTable paramtab;
 
 /**/
 mod_export HashTable
@@ -614,7 +608,7 @@ isplaceholderref(Param pm)
 mod_export Param
 getparam(const char *name)
 {
-    return (Param) realparamtab->getnode2(realparamtab, name);
+    return (Param) paramtab->getnode2(paramtab, name);
 }
 
 /*
@@ -761,7 +755,7 @@ resolveparamref_rec(Param pm, int load, Param *lastref, const Param stop)
 	    pm->gsu.s = &argn_gsu;
 	}
 	unqueue_signals();
-    } else if ((pm = (Param)gethashnode2(realparamtab, refname)) &&
+    } else if ((pm = (Param)gethashnode2(paramtab, refname)) &&
 	       (pm = upscope(pm, ref)) && pm != stop)
 	pm = resolveparamref_rec(pm, load, lastref, stop);
     return pm;
@@ -1024,16 +1018,16 @@ createparamtable(void)
     char *machinebuf;
 #endif
 
-    realparamtab = newparamtable(151, "paramtab");
+    paramtab = newparamtable(151, "paramtab");
     /* Add the special parameters to the hash table */
     for (ip = special_params; ip->node.nam; ip++)
-	realparamtab->addnode(realparamtab, ztrdup(ip->node.nam), ip);
+	paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
     if (EMULATION(EMULATE_SH|EMULATE_KSH)) {
 	for (ip = special_params_sh; ip->node.nam; ip++)
-	    realparamtab->addnode(realparamtab, ztrdup(ip->node.nam), ip);
+	    paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
     } else {
 	while ((++ip)->node.nam)
-	    realparamtab->addnode(realparamtab, ztrdup(ip->node.nam), ip);
+	    paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
     }
 
     argvparam = (Param) &argvparam_pm;
@@ -1222,7 +1216,7 @@ assigngetset(Param pm)
 mod_export Param
 createparam(char *name, int flags)
 {
-    return createparam_ht(realparamtab, name, flags);
+    return createparam_ht(paramtab, name, flags);
 }
 
 /**/
@@ -1231,17 +1225,17 @@ createparam_ht(HashTable ht, char *name, int flags)
 {
     Param pm, oldpm;
 
-    if (ht != realparamtab)
+    if (ht != paramtab)
 	flags = (flags & ~PM_EXPORTED) | PM_HASHELEM;
 
     if (name != nulstring) {
-	oldpm = (Param) (ht == realparamtab ?
+	oldpm = (Param) (ht == paramtab ?
 			 /* gethashnode2() for direct table read */
-			 gethashnode2(realparamtab, name) :
+			 gethashnode2(paramtab, name) :
 			 ht->getnode(ht, name));
 
 	if (oldpm && (oldpm->node.flags & PM_RO_BY_DESIGN)) {
-	    DPUTS(ht != realparamtab, "BUG: createparam/ro-by-design: ht != realparamtab");
+	    DPUTS(ht != paramtab, "BUG: createparam/ro-by-design: ht != paramtab");
 	    if (!(flags & PM_LOCAL)) {
 		/* Must call the API for namerefs and specials to work */
 		pm = getparam(oldpm->node.nam);
@@ -1263,7 +1257,7 @@ createparam_ht(HashTable ht, char *name, int flags)
 	if (isset_pm(oldpm) &&
 	    (oldpm->level == locallevel || !(flags & PM_LOCAL)) &&
 	    !(flags & PM_NAMEREF) && (oldpm->node.flags & PM_NAMEREF)) {
-	    DPUTS(ht != realparamtab, "BUG: createparam/nameref: ht != realparamtab");
+	    DPUTS(ht != paramtab, "BUG: createparam/nameref: ht != paramtab");
 	    /* The reference oldpm should either refer to a paramater
 	     * that was unset or that does not yet exist, or it should
 	     * be or refer to a placeholder reference. If it refers to
@@ -1322,7 +1316,7 @@ createparam_ht(HashTable ht, char *name, int flags)
 		}
 		oldpm->node.flags &= ~PM_UNSET;
 		if ((oldpm->node.flags & PM_SPECIAL) && oldpm->ename) {
-		    DPUTS(ht != realparamtab, "BUG: createparam/ename: ht != realparamtab");
+		    DPUTS(ht != paramtab, "BUG: createparam/ename: ht != paramtab");
 		    Param altpm = resolveparam(oldpm->ename, 1);
 		    if (altpm)
 			altpm->node.flags &= ~PM_UNSET;
@@ -3934,7 +3928,7 @@ resetparam(Param pm, int flags)
 mod_export void
 unsetparam(char *s)
 {
-    unsetparam_ht(realparamtab, s);
+    unsetparam_ht(paramtab, s);
 }
 
 /**/
@@ -3944,9 +3938,7 @@ unsetparam_ht(HashTable ht, char *s)
     Param pm;
 
     queue_signals();
-    if ((pm = (Param) (ht == realparamtab ?
-		       (HashNode) getparam(s) :
-		       ht->getnode(ht, s))) &&
+    if ((pm = (ht == paramtab ? getparam(s) : (Param) ht->getnode(ht, s))) &&
 	!(pm->node.flags & PM_NAMEREF))
 	unsetparam_pm_ht(ht, pm, 0, 1);
     unqueue_signals();
@@ -3962,7 +3954,7 @@ unsetparam_ht(HashTable ht, char *s)
 mod_export int
 unsetparam_pm(Param pm, int altflag, int exp)
 {
-    return unsetparam_pm_ht(realparamtab, pm, altflag, exp);
+    return unsetparam_pm_ht(paramtab, pm, altflag, exp);
 }
 
 /**/
@@ -3991,7 +3983,7 @@ unsetparam_pm_ht(HashTable ht, Param pm, int altflag, int exp)
 
     /* remove it under its alternate name if necessary */
     if (altremove) {
-	DPUTS(ht != realparamtab, "BUG: unsetparam_pm/ename: ht != realparamtab");
+	DPUTS(ht != paramtab, "BUG: unsetparam_pm/ename: ht != paramtab");
 	Param altpm = resolveparam(altremove, 1);
 	/* tied parameters are at the same local level as each other */
 	Param oldpm = NULL;
@@ -4045,7 +4037,7 @@ unsetparam_pm_ht(HashTable ht, Param pm, int altflag, int exp)
      * Global variables can only be deleted if they aren't hidden by a
      * local one with the same name.
      */
-    if (!pm->level && ht == realparamtab && pm != getparam(pm->node.nam)) {
+    if (!pm->level && ht == paramtab && pm != getparam(pm->node.nam)) {
 	LinkList refs;
 	if (!scoperefs)
 	    scoperefs = zshcalloc((scoperefs_num = 8) * sizeof(refs));
@@ -6044,7 +6036,7 @@ endparamscope(void)
 #ifdef USE_LOCALE
     lc_update_needed = 0;
 #endif
-    scanhashtable(realparamtab, 0, 0, 0, scanendscope, 0);
+    scanhashtable(paramtab, 0, 0, 0, scanendscope, 0);
 #ifdef USE_LOCALE
     if (lc_update_needed)
     {
@@ -6542,7 +6534,7 @@ setscope(Param pm)
     queue_signals();
     /* Compute pm->base */
     if (!(pm->node.flags & PM_UPPER) && refname && *refname &&
-	(basepm = (Param)gethashnode2(realparamtab, refname)) &&
+	(basepm = (Param) gethashnode2(paramtab, refname)) &&
 	(basepm != pm || !basepm->old || (basepm = basepm->old))) {
 	setscope_base(pm, basepm->level);
     }

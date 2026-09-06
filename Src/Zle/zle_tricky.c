@@ -437,8 +437,8 @@ checkparams(char *p)
     int t0, n, l = strlen(p), e = 0;
     struct hashnode *hn;
 
-    for (t0 = realparamtab->hsize - 1, n = 0; n < 2 && t0 >= 0; t0--)
-	for (hn = realparamtab->nodes[t0]; n < 2 && hn; hn = hn->next)
+    for (t0 = paramtab->hsize - 1, n = 0; n < 2 && t0 >= 0; t0--)
+	for (hn = paramtab->nodes[t0]; n < 2 && hn; hn = hn->next)
 	    if (pfxlen(p, hn->nam) == l) {
 		n++;
 		if ((int)strlen(hn->nam) == l)
