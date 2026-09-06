@@ -614,7 +614,6 @@ isplaceholderref(Param pm)
 mod_export Param
 getparam(const char *name)
 {
-    DPUTS(paramtab != realparamtab, "BUG: getparam: paramtab != realparamtab");
     return (Param) realparamtab->getnode2(realparamtab, name);
 }
 
@@ -732,7 +731,6 @@ resolveparamref_pm(Param pm, int load, Param *lastref)
 static Param
 resolveparamref_rec(Param pm, int load, Param *lastref, const Param stop)
 {
-    DPUTS(paramtab != realparamtab, "BUG: resolveparam_rec: paramtab != realparamtab");
     Param ref;
     char *refname;
     if (load)
@@ -2377,7 +2375,6 @@ getvalue(Value v, char **pptr, int bracks)
 mod_export Value
 fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 {
-    DPUTS(paramtab != realparamtab, "BUG: fetchvalue: paramtab != realparamtab");
     char *s, *t, *ie;
     char sav, c;
     int ppar = 0;
@@ -3315,7 +3312,6 @@ check_warn_pm(Param pm, const char *pmtype, int created,
 mod_export Param
 assignsparam(char *s, char *val, int flags)
 {
-    DPUTS(paramtab != realparamtab, "BUG: assignsparam: paramtab != realparamtab");
     struct value vbuf;
     Value v;
     char *t = s;
@@ -3480,7 +3476,6 @@ setsparam(char *s, char *val)
 mod_export Param
 assignaparam(char *s, char **val, int flags)
 {
-    DPUTS(paramtab != realparamtab, "BUG: assignaparam: paramtab != realparamtab");
     struct value vbuf;
     Value v;
     char *t = s;
@@ -3726,7 +3721,6 @@ setaparam(char *s, char **aval)
 mod_export Param
 sethparam(char *s, char **val)
 {
-    DPUTS(paramtab != realparamtab, "BUG: sethparam: paramtab != realparamtab");
     struct value vbuf;
     Value v;
     char *t = s;
@@ -3788,7 +3782,6 @@ sethparam(char *s, char **val)
 static Param
 assignnparam(char *s, mnumber val, int flags)
 {
-    DPUTS(paramtab != realparamtab, "BUG: assignnparam: paramtab != realparamtab");
     struct value vbuf;
     Value v;
     char *t = s, *ss;
@@ -3921,7 +3914,6 @@ setiparam_no_convert(char *s, zlong val)
 mod_export int
 resetparam(Param pm, int flags)
 {
-    DPUTS(paramtab != realparamtab, "BUG: resetparam: paramtab != realparamtab");
     char *s = pm->node.nam;
     queue_signals();
     if (pm != getparam(s)) {
@@ -4503,7 +4495,6 @@ tiedarrgetfn(Param pm)
 void
 tiedarrsetfn(Param pm, char *x)
 {
-    DPUTS(paramtab != realparamtab, "BUG: tiedarrsetfn: paramtab != realparamtab");
     struct tieddata *dptr = (struct tieddata *)pm->u.data;
 
     if (*dptr->arrptr)
@@ -5475,7 +5466,6 @@ pipestatsetfn(UNUSED(Param pm), char **x)
 void
 arrfixenv(char *s, char **t)
 {
-    DPUTS(paramtab != realparamtab, "BUG: arrfixenv: paramtab != realparamtab");
     Param pm;
     int joinchar;
 
@@ -6469,7 +6459,6 @@ printparamnode(HashNode hn, int printflags)
 	     * typeset -T SCALAR array=('')
 	     * (same for (a b:c)...)
 	     */
-	    DPUTS(paramtab != realparamtab, "BUG: printparamnode_pm/ename: paramtab != realparamtab");
 	    Param tmp = resolveparam(p->ename, 1);
 
 	    /*
