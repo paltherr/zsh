@@ -615,7 +615,7 @@ mod_export Param
 getparam(const char *name)
 {
     DPUTS(paramtab != realparamtab, "BUG: getparam: paramtab != realparamtab");
-    return (Param) paramtab->getnode2(paramtab, name);
+    return (Param) realparamtab->getnode2(realparamtab, name);
 }
 
 /*
@@ -1029,13 +1029,13 @@ createparamtable(void)
     paramtab = realparamtab = newparamtable(151, "paramtab");
     /* Add the special parameters to the hash table */
     for (ip = special_params; ip->node.nam; ip++)
-	paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
+	realparamtab->addnode(realparamtab, ztrdup(ip->node.nam), ip);
     if (EMULATION(EMULATE_SH|EMULATE_KSH)) {
 	for (ip = special_params_sh; ip->node.nam; ip++)
-	    paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
+	    realparamtab->addnode(realparamtab, ztrdup(ip->node.nam), ip);
     } else {
 	while ((++ip)->node.nam)
-	    paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
+	    realparamtab->addnode(realparamtab, ztrdup(ip->node.nam), ip);
     }
 
     argvparam = (Param) &argvparam_pm;
@@ -6040,7 +6040,7 @@ endparamscope(void)
 #ifdef USE_LOCALE
     lc_update_needed = 0;
 #endif
-    scanhashtable(paramtab, 0, 0, 0, scanendscope, 0);
+    scanhashtable(realparamtab, 0, 0, 0, scanendscope, 0);
 #ifdef USE_LOCALE
     if (lc_update_needed)
     {
