@@ -1784,12 +1784,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		v->pm->gsu.h->setfn(v->pm, ht);
 	    }
 	    untokenize(s);
-	    if (!(v->pm = (Param) ht->getnode(ht, s))) {
-		HashTable tht = paramtab;
-		paramtab = ht;
-		v->pm = createparam(s, PM_SCALAR|PM_UNSET);
-		paramtab = tht;
-	    }
+	    if (!(v->pm = (Param) ht->getnode(ht, s)))
+		v->pm = createparam_ht(ht, s, PM_SCALAR|PM_UNSET);
 	    v->scanflags = (*inv ? SCANPM_WANTINDEX : 0);
 	    v->start = 0;
 	    *inv = 0;	/* We've already obtained the "index" (key) */
