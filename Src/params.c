@@ -1227,21 +1227,21 @@ createparam(char *name, int flags)
 
 /**/
 mod_export Param
-createparam_ht(HashTable paramtab, char *name, int flags)
+createparam_ht(HashTable ht, char *name, int flags)
 {
     Param pm, oldpm;
 
-    if (paramtab != realparamtab)
+    if (ht != realparamtab)
 	flags = (flags & ~PM_EXPORTED) | PM_HASHELEM;
 
     if (name != nulstring) {
-	oldpm = (Param) (paramtab == realparamtab ?
+	oldpm = (Param) (ht == realparamtab ?
 			 /* gethashnode2() for direct table read */
-			 gethashnode2(paramtab, name) :
-			 paramtab->getnode(paramtab, name));
+			 gethashnode2(realparamtab, name) :
+			 ht->getnode(ht, name));
 
 	if (oldpm && (oldpm->node.flags & PM_RO_BY_DESIGN)) {
-	    DPUTS(paramtab != realparamtab, "BUG: createparam/ro-by-design: paramtab != realparamtab");
+	    DPUTS(ht != realparamtab, "BUG: createparam/ro-by-design: ht != realparamtab");
 	    if (!(flags & PM_LOCAL)) {
 		/* Must call the API for namerefs and specials to work */
 		pm = getparam(oldpm->node.nam);
@@ -1263,7 +1263,7 @@ createparam_ht(HashTable paramtab, char *name, int flags)
 	if (isset_pm(oldpm) &&
 	    (oldpm->level == locallevel || !(flags & PM_LOCAL)) &&
 	    !(flags & PM_NAMEREF) && (oldpm->node.flags & PM_NAMEREF)) {
-	    DPUTS(paramtab != realparamtab, "BUG: createparam/nameref: paramtab != realparamtab");
+	    DPUTS(ht != realparamtab, "BUG: createparam/nameref: ht != realparamtab");
 	    /* The reference oldpm should either refer to a paramater
 	     * that was unset or that does not yet exist, or it should
 	     * be or refer to a placeholder reference. If it refers to
@@ -1322,7 +1322,7 @@ createparam_ht(HashTable paramtab, char *name, int flags)
 		}
 		oldpm->node.flags &= ~PM_UNSET;
 		if ((oldpm->node.flags & PM_SPECIAL) && oldpm->ename) {
-		    DPUTS(paramtab != realparamtab, "BUG: createparam/ename: paramtab != realparamtab");
+		    DPUTS(ht != realparamtab, "BUG: createparam/ename: ht != realparamtab");
 		    Param altpm = resolveparam(oldpm->ename, 1);
 		    if (altpm)
 			altpm->node.flags &= ~PM_UNSET;
@@ -1341,9 +1341,9 @@ createparam_ht(HashTable paramtab, char *name, int flags)
 		 */
 		if (oldpm->env)
 		    delenv(oldpm);
-		paramtab->removenode(paramtab, name);
+		ht->removenode(ht, name);
 	    }
-	    paramtab->addnode(paramtab, ztrdup(name), pm);
+	    ht->addnode(ht, ztrdup(name), pm);
 	}
 
 	if (isset(ALLEXPORT) && !(flags & (PM_NAMEREF | PM_HASHELEM)))
