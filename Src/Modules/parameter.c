@@ -40,13 +40,15 @@ static int incleanup;
 
 /**/
 static char *
-paramtypestr(Param pm, int append)
+paramtypestr(Param pm)
 {
     char *val = NULL;
-    int f = pm->node.flags;
+    int f;
 
-    if (!(f & PM_UNSET)) {
-	if (pm->node.flags & PM_AUTOLOAD)
+    if (!isset_pm(pm))
+	return dupstring("");
+    {
+	if ((f = pm->node.flags) & PM_AUTOLOAD)
 	    return dupstring("undefined");
 
 	switch (PM_TYPE(f)) {
@@ -88,14 +90,9 @@ paramtypestr(Param pm, int append)
 	    val = dyncat(val, "-hideval");
 	if (f & PM_SPECIAL)
 	    val = dyncat(val, "-special");
-    } else
-	val = dupstring("");
 
-    if (append) {
-	if ((pm->node.flags & PM_NAMEREF) &&
-	    (pm = asset_pm(resolveparam_pm(pm, 0)))) {
-	    val = zhtricat(val, "-", paramtypestr(pm, 0));
-	}
+	if ((f & PM_NAMEREF) && (pm = asset_pm(resolveparam_pm(pm, 0))))
+	    val = zhtricat(val, "-", paramtypestr(pm));
     }
     return val;
 }
@@ -111,7 +108,7 @@ getpmparameter(UNUSED(HashTable ht), const char *name)
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
     if ((rpm = asset_pm(getparam(name)))) {
-	pm->u.str = paramtypestr(rpm, 1);
+	pm->u.str = paramtypestr(rpm);
     } else {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
@@ -139,7 +136,7 @@ scanpmparameters(UNUSED(HashTable ht), ScanFunc func, int flags)
 	    if (func != scancountparams &&
 		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		 !(flags & SCANPM_WANTKEYS)))
-		pm.u.str = paramtypestr((Param) hn, 1);
+		pm.u.str = paramtypestr((Param) hn);
 	    func(&pm.node, flags);
 	}
 }
