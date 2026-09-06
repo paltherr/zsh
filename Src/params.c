@@ -3939,16 +3939,16 @@ unsetparam(char *s)
 
 /**/
 mod_export void
-unsetparam_ht(HashTable paramtab, char *s)
+unsetparam_ht(HashTable ht, char *s)
 {
     Param pm;
 
     queue_signals();
-    if ((pm = (Param) (paramtab == realparamtab ?
+    if ((pm = (Param) (ht == realparamtab ?
 		       (HashNode) getparam(s) :
-		       paramtab->getnode(paramtab, s))) &&
+		       ht->getnode(ht, s))) &&
 	!(pm->node.flags & PM_NAMEREF))
-	unsetparam_pm_ht(paramtab, pm, 0, 1);
+	unsetparam_pm_ht(ht, pm, 0, 1);
     unqueue_signals();
 }
 
@@ -3967,9 +3967,8 @@ unsetparam_pm(Param pm, int altflag, int exp)
 
 /**/
 mod_export int
-unsetparam_pm_ht(HashTable paramtab, Param pm, int altflag, int exp)
+unsetparam_pm_ht(HashTable ht, Param pm, int altflag, int exp)
 {
-    Param oldpm, altpm;
     char *altremove;
 
     if ((pm->node.flags & PM_READONLY) && pm->level <= locallevel) {
@@ -3992,10 +3991,10 @@ unsetparam_pm_ht(HashTable paramtab, Param pm, int altflag, int exp)
 
     /* remove it under its alternate name if necessary */
     if (altremove) {
-	DPUTS(paramtab != realparamtab, "BUG: unsetparam_pm/ename: paramtab != realparamtab");
-	altpm = resolveparam(altremove, 1);
+	DPUTS(ht != realparamtab, "BUG: unsetparam_pm/ename: ht != realparamtab");
+	Param altpm = resolveparam(altremove, 1);
 	/* tied parameters are at the same local level as each other */
-	oldpm = NULL;
+	Param oldpm = NULL;
 	/*
 	 * Look for param under alternate name hidden by a local.
 	 * If this parameter is special, however, the visible
@@ -4046,8 +4045,7 @@ unsetparam_pm_ht(HashTable paramtab, Param pm, int altflag, int exp)
      * Global variables can only be deleted if they aren't hidden by a
      * local one with the same name.
      */
-    if (!pm->level && paramtab == realparamtab &&
-	pm != getparam(pm->node.nam)) {
+    if (!pm->level && ht == realparamtab && pm != getparam(pm->node.nam)) {
 	LinkList refs;
 	if (!scoperefs)
 	    scoperefs = zshcalloc((scoperefs_num = 8) * sizeof(refs));
@@ -4058,11 +4056,11 @@ unsetparam_pm_ht(HashTable paramtab, Param pm, int altflag, int exp)
     }
 
     /* remove parameter node from table */
-    paramtab->removenode(paramtab, pm->node.nam);
+    ht->removenode(ht, pm->node.nam);
 
     if (pm->old) {
-	oldpm = pm->old;
-	paramtab->addnode(paramtab, oldpm->node.nam, oldpm);
+	Param oldpm = pm->old;
+	ht->addnode(ht, oldpm->node.nam, oldpm);
 	if (oldpm->node.flags & PM_EXPORTED) {
 	    /*
 	     * Re-export the old value which we removed in typeset_single().
@@ -4074,7 +4072,7 @@ unsetparam_pm_ht(HashTable paramtab, Param pm, int altflag, int exp)
 	}
     }
 
-    paramtab->freenode(&pm->node); /* free parameter node */
+    ht->freenode(&pm->node); /* free parameter node */
 
     return 0;
 }
