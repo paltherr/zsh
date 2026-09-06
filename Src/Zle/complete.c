@@ -1308,13 +1308,13 @@ static struct compparam compkparams[] = {
 #define COMPSTATENAME "compstate"
 
 static void
-addcompparams(struct compparam *cp, Param *pp)
+addcompparams(HashTable ht, struct compparam *cp, Param *pp)
 {
     for (; cp->name; cp++, pp++) {
-	Param pm = createparam(cp->name,
-			       cp->type |PM_SPECIAL|PM_REMOVABLE|PM_LOCAL);
+	Param pm = createparam_ht(ht, cp->name,
+				  cp->type |PM_SPECIAL|PM_REMOVABLE|PM_LOCAL);
 	if (!pm)
-	    pm = (Param) paramtab->getnode2(paramtab, cp->name);
+	    pm = (Param) ht->getnode2(ht, cp->name);
 	DPUTS1(!pm, "param %s not set in addcompparams", cp->name);
 
 	*pp = pm;
@@ -1347,7 +1347,7 @@ makecompparams(void)
 {
     Param cpm;
 
-    addcompparams(comprparams, comprpms);
+    addcompparams(realparamtab, comprparams, comprpms);
 
     if (!(cpm = createparam(
 	      COMPSTATENAME,
@@ -1358,9 +1358,8 @@ makecompparams(void)
     comprpms[CPN_COMPSTATE] = cpm;
     cpm->level = locallevel + 1;
     cpm->gsu.h = &compstate_gsu;
-    cpm->u.hash = paramtab = newparamtable(31, COMPSTATENAME);
-    addcompparams(compkparams, compkpms);
-    paramtab = realparamtab;
+    cpm->u.hash = newparamtable(31, COMPSTATENAME);
+    addcompparams(cpm->u.hash, compkparams, compkpms);
 }
 
 /**/
