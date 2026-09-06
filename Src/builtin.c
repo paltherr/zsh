@@ -3870,10 +3870,9 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		continue;
 	    }
 	    if (PM_TYPE(pm->node.flags) == PM_HASHED) {
-		HashTable tht = paramtab;
-		if ((paramtab = pm->gsu.h->getfn(pm)))
-		    unsetparam(subscript);
-		paramtab = tht;
+		HashTable ht;
+		if ((ht = pm->gsu.h->getfn(pm)))
+		    unsetparam_ht(ht, subscript);
 	    } else if (PM_TYPE(pm->node.flags) == PM_SCALAR ||
 		       PM_TYPE(pm->node.flags) == PM_ARRAY) {
 		struct value vbuf;
