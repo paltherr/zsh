@@ -1224,6 +1224,13 @@ assigngetset(Param pm)
 mod_export Param
 createparam(char *name, int flags)
 {
+    return createparam_ht(paramtab, name, flags);
+}
+
+/**/
+mod_export Param
+createparam_ht(HashTable paramtab, char *name, int flags)
+{
     Param pm, oldpm;
 
     if (paramtab != realparamtab)
@@ -3939,6 +3946,13 @@ resetparam(Param pm, int flags)
 mod_export void
 unsetparam(char *s)
 {
+    unsetparam_ht(paramtab, s);
+}
+
+/**/
+mod_export void
+unsetparam_ht(HashTable paramtab, char *s)
+{
     Param pm;
 
     queue_signals();
@@ -3946,7 +3960,7 @@ unsetparam(char *s)
 		       (HashNode) getparam(s) :
 		       paramtab->getnode(paramtab, s))) &&
 	!(pm->node.flags & PM_NAMEREF))
-	unsetparam_pm(pm, 0, 1);
+	unsetparam_pm_ht(paramtab, pm, 0, 1);
     unqueue_signals();
 }
 
@@ -3959,6 +3973,13 @@ unsetparam(char *s)
 /**/
 mod_export int
 unsetparam_pm(Param pm, int altflag, int exp)
+{
+    return unsetparam_pm_ht(paramtab, pm, altflag, exp);
+}
+
+/**/
+mod_export int
+unsetparam_pm_ht(HashTable paramtab, Param pm, int altflag, int exp)
 {
     Param oldpm, altpm;
     char *altremove;
