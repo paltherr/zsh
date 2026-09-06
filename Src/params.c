@@ -548,7 +548,7 @@ static int scoperefs_num = 0;
  */
  
 /**/
-mod_export HashTable paramtab, realparamtab;
+mod_export HashTable realparamtab;
 
 /**/
 mod_export HashTable
@@ -1024,7 +1024,7 @@ createparamtable(void)
     char *machinebuf;
 #endif
 
-    paramtab = realparamtab = newparamtable(151, "paramtab");
+    realparamtab = newparamtable(151, "paramtab");
     /* Add the special parameters to the hash table */
     for (ip = special_params; ip->node.nam; ip++)
 	realparamtab->addnode(realparamtab, ztrdup(ip->node.nam), ip);
@@ -1222,7 +1222,7 @@ assigngetset(Param pm)
 mod_export Param
 createparam(char *name, int flags)
 {
-    return createparam_ht(paramtab, name, flags);
+    return createparam_ht(realparamtab, name, flags);
 }
 
 /**/
@@ -3934,7 +3934,7 @@ resetparam(Param pm, int flags)
 mod_export void
 unsetparam(char *s)
 {
-    unsetparam_ht(paramtab, s);
+    unsetparam_ht(realparamtab, s);
 }
 
 /**/
@@ -3962,7 +3962,7 @@ unsetparam_ht(HashTable paramtab, char *s)
 mod_export int
 unsetparam_pm(Param pm, int altflag, int exp)
 {
-    return unsetparam_pm_ht(paramtab, pm, altflag, exp);
+    return unsetparam_pm_ht(realparamtab, pm, altflag, exp);
 }
 
 /**/
