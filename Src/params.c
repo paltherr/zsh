@@ -585,7 +585,7 @@ loadparamnode(Param pm)
 	char *nam = dupstring(pm->node.nam);
 	char *mn = dupstring(pm->u.str);
 	(void)ensurefeature(mn, "p:", nam);
-	pm = (Param)gethashnode2(paramtab, nam);
+	pm = getparam(nam);
 	while (pm && pm->level > level)
 	    pm = pm->old;
 	if (pm && (pm->level != level || (pm->node.flags & PM_AUTOLOAD)))
@@ -6544,7 +6544,7 @@ printparamnode(HashNode hn, int printflags)
 mod_export void
 setloopvar(char *name, char *value)
 {
-  Param pm = (Param) gethashnode2(realparamtab, name);
+  Param pm = getparam(name);
 
   if (pm && (pm->node.flags & PM_NAMEREF)) {
       if (pm->node.flags & PM_READONLY) {
