@@ -1283,47 +1283,47 @@ createparam(char *name, int flags)
 	     **/
 	}
 
-	if (oldpm && !(flags & PM_NAMEREF) &&
+	if (isset_pm(oldpm) &&
 	    (oldpm->level == locallevel || !(flags & PM_LOCAL)) &&
-	    (oldpm->node.flags & PM_NAMEREF) &&
-	    (!(oldpm->node.flags & PM_UNSET) ||
-	     (oldpm->node.flags & PM_DECLARED))) {
+	    !(flags & PM_NAMEREF) && (oldpm->node.flags & PM_NAMEREF)) {
 	    DPUTS(paramtab != realparamtab, "BUG: createparam/nameref: paramtab != realparamtab");
-	    /**
-	     * Here we only have to deal with namerefs that refer to
-	     * not-yet-defined or unset variable. All other namerefs
-	     * have already been taken care of by the resolve_nameref
-	     * in typeset_single. It's unclear why these can't be
-	     * handled there too.
-	     **/
-	    Param lastpm = resolve_nameref_rec(oldpm, NULL, 1);
+	    /* The reference oldpm should either refer to a paramater
+	     * that was unset or that does not yet exist, or it should
+	     * be or refer to a placeholder reference. If it refers to
+	     * an existing parameter, then createparam should most
+	     * likely not have been called. */
+	    Param lastref, lastpm = resolveparamref_pm(oldpm, 0, &lastref);
+	    char *refname;
 	    if (lastpm) {
-		if (lastpm->node.flags & PM_NAMEREF &&
-		    (!(lastpm->node.flags & PM_UNSET) ||
-		     (lastpm->node.flags & PM_DECLARED))) {
-		    char *refname = GETREFNAME(lastpm);
-		    if (refname && *refname) {
-			/* nameref pointing to a not-yet-defined variable */
-			name = refname;
-			oldpm = NULL;
-		    } else {
-			/* nameref pointing to an uninitialized nameref */
-			if (!(lastpm->node.flags & PM_READONLY)) {
-			    if (flags & ~PM_LOCAL) {
-				/* Only plain scalar assignment allowed */
-				zerr("%s: can't change type of named reference",
-				     name);	/* Differs from ksh93u+ */
-				return NULL;
-			    }
-			}
-			return lastpm;
-		    }
-		} else {
-		    /* nameref pointing to an unset local */
-		    DPUTS(!(lastpm->node.flags & PM_UNSET),
-			  "BUG: local parameter is not unset");
-		    oldpm = lastpm;
+		DPUTS(isset_pm(lastpm), "BUG: parameter is not unset");
+		/* oldpm refers to the unset parameter lastpm */
+		oldpm = lastpm;
+	    } else if (!(refname = GETREFNAME(lastref)) || !*refname) {
+		/* oldpm is or refers to the placeholder reference lastref */
+		/* TODO: Is this section dead? At least, the error
+		 * seems impossible to trigger. */
+		if (!(lastref->node.flags & PM_READONLY) &&
+		    (flags & ~PM_LOCAL)) {
+		    /* Only plain scalar assignment allowed */
+		    /* Differs from ksh93u+ */
+		    zerr("%s: can't change type of named reference", name);
+		    return NULL;
 		}
+		return lastref;
+	    } else if (!getparam(refname)) {
+		/* oldpm refers to a nonexistent parameter named refname */
+		name = refname;
+		oldpm = NULL;
+	    } else {
+		/* oldpm refers to a parameter named refname that only
+		 * exists in scopes too deeply nested to be seen by
+		 * lastref. The creation of a hidden parameter is
+		 * needed, which is currently not supported. */
+		/* TODO: Should this case be explicitly handled here?
+		 * Should it trigger an error or a warning?  For now,
+		 * probably more by accident than by design, oldpm and
+		 * name are left unchanged, which leads, apparently
+		 * always, to returning NULL with no error message. */
 	    }
 	}
 
