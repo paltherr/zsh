@@ -682,23 +682,97 @@ loadparam_pm(Param pm)
     return isset_pm(pm) ? loadparamnode(pm) : pm;
 }
 
+
+/*
+ * Retrieves the parameter with the given name, and returns the
+ * parameter it refers to as detailed in resolveparam_pm(). Returns
+ * NULL if there is no parameter with the given name.
+ */
+
+/**/
+mod_export Param
+resolveparam(const char *name, int load)
+{
+    return resolveparam_pm(getparam(name), load);
+}
+
+/*
+ * Returns the parameter referred to by the provided one, or NULL if
+ * there is no such parameter. Returns the parameter itself if it is
+ * not a reference. Returns a parameter, possibly a reference, that is
+ * not set if the provided parameter is or refers to such a parameter.
+ * Returns NULL if and only if the provided parameter is NULL, is or
+ * refers to a placeholder reference or a reference that refers to a
+ * nonexistent parameter, or, if load is non-zero, is or refers to an
+ * autoload parameter that fails to load.
+ *
+ * If load is non-zero, loads any autoload parameter encountered
+ * during the resolution, including the provided one.
+ *
+ * The returned parameter is guaranteed to NOT be a set reference.
+ * Though, it may be an unset one, or, if load is zero, an autoload
+ * parameter that turns into a set reference upon loading.
+ */
+
+/**/
+mod_export Param
+resolveparam_pm(Param pm, int load)
+{
+    return resolveparamref_rec(pm, load, NULL, NULL);
+}
+
+/*
+ * Same as resolveparam() but additionally assigns lastref with the
+ * last reference followed during the resolution, or NULL if there was
+ * none.
+ */
+
+/**/
+mod_export Param
+resolveparamref(const char *name, int load, Param *lastref)
+{
+    return resolveparamref_pm(getparam(name), load, lastref);
+}
+
+/*
+ * Same as resolveparam_pm() but additionally assigns lastref with the
+ * last reference followed during the resolution, or NULL if there was
+ * none.
+ */
+
+/**/
+mod_export Param
+resolveparamref_pm(Param pm, int load, Param *lastref)
+{
+    *lastref = NULL;
+    return resolveparamref_rec(pm, load, lastref, NULL);
+}
+
+/*
+ * Same as resolveparamref_pm() but does NOT assign lastref with NULL
+ * if no references are followed and returns stop if any reference
+ * followed refers to it.
+ */
+
 /**/
 static Param
-resolveparam_rec(Param pm, const Param stop, int keep_lastref)
+resolveparamref_rec(Param pm, int load, Param *lastref, const Param stop)
 {
     DPUTS(paramtab != realparamtab, "BUG: resolveparam_rec: paramtab != realparamtab");
-    Param ref = pm;
+    Param ref;
     char *refname;
-    if (!pm || !(pm->node.flags & PM_NAMEREF) || (pm->node.flags & PM_UNSET)
-	|| !(refname = GETREFNAME(pm)) || !*refname)
+    if (load)
+	pm = loadparam_pm(pm);
+    if (!isset_pm(pm) || !(pm->node.flags & PM_NAMEREF))
 	return pm;
-    queue_signals();
-    if ((pm = (Param)gethashnode2(realparamtab, refname))) {
-	if ((pm = loadparamnode(upscope(pm, ref))) &&
-	    pm != stop && !(pm->node.flags & PM_UNSET))
-	    pm = resolveparam_rec(pm, stop, keep_lastref);
-    } else if (idigit(*refname)) {
+    ref = pm;
+    if (lastref)
+	*lastref = ref;
+    if (!(refname = GETREFNAME(ref)) || !*refname)
+	return NULL;
+    if (idigit(*refname)) {
 	int ppar = zstrtol(refname, NULL, 10);
+	queue_signals();
 	if (ppar >= argnparams_size) {
 	    size_t old_size = argnparams_size;
 	    size_t new_size = argnparams_size = maximum(2 * old_size, ppar + 1);
@@ -714,9 +788,10 @@ resolveparam_rec(Param pm, const Param stop, int keep_lastref)
 	    pm->u.val = ppar;
 	    pm->gsu.s = &argn_gsu;
 	}
-    } else if (keep_lastref)
-	pm = ref;
-    unqueue_signals();
+	unqueue_signals();
+    } else if ((pm = (Param)gethashnode2(realparamtab, refname)) &&
+	       (pm = upscope(pm, ref)) && pm != stop)
+	pm = resolveparamref_rec(pm, load, lastref, stop);
     return pm;
 }
 
