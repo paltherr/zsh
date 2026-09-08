@@ -2449,14 +2449,15 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 	if (sav)
 	    *s = sav;
     } else {
-	Param pm;
-	int isvarat;
-
-        isvarat = (t[0] == '@' && !t[1]);
-	if (scanflags & SCANPM_NONAMEREF)
-	    pm = (Param) paramtab->getnode2(paramtab, *t == '0' ? "0" : t);
-	else
-	    pm = (Param) paramtab->getnode(paramtab, *t == '0' ? "0" : t);
+	int isvarat = (t[0] == '@' && !t[1]);
+	Param pm = getparam(*t == '0' ? "0" : t);
+	if (!(scanflags & SCANPM_NONAMEREF)) {
+	    Param lastref;
+	    pm = resolveparamref_pm(pm, 1, &lastref);
+	    /* TODO: Do the following only for assignments. */
+	    if (!pm && isplaceholderref(lastref))
+		pm = lastref;
+	}
 	if (!pm && *t == '.' && !isident(t)) {
 	    /* badly formed namespace reference */
 	    if (sav)
@@ -2465,8 +2466,7 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 	} else if (sav)
 	    *s = sav;
 	*pptr = s;
-	if (!pm || ((pm->node.flags & PM_UNSET) &&
-		    !(pm->node.flags & PM_DECLARED)))
+	if (!isset_pm(pm))
 	    return NULL;
 	if (!v)
 	    v = (Value) zhalloc(sizeof *v);

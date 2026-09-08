@@ -622,8 +622,13 @@ getprivatenode2(HashTable ht, const char *nam)
     HashNode hn = gethashnode2(ht, nam);
     Param pm = (Param) hn;
 
-    while (!fakelevel && pm && locallevel > pm->level && is_private(pm))
+    while (!fakelevel && pm && is_private(pm) && locallevel > pm->level) {
+	if (pm->level == private_wraplevel + 1) {
+	    /* Variable is in the current function scope */
+	    break;
+	}
 	pm = pm->old;
+    }
     return (HashNode)pm;
 }
 
