@@ -643,6 +643,45 @@ isplaceholderref(Param pm)
 	(!(refname = GETREFNAME(pm)) || !*refname);
 }
 
+/*
+ * Returns the parameter with the given name, or NULL if there is none
+ * with that name. The returned parameter may be one that is not set.
+ */
+
+/**/
+mod_export Param
+getparam(const char *name)
+{
+    DPUTS(paramtab != realparamtab, "BUG: getparam: paramtab != realparamtab");
+    return (Param) paramtab->getnode2(paramtab, name);
+}
+
+/*
+ * Retrieves the parameter with the given name, loads it if it is an
+ * autoload one, and returns it. Returns NULL if there is no parameter
+ * with the given name or if the parameter fails to load. The returned
+ * parameter may be one that is not set.
+ */
+
+/**/
+mod_export Param
+loadparam(const char *name)
+{
+    return loadparam_pm(getparam(name));
+}
+
+/*
+ * Loads the parameter if it is an autoload one and returns it, or
+ * NULL if the parameter fails to load.
+ */
+
+/**/
+mod_export Param
+loadparam_pm(Param pm)
+{
+    return isset_pm(pm) ? loadparamnode(pm) : pm;
+}
+
 /* Copy a parameter hash table */
 
 static HashTable outtable;
