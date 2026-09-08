@@ -561,22 +561,11 @@ wrap_private(Eprog prog, FuncWrap w, char *name)
     return 1;
 }
 
-static GetNodeFunc getparamnode;
-
 /**/
 static HashNode
-getprivatenode(HashTable ht, const char *nam)
+getprivatenode2(HashTable ht, const char *nam)
 {
-    /* getparamnode() would follow namerefs, we must not do that here */
-    HashNode hn = gethashnode2(ht, nam);
-    Param pm = (Param) hn;
-
-    /* autoload has precedence over nameref, so getparamnode() */
-    if (pm && (pm->node.flags & PM_AUTOLOAD)) {
-	hn = getparamnode(ht, nam);
-	pm = (Param) hn;
-	/* how would an autoloaded private behave?  return here? */
-    }
+    Param pm = (Param) gethashnode2(ht, nam);
     while (!fakelevel && pm && is_private(pm) && locallevel > pm->level) {
 	if (pm->level == private_wraplevel + 1) {
 	    /* Variable is in the current function scope */
@@ -603,30 +592,6 @@ getprivatenode(HashTable ht, const char *nam)
 	    DPUTS(pm->old, "BUG: PM_UNSET cleared in wrong scope");
 	}
 #endif
-	pm = pm->old;
-    }
-
-    /* resolve nameref after skipping private parameters */
-    if (pm && (pm->node.flags & PM_NAMEREF) &&
-	(pm->u.str || (pm->node.flags & PM_UNSET)))
-	pm = resolve_nameref(pm);
-
-    return (HashNode)pm;
-}
-
-/**/
-static HashNode
-getprivatenode2(HashTable ht, const char *nam)
-{
-    /* getparamnode() would follow autoloads, we must not do that here */
-    HashNode hn = gethashnode2(ht, nam);
-    Param pm = (Param) hn;
-
-    while (!fakelevel && pm && is_private(pm) && locallevel > pm->level) {
-	if (pm->level == private_wraplevel + 1) {
-	    /* Variable is in the current function scope */
-	    break;
-	}
 	pm = pm->old;
     }
     return (HashNode)pm;
@@ -677,10 +642,8 @@ setup_(UNUSED(Module m))
     HashNode hn = builtintab->getnode(builtintab, "local");
 
     /* Horrible, horrible hack */
-    getparamnode = realparamtab->getnode;
     save_getnode2 = realparamtab->getnode2;
     save_printnode = realparamtab->printnode;
-    realparamtab->getnode = getprivatenode;
     realparamtab->getnode2 = getprivatenode2;
     realparamtab->printnode = printprivatenode;
 
@@ -725,8 +688,7 @@ cleanup_(Module m)
     *(Builtin)hn = save_local;
 
     removehashnode(reswdtab, "private");
-    
-    realparamtab->getnode = getparamnode;
+
     realparamtab->getnode2 = save_getnode2;
     realparamtab->printnode = save_printnode;
 
