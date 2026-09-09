@@ -301,20 +301,28 @@ F:future revision will create a global with this assignment
 *>*
 *>*
 
- typeset top=TOP
+ typeset out=OUT
  () {
-  local -P -n test=top
-  print $test
-  test=top
-  print $test
-  () { print UP: $test }
+   typeset lcl=LCL
+   local -P -n ref1=out ref2=lcl ref3=undef ref4=""
+   print "A: ref1=$ref1 ref2=$ref2 ref3=$ref3 ref4=$ref4 out=$out lcl=$lcl undef=$undef"
+   ref1=Out ref2=Lcl ref3=Glb ref4=out
+   print "B: ref1=$ref1 ref2=$ref2 ref3=$ref3 ref4=$ref4 out=$out lcl=$lcl undef=$undef"
+   () { print "C: ref1=$ref1 ref2=$ref2 ref3=$ref3 ref4=$ref4 out=$out lcl=$lcl undef=$undef" }
+   typeset -p ref1 ref2 ref3 ref4 undef
  }
- print $top
+ print "D: out=$out undef=$undef"
+ unset undef
 0:nameref can be declared private
->TOP
->top
->UP:
->top
+>A: ref1=OUT ref2=LCL ref3= ref4= out=OUT lcl=LCL undef=
+>B: ref1=Out ref2=Lcl ref3=Glb ref4=Out out=Out lcl=Lcl undef=Glb
+>C: ref1= ref2= ref3= ref4= out=Out lcl=Lcl undef=Glb
+>typeset -hn ref1=out
+>typeset -hn ref2=lcl
+>typeset -hn ref3=undef
+>typeset -hn ref4=out
+>typeset -g undef=Glb
+>D: out=Out undef=Glb
 
  () {
    typeset -a ary

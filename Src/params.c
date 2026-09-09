@@ -1099,8 +1099,7 @@ createparam(char *name, int flags)
 	}
 
 	if (oldpm && !(flags & PM_NAMEREF) &&
-	    (oldpm->level == locallevel ?
-	     !(oldpm->node.flags & PM_RO_BY_DESIGN) : !(flags & PM_LOCAL)) &&
+	    (oldpm->level == locallevel || !(flags & PM_LOCAL)) &&
 	    (oldpm->node.flags & PM_NAMEREF) &&
 	    (!(oldpm->node.flags & PM_UNSET) ||
 	     (oldpm->node.flags & PM_DECLARED))) {
