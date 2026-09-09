@@ -76,16 +76,18 @@
 0d:Test loading of all compiled modules
 
  zmodload -e $mods
-0d:Check that zsh believes the modules did load
+0:Check that zsh believes the modules did load
 
 # Now check for proper failure conditions by trying some operations on
 # a nonexistent module.
 
  zmodload bogus/notamodule
-1D:Check that loading a nonexistent module fails
+1:Check that loading a nonexistent module fails
+*?\(eval\):1: failed to load module `bogus/notamodule':*
 
  zmodload -u bogus/notamodule
-1D:Check that unloading a nonexistent module fails
+1:Check that unloading a nonexistent module fails
+?(eval):zmodload:1: no such module bogus/notamodule
 
 # Test adding and removing autoloads, using a nonexistent module.
 
@@ -126,14 +128,18 @@
    mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -ab zsh/example example
-   builtin example
+   builtin example >/dev/null
    zmodload -e zsh/example
-0d:Autoload a module via a builtin
+0:Autoload a module via a builtin
+>Thank you for using the example module.  Have a nice day.
+>The example module has now been set up.
 
   mod=zsh/example skip-test-if-module-is-not-available
   zmodload -u zsh/example
-  builtin example
-0d:Autoloads are persistent
+  builtin example >/dev/null
+0:Autoloads are persistent
+>Thank you for using the example module.  Have a nice day.
+>The example module has now been set up.
 
   (zmodload -u zsh/parameter
   zmodload -aF zsh/parameter b:fail
@@ -216,23 +222,32 @@
    mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -ac -I zsh/example ex
-   [[ exam -ex ple ]]
+   [[ exam -ex ple ]]; echo status=$?
    zmodload -e zsh/example
-0d:Autoload a module via a condition
+0:Autoload a module via a condition
+>Thank you for using the example module.  Have a nice day.
+>The example module has now been set up.
+>status=0
 
    mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -ap zsh/example exint
-   : $exint
+   echo exint=$exint
    zmodload -e zsh/example
-0d:Autoload a module via a parameter
+0:Autoload a module via a parameter
+>Thank you for using the example module.  Have a nice day.
+>The example module has now been set up.
+>exint=42
 
    mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -af zsh/example sum
-   (( sum(1) ))
+   echo sum=$(( sum(1,2,3) ))
    zmodload -e zsh/example
-0d:Autoload a module via a math function
+0:Autoload a module via a math function
+>Thank you for using the example module.  Have a nice day.
+>The example module has now been set up.
+>sum=6
 
    mod=zsh/watch skip-test-if-module-is-not-available
    zmodload -u zsh/watch
@@ -252,9 +267,11 @@
    mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u example
    zmodload -ab example
-   builtin example
+   builtin example >/dev/null
    zmodload -e example
-0d:Unload/autoload the module via its alias
+0:Unload/autoload the module via its alias
+>Thank you for using the example module.  Have a nice day.
+>The example module has now been set up.
 
  zmodload -R example
  zmodload -e example
