@@ -6553,29 +6553,29 @@ setloopvar(char *name, char *value)
 static void
 setscope(Param pm)
 {
-	Param basepm = NULL;
-	char *refname = GETREFNAME(pm);
-	queue_signals();
-	/* Compute pm->base */
-	if (!(pm->node.flags & PM_UPPER) && refname && *refname &&
-	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
-	    (basepm = loadparam_pm(basepm)) &&
-	    (basepm != pm || !basepm->old || (basepm = basepm->old))) {
-	    setscope_base(pm, basepm->level);
-	}
-	if (pm->base > pm->level) {
-	    if (EMULATION(EMULATE_KSH)) {
-		zerr("%s: global reference cannot refer to local variable",
-		      pm->node.nam);
-		unsetparam_pm(pm, 0, 1);
-	    } else if (isset(WARNNESTEDVAR))
-		zwarn("reference %s in enclosing scope set to local variable %s",
-		      pm->node.nam, refname);
-	}
-	if (basepm == pm || resolveparamref_rec(pm, 0, NULL, pm) == pm) {
-	    zerr("%s: invalid self reference", refname);
+    Param basepm = NULL;
+    char *refname = GETREFNAME(pm);
+    queue_signals();
+    /* Compute pm->base */
+    if (!(pm->node.flags & PM_UPPER) && refname && *refname &&
+	(basepm = (Param)gethashnode2(realparamtab, refname)) &&
+	(basepm = loadparam_pm(basepm)) &&
+	(basepm != pm || !basepm->old || (basepm = basepm->old))) {
+	setscope_base(pm, basepm->level);
+    }
+    if (pm->base > pm->level) {
+	if (EMULATION(EMULATE_KSH)) {
+	    zerr("%s: global reference cannot refer to local variable",
+		 pm->node.nam);
 	    unsetparam_pm(pm, 0, 1);
-	}
+	} else if (isset(WARNNESTEDVAR))
+	    zwarn("reference %s in enclosing scope set to local variable %s",
+		  pm->node.nam, refname);
+    }
+    if (basepm == pm || resolveparamref_rec(pm, 0, NULL, pm) == pm) {
+	zerr("%s: invalid self reference", refname);
+	unsetparam_pm(pm, 0, 1);
+    }
     unqueue_signals();
 }
 
