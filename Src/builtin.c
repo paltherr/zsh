@@ -2476,10 +2476,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    return NULL;
 	} else if ((on & PM_LOCAL) && locallevel) {
 	    *subscript = 0;
-	    pm = (Param) (paramtab == realparamtab ?
-			  /* getnode2() to avoid autoloading */
-			  paramtab->getnode2(paramtab, pname) :
-			  paramtab->getnode(paramtab, pname));
+	    pm = (Param) paramtab->getnode2(paramtab, pname));
 	    *subscript = '[';
 	    if (!pm || pm->level != locallevel) {
 		zerrnam(cname,
@@ -3116,10 +3113,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 
     /* Take arguments literally.  Don't glob */
     while ((asg = getasg(&argv, assigns))) {
-	HashNode hn = (paramtab == realparamtab ?
-		       /* getnode2() to avoid autoloading */
-		       paramtab->getnode2(paramtab, asg->name) :
-		       paramtab->getnode(paramtab, asg->name));
+	HashNode hn = paramtab->getnode2(paramtab, asg->name);
 	if (OPT_ISSET(ops,'p')) {
 	    if (hn)
 		paramtab->printnode(hn, printflags);

@@ -3933,10 +3933,7 @@ resetparam(Param pm, int flags)
     DPUTS(paramtab != realparamtab, "BUG: resetparam: paramtab != realparamtab");
     char *s = pm->node.nam;
     queue_signals();
-    if (pm != (Param)(paramtab == realparamtab ?
-	       /* getnode2() to avoid autoloading */
-	       paramtab->getnode2(paramtab, s) :
-	       paramtab->getnode(paramtab, s))) {
+    if (pm != (Param) paramtab->getnode2(paramtab, s)) {
 	unqueue_signals();
 	zerr("can't change type of hidden variable: %s", s);
 	return 1;
@@ -4053,11 +4050,8 @@ unsetparam_pm(Param pm, int altflag, int exp)
      * Global variables can only be deleted if they aren't hidden by a
      * local one with the same name.
      */
-    if (!pm->level &&
-	pm != (Param) (paramtab == realparamtab ?
-		       /* getnode2() to avoid autoloading */
-		       paramtab->getnode2(paramtab, pm->node.nam) :
-		       paramtab->getnode(paramtab, pm->node.nam))) {
+    if (!pm->level && paramtab == realparamtab &&
+	pm != (Param) paramtab->getnode2(paramtab, pm->node.nam)) {
 	LinkList refs;
 	if (!scoperefs)
 	    scoperefs = zshcalloc((scoperefs_num = 8) * sizeof(refs));
