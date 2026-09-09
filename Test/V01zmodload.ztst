@@ -129,16 +129,34 @@
    zmodload -u zsh/example
    zmodload -ab zsh/example example
    builtin example >/dev/null
+   type example
+   typeset -p exarr
    zmodload -e zsh/example
 0:Autoload a module via a builtin
 >Thank you for using the example module.  Have a nice day.
 >The example module has now been set up.
+>example is a shell builtin
+>typeset -g -a exarr=(  )
 
   mod=zsh/example skip-test-if-module-is-not-available
   zmodload -u zsh/example
   builtin example >/dev/null
 0:Autoloads are persistent
 >Thank you for using the example module.  Have a nice day.
+>The example module has now been set up.
+
+  mod=zsh/example skip-test-if-module-is-not-available
+  type example
+  zmodload -u zsh/example
+  type example
+  zmodload -ub example
+  type example
+  zmodload zsh/example
+0:Autoloads can be removed
+>example is a shell builtin
+>Thank you for using the example module.  Have a nice day.
+>example is a shell builtin
+>example not found
 >The example module has now been set up.
 
   (zmodload -u zsh/parameter
@@ -223,31 +241,43 @@
    zmodload -u zsh/example
    zmodload -ac -I zsh/example ex
    [[ exam -ex ple ]]; echo status=$?
+   type example
+   typeset -p exarr
    zmodload -e zsh/example
 0:Autoload a module via a condition
 >Thank you for using the example module.  Have a nice day.
 >The example module has now been set up.
 >status=0
+>example is a shell builtin
+>typeset -g -a exarr=( example array )
 
    mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -ap zsh/example exint
    echo exint=$exint
+   type example
+   typeset -p exarr
    zmodload -e zsh/example
 0:Autoload a module via a parameter
 >Thank you for using the example module.  Have a nice day.
 >The example module has now been set up.
 >exint=42
+>example not found
+?(eval):typeset:6: no such variable: exarr
 
    mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -af zsh/example sum
    echo sum=$(( sum(1,2,3) ))
+   type example
+   typeset -p exarr
    zmodload -e zsh/example
 0:Autoload a module via a math function
 >Thank you for using the example module.  Have a nice day.
 >The example module has now been set up.
 >sum=6
+>example not found
+?(eval):typeset:6: no such variable: exarr
 
    mod=zsh/watch skip-test-if-module-is-not-available
    zmodload -u zsh/watch
@@ -268,10 +298,14 @@
    zmodload -u example
    zmodload -ab example
    builtin example >/dev/null
+   type example
+   typeset -p exarr
    zmodload -e example
 0:Unload/autoload the module via its alias
 >Thank you for using the example module.  Have a nice day.
 >The example module has now been set up.
+>example is a shell builtin
+>typeset -g -a exarr=(  )
 
  zmodload -R example
  zmodload -e example
