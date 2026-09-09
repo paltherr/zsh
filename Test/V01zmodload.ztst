@@ -42,6 +42,13 @@
  mkdir zmodload.tmp
  cd zmodload.tmp
 
+ alias skip-test-if-module-is-not-available=';
+   if [[ $mods[(r)$mod] != $mod ]]; then
+     ZTST_skip="$mod module not available"
+     return
+   fi
+ '
+
 %test
 
 # This first test depends on knowing that zsh is run with +Z from the
@@ -116,19 +123,16 @@
 
 # If the "example" module is available, test various autoloading behavior.
 
- if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -ab zsh/example example
    builtin example
    zmodload -e zsh/example
- else print -u$ZTST_fd Warning: zsh/example not linked: not checking autoloading
- fi
 0d:Autoload a module via a builtin
 
- if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+  mod=zsh/example skip-test-if-module-is-not-available
   zmodload -u zsh/example
   builtin example
- fi
 0d:Autoloads are persistent
 
   (zmodload -u zsh/parameter
@@ -209,40 +213,31 @@
 >p:userdirs
 >p:usergroups
 
- if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -ac -I zsh/example ex
    [[ exam -ex ple ]]
    zmodload -e zsh/example
- else :
- fi
 0d:Autoload a module via a condition
 
- if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -ap zsh/example exint
    : $exint
    zmodload -e zsh/example
- else :
- fi
 0d:Autoload a module via a parameter
 
- if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u zsh/example
    zmodload -af zsh/example sum
    (( sum(1) ))
    zmodload -e zsh/example
- else :
- fi
 0d:Autoload a module via a math function
 
- if [[ $mods[(r)zsh/watch] == zsh/watch ]]; then
+   mod=zsh/watch skip-test-if-module-is-not-available
    zmodload -u zsh/watch
    WATCH=foo:bar
    typeset -p WATCH watch
- else
-   ZTST_skip="zsh/watch module not available"
- fi
 0:Autoload tied parameters
 >typeset -g -T WATCH watch=( foo bar )
 >typeset -g -aT WATCH watch=( foo bar )
@@ -254,13 +249,11 @@
 0:Test creating a module alias
 >example -> zsh/example
 
- if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   mod=zsh/example skip-test-if-module-is-not-available
    zmodload -u example
    zmodload -ab example
    builtin example
    zmodload -e example
- else :
- fi
 0d:Unload/autoload the module via its alias
 
  zmodload -R example
@@ -285,9 +278,8 @@
 0:Listing feature autoloads includes unloaded modules
 >zmodload -Fa zsh/zftp b:zftp
 
-  if ! zmodload zsh/system >/dev/null 2>&1; then
-    ZTST_skip="zsh/system module not available"
-  else
+    mod=zsh/system skip-test-if-module-is-not-available
+    zmodload zsh/system
     zmodload -lF zsh/system
     zmodload -F zsh/system -p:errnos
     print ${+errnos}
@@ -295,7 +287,6 @@
     zmodload -F zsh/system +p:errnos
     print ${+errnos}
     zmodload -lF zsh/system
-  fi
 0:Regression tests for index bug with math functions.
 >+b:syserror
 >+b:sysread
@@ -327,16 +318,14 @@
 >+p:errnos
 >+p:sysparams
 
-  if ! zmodload zsh/system >/dev/null 2>&1; then
-    ZTST_skip="zsh/system module not available"
-  else
+    mod=zsh/system skip-test-if-module-is-not-available
+    zmodload zsh/system
     zmodload -F zsh/system -f:systell
     zmodload -lF zsh/system
     (print $(( systell(-1) )))
     zmodload -F zsh/system +f:systell
     zmodload -lF zsh/system
     (print $(( systell(-1) )))
-  fi
 1:Module Features for math functions
 >+b:syserror
 >+b:sysread
@@ -356,8 +345,8 @@
 >+f:systell
 >+p:errnos
 >+p:sysparams
-?(eval):6: unknown function: systell
-?(eval):9: file descriptor out of range
+?(eval):5: unknown function: systell
+?(eval):8: file descriptor out of range
 
  $ZTST_testdir/../Src/zsh -fc "
    MODULE_PATH=${(q)MODULE_PATH}
