@@ -827,6 +827,7 @@ F:Same test, should part 5 output look like this?
  () {
    zmodload -u zsh/parameter
    typeset -n myself=parameters
+   print -r -- $myself[myself]
    local -h parameters
    print -r -- $myself[myself]
    typeset -p parameters
@@ -834,6 +835,7 @@ F:Same test, should part 5 output look like this?
  else ZTST_skip='Cannot zmodload zsh/parameter, skipping autoload test'
  fi
 0:up-reference part 9, autoloading with hidden special
+>nameref-local-association-readonly-hide-hideval-special
 >nameref-local-association-readonly-hide-hideval-special
 >typeset -h parameters
 
@@ -1632,15 +1634,12 @@ F:previously this could create an infinite recursion and crash
  typeset -n ref=SRANDOM
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
  echo v=${ref/<->/integer}
- zmodload -u zsh/random
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
- echo v=${ref/<->/integer}
-0:Referring and dereferring an autoload variable loads it
+0:Referring an autoload variable doesn't load it but dereferring it does
 >z=SRANDOM (zsh/random)
+>z=SRANDOM (zsh/random)
+>v=integer
 >z=
->v=integer
->z=SRANDOM (zsh/random)
->v=integer
 
  typeset -n ref=SRANDOM
  echo v=${ref/<->/integer}

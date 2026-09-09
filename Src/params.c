@@ -6559,7 +6559,6 @@ setscope(Param pm)
     /* Compute pm->base */
     if (!(pm->node.flags & PM_UPPER) && refname && *refname &&
 	(basepm = (Param)gethashnode2(realparamtab, refname)) &&
-	(basepm = loadparam_pm(basepm)) &&
 	(basepm != pm || !basepm->old || (basepm = basepm->old))) {
 	setscope_base(pm, basepm->level);
     }
