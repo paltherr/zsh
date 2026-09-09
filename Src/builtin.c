@@ -804,13 +804,13 @@ set_pwd_env(void)
 
     /* update the PWD and OLDPWD shell parameters */
 
-    pm = (Param) realparamtab->getnode2(realparamtab, "PWD");
+    pm = getparam("PWD");
     if (pm && PM_TYPE(pm->node.flags) != PM_SCALAR) {
 	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
 
-    pm = (Param) realparamtab->getnode2(realparamtab, "OLDPWD");
+    pm = getparam("OLDPWD");
     if (pm && PM_TYPE(pm->node.flags) != PM_SCALAR) {
 	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
@@ -819,10 +819,10 @@ set_pwd_env(void)
     assignsparam("PWD", ztrdup(pwd), 0);
     assignsparam("OLDPWD", ztrdup(oldpwd), 0);
 
-    pm = (Param) realparamtab->getnode2(realparamtab, "PWD");
+    pm = getparam("PWD");
     if (!(pm->node.flags & PM_EXPORTED))
 	addenv(pm, pwd);
-    pm = (Param) realparamtab->getnode2(realparamtab, "OLDPWD");
+    pm = getparam("OLDPWD");
     if (!(pm->node.flags & PM_EXPORTED))
 	addenv(pm, oldpwd);
 }
@@ -2476,7 +2476,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    return NULL;
 	} else if ((on & PM_LOCAL) && locallevel) {
 	    *subscript = 0;
-	    pm = (Param) paramtab->getnode2(paramtab, pname));
+	    pm = getparam(pname);
 	    *subscript = '[';
 	    if (!pm || pm->level != locallevel) {
 		zerrnam(cname,
@@ -3113,7 +3113,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 
     /* Take arguments literally.  Don't glob */
     while ((asg = getasg(&argv, assigns))) {
-	HashNode hn = paramtab->getnode2(paramtab, asg->name);
+	HashNode hn = (HashNode) getparam(asg->name);
 	if (OPT_ISSET(ops,'p')) {
 	    if (hn)
 		paramtab->printnode(hn, printflags);

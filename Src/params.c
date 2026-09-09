@@ -1141,7 +1141,7 @@ createparamtable(void)
      * For native emulation we always set the variable home
      * (see setupvals()).
      */
-    pm = (Param) realparamtab->getnode2(realparamtab, "HOME");
+    pm = getparam("HOME");
     if (EMULATION(EMULATE_ZSH))
     {
 	pm->node.flags &= ~PM_UNSET;
@@ -1149,10 +1149,10 @@ createparamtable(void)
 	    addenv(pm, home);
     } else if (!home)
 	pm->node.flags |= PM_UNSET;
-    pm = (Param) realparamtab->getnode2(realparamtab, "LOGNAME");
+    pm = getparam("LOGNAME");
     if (!(pm->node.flags & PM_EXPORTED))
 	addenv(pm, pm->u.str);
-    pm = (Param) realparamtab->getnode2(realparamtab, "SHLVL");
+    pm = getparam("SHLVL");
     sprintf(buf, "%d", (int)++shlvl);
     /* shlvl value in environment needs updating unconditionally */
     addenv(pm, buf);
@@ -1250,7 +1250,7 @@ createparam(char *name, int flags)
 	    DPUTS(paramtab != realparamtab, "BUG: createparam/ro-by-design: paramtab != realparamtab");
 	    if (!(flags & PM_LOCAL)) {
 		/* Must call the API for namerefs and specials to work */
-		pm = (Param) paramtab->getnode2(paramtab, oldpm->node.nam);
+		pm = getparam(oldpm->node.nam);
 		if (!pm || ((pm->node.flags & PM_NAMEREF) &&
 			    pm->level != locallevel)) {
 		    zerr("%s: can't modify read-only parameter", name);
@@ -3933,7 +3933,7 @@ resetparam(Param pm, int flags)
     DPUTS(paramtab != realparamtab, "BUG: resetparam: paramtab != realparamtab");
     char *s = pm->node.nam;
     queue_signals();
-    if (pm != (Param) paramtab->getnode2(paramtab, s)) {
+    if (pm != getparam(s)) {
 	unqueue_signals();
 	zerr("can't change type of hidden variable: %s", s);
 	return 1;
@@ -3955,8 +3955,7 @@ unsetparam(char *s)
 
     queue_signals();
     if ((pm = (Param) (paramtab == realparamtab ?
-		       /* getnode2() to avoid autoloading */
-		       paramtab->getnode2(paramtab, s) :
+		       (HashNode) getparam(s) :
 		       paramtab->getnode(paramtab, s))) &&
 	!(pm->node.flags & PM_NAMEREF))
 	unsetparam_pm(pm, 0, 1);
@@ -4051,7 +4050,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
      * local one with the same name.
      */
     if (!pm->level && paramtab == realparamtab &&
-	pm != (Param) paramtab->getnode2(paramtab, pm->node.nam)) {
+	pm != getparam(pm->node.nam)) {
 	LinkList refs;
 	if (!scoperefs)
 	    scoperefs = zshcalloc((scoperefs_num = 8) * sizeof(refs));

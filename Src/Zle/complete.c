@@ -1352,7 +1352,7 @@ makecompparams(void)
     if (!(cpm = createparam(
 	      COMPSTATENAME,
 	      PM_SPECIAL|PM_REMOVABLE|PM_SINGLE|PM_LOCAL|PM_HASHED)))
-	cpm = (Param) realparamtab->getnode2(realparamtab, COMPSTATENAME);
+	cpm = getparam(COMPSTATENAME);
     DPUTS1(!cpm, "param %s not set in makecompparams", COMPSTATENAME);
 
     comprpms[CPN_COMPSTATE] = cpm;

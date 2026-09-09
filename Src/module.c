@@ -1026,7 +1026,7 @@ checkaddparam(const char *nam, int opt_i)
 {
     Param pm;
 
-    if (!(pm = (Param) realparamtab->getnode2(realparamtab, nam)))
+    if (!(pm = getparam(nam)))
 	return 0;
 
     if (pm->level || !(pm->node.flags & PM_AUTOLOAD)) {
@@ -1070,7 +1070,7 @@ addparamdef(Paramdef d)
 	    return 1;
     }
     else if (!(pm = createparam(d->name, d->flags)) &&
-	!(pm = (Param) realparamtab->getnode2(realparamtab, d->name)))
+	     !(pm = getparam(d->name)))
 	return 1;
 
     d->pm = pm;
@@ -1127,7 +1127,7 @@ addparamdef(Paramdef d)
 int
 deleteparamdef(Paramdef d)
 {
-    Param pm = (Param) realparamtab->getnode2(realparamtab, d->name);
+    Param pm = getparam(d->name);
 
     if (!pm)
 	return 1;
@@ -1238,7 +1238,7 @@ add_autoparam(const char *module, const char *pnam, int flags)
 static int
 del_autoparam(UNUSED(const char *modnam), const char *pnam, int flags)
 {
-    Param pm = (Param) realparamtab->getnode2(realparamtab, pnam);
+    Param pm = getparam(pnam);
 
     if (!pm) {
 	if (!(flags & FEAT_IGNORE))
