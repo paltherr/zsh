@@ -576,34 +576,6 @@ newparamtable(int size, char const *name)
 }
 
 /**/
-static Param
-loadparamnode(Param pm)
-{
-    if (pm && (pm->node.flags & PM_AUTOLOAD) && pm->u.str) {
-	DPUTS(paramtab != realparamtab, "BUG: loadparamnode: paramtab != realparamtab");
-	int level = pm->level;
-	char *nam = dupstring(pm->node.nam);
-	char *mn = dupstring(pm->u.str);
-	(void)ensurefeature(mn, "p:", nam);
-	pm = getparam(nam);
-	while (pm && pm->level > level)
-	    pm = pm->old;
-	if (pm && (pm->level != level || (pm->node.flags & PM_AUTOLOAD)))
-	    pm = NULL;
-	if (!pm) {
-	    /*
-	     * This used to be a warning, but surely if we allow
-	     * stuff to go ahead with the autoload stub with
-	     * no error status we're in for all sorts of mayhem?
-	     */
-	    zerr("autoloading module %s failed to define parameter: %s", mn,
-		 nam);
-	}
-    }
-    return pm;
-}
-
-/**/
 static HashNode
 getparamnode(HashTable ht, const char *nam)
 {
@@ -677,7 +649,19 @@ loadparam(const char *name)
 mod_export Param
 loadparam_pm(Param pm)
 {
-    return isset_pm(pm) ? loadparamnode(pm) : pm;
+    if (!isset_pm(pm) || !(pm->node.flags & PM_AUTOLOAD))
+	return pm;
+    char *module = dupstring(pm->u.str);
+    char *name = dupstring(pm->node.nam);
+    int level = pm->level;
+    ensurefeature(module, "p:", name);
+    pm = getparam(name);
+    while (pm && pm->level > level)
+	pm = pm->old;
+    if (pm && pm->level == level && !(pm->node.flags & PM_AUTOLOAD))
+	return pm;
+    zerr("autoloading module %s failed to define parameter: %s", module, name);
+    return NULL;
 }
 
 
@@ -6577,7 +6561,7 @@ setscope(Param pm)
 	/* Compute pm->base */
 	if (!(pm->node.flags & PM_UPPER) && refname &&
 	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
-	    (basepm = (Param)loadparamnode(basepm)) &&
+	    (basepm = loadparam_pm(basepm)) &&
 	    (basepm != pm || !basepm->old || (basepm = basepm->old))) {
 	    setscope_base(pm, basepm->level);
 	}
