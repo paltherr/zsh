@@ -1420,6 +1420,8 @@ add_automathfunc(const char *module, const char *fnam, int flags)
     f->name = ztrdup(fnam);
     f->module = ztrdup(module);
     f->flags = 0;
+    if (flags & FEAT_AUTOALL)
+	f->flags |= MFF_AUTOALL;
 
     if (addmathfunc(f)) {
 	zsfree(f->name);

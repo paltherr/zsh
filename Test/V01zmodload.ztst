@@ -276,8 +276,8 @@
 >Thank you for using the example module.  Have a nice day.
 >The example module has now been set up.
 >sum=6
->example not found
-?(eval):typeset:6: no such variable: exarr
+>example is a shell builtin
+>typeset -g -a exarr=( example array )
 
    mod=zsh/watch skip-test-if-module-is-not-available
    zmodload -u zsh/watch
