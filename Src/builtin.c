@@ -2410,8 +2410,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	tpm = (Param) zshcalloc(sizeof *tpm);
 
 	tpm->node.nam = pm->node.nam;
-	if (pm->ename &&
-	    (pm2 = (Param) paramtab->getnode(paramtab, pm->ename)) &&
+	if (pm->ename && (pm2 = resolveparam(pm->ename, 1)) &&
 	    pm2->level == locallevel) {
 	    /* This is getting silly, but anyway:  if one of a path/PATH
 	     * pair has already been made local at the current level, we
@@ -2910,8 +2909,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	else
 	    joinchar = *joinstr;
 
-	pm = (Param) paramtab->getnode(paramtab, asg0.name);
-	apm = (Param) paramtab->getnode(paramtab, asg->name);
+	pm = resolveparam(asg0.name, 1);
+	apm = resolveparam(asg->name, 1);
 
 	if (pm && (pm->node.flags & (PM_SPECIAL|PM_TIED)) == (PM_SPECIAL|PM_TIED)) {
 	    /*
@@ -2998,9 +2997,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	asg2.name = asg->name;
 	asg2.flags = 0;
 	asg2.value.array = (LinkList)0;
-	if (!(apm=typeset_single(name, asg->name,
-				 (Param)paramtab->getnode(paramtab,
-							  asg->name),
+	if (!(apm=typeset_single(name, asg->name, resolveparam(asg->name, 1),
 				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
 				 off, roff, &asg2, NULL, ops, 0))) {
 	    if (oldval)

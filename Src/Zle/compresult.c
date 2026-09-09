@@ -1082,7 +1082,7 @@ do_single(Cmatch m)
 			} else
 			    n = p + 1;
 
-			if ((pm = (Param) realparamtab->getnode(realparamtab, n)) &&
+			if ((pm = resolveparam(n, 1)) ||
 			    PM_TYPE(pm->node.flags) != PM_SCALAR)
 			    tryit = 0;
 		    }

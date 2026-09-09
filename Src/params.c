@@ -1329,8 +1329,7 @@ createparam(char *name, int flags)
 		oldpm->node.flags &= ~PM_UNSET;
 		if ((oldpm->node.flags & PM_SPECIAL) && oldpm->ename) {
 		    DPUTS(paramtab != realparamtab, "BUG: createparam/ename: paramtab != realparamtab");
-		    Param altpm =
-			(Param) paramtab->getnode(paramtab, oldpm->ename);
+		    Param altpm = resolveparam(oldpm->ename, 1);
 		    if (altpm)
 			altpm->node.flags &= ~PM_UNSET;
 		}
@@ -3839,7 +3838,7 @@ assignnparam(char *s, mnumber val, int flags)
 	    unqueue_signals();
 	    return NULL;
 	}
-	if (!pm && !(pm = (Param) paramtab->getnode(paramtab, t))) {
+	if (!pm && !(pm = resolveparam(t, 1))) {
 	    DPUTS(!pm, "BUG: parameter not created");
 	    if (!errflag)
 		zerr("%s: parameter not found", t);
@@ -3996,7 +3995,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
     /* remove it under its alternate name if necessary */
     if (altremove) {
 	DPUTS(paramtab != realparamtab, "BUG: unsetparam_pm/ename: paramtab != realparamtab");
-	altpm = (Param) paramtab->getnode(paramtab, altremove);
+	altpm = resolveparam(altremove, 1);
 	/* tied parameters are at the same local level as each other */
 	oldpm = NULL;
 	/*
@@ -4505,7 +4504,7 @@ tiedarrsetfn(Param pm, char *x)
     if (*dptr->arrptr)
 	freearray(*dptr->arrptr);
     else if (pm->ename) {
-	Param altpm = (Param) paramtab->getnode(paramtab, pm->ename);
+	Param altpm = resolveparam(pm->ename, 1);
 	if (altpm)
 	    altpm->node.flags &= ~PM_DEFAULTED;
     }
@@ -5478,8 +5477,8 @@ arrfixenv(char *s, char **t)
     if (t == path)
 	cmdnamtab->emptytable(cmdnamtab);
 
-    pm = (Param) paramtab->getnode(paramtab, s);
-    
+    pm = resolveparam(s, 1);
+
     /*
      * Only one level of a parameter can be exported.  Unless
      * ALLEXPORT is set, this must be global.
@@ -6466,7 +6465,7 @@ printparamnode(HashNode hn, int printflags)
 	     * (same for (a b:c)...)
 	     */
 	    DPUTS(paramtab != realparamtab, "BUG: printparamnode_pm/ename: paramtab != realparamtab");
-	    Param tmp = (Param) paramtab->getnode(paramtab, p->ename);
+	    Param tmp = resolveparam(p->ename, 1);
 
 	    /*
 	     * Swap param and tied peer for typeset -p output

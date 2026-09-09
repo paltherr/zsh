@@ -4485,7 +4485,7 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 	char *ss = itype_end(s, INAMESPC, 0);
 	int slen = *ss == '[' || *ss == Inbrack ? ss - s : strlen(s);
 	addlinknode(*remove_p, s = dupstring_wlen(s, slen));
-	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
+	if ((pm = resolveparam(s, 1))) {
 	    Param tpm = NULL;
 	    if (pm->env)
 		delenv(pm);
@@ -4533,7 +4533,7 @@ restore_params(LinkList restorelist, LinkList removelist)
 
     /* remove temporary parameters */
     while ((s = (char *) ugetnode(removelist))) {
-	if ((pm = (Param) paramtab->getnode(paramtab, s)) &&
+	if ((pm = resolveparam(s, 1)) &&
 	    !(pm->node.flags & PM_SPECIAL)) {
 	    pm->node.flags &= ~PM_READONLY;
 	    unsetparam_pm(pm, 0, 0);
@@ -4544,7 +4544,7 @@ restore_params(LinkList restorelist, LinkList removelist)
 	/* restore saved parameters */
 	while ((pm = (Param) ugetnode(restorelist))) {
 	    if (pm->node.flags & PM_SPECIAL) {
-		Param tpm = (Param) paramtab->getnode(paramtab, pm->node.nam);
+		Param tpm = resolveparam(pm->node.nam, 1);
 
 		DPUTS(!tpm || PM_TYPE(pm->node.flags) != PM_TYPE(tpm->node.flags) ||
 		      !(pm->node.flags & PM_SPECIAL),
