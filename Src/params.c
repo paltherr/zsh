@@ -654,7 +654,7 @@ loadparam_pm(Param pm)
     char *module = dupstring(pm->u.str);
     char *name = dupstring(pm->node.nam);
     int level = pm->level;
-    ensurefeature(module, "p:", name);
+    ensurefeature(module, "p:", (pm->node.flags & PM_AUTOALL) ? NULL : name);
     pm = getparam(name);
     while (pm && pm->level > level)
 	pm = pm->old;
