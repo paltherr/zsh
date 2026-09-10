@@ -130,8 +130,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     resource_name = OPT_ARG(ops, 'f');
     pmname = *args;
 
-    if ((tied_param = (Param)realparamtab->getnode(realparamtab, pmname)) &&
-	!(tied_param->node.flags & PM_UNSET)) {
+    if ((tied_param = asset_pm(resolveparam(pmname, 0)))) {
 	/*
 	 * Unset any existing parameter.  Note there's no implicit
 	 * "local" here, but if the existing parameter is local
@@ -203,8 +202,8 @@ bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
     int ret = 0;
 
     for (pmname = *args; *args++; pmname = *args) {
-	pm = (Param) realparamtab->getnode(realparamtab, pmname);
-	if(!pm) {
+	pm = resolveparam(pmname, 0);
+	if (!isset_pm(pm)) {
 	    zwarnnam(nam, "cannot untie %s", pmname);
 	    ret = 1;
 	    continue;
@@ -243,8 +242,8 @@ bin_zgdbmpath(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
         return 1;
     }
 
-    pm = (Param) realparamtab->getnode(realparamtab, pmname);
-    if(!pm) {
+    pm = resolveparam(pmname, 0);
+    if (!isset_pm(pm)) {
         zwarnnam(nam, "no such parameter: %s", pmname);
         return 1;
     }

@@ -93,8 +93,7 @@ paramtypestr(Param pm, int append)
 
     if (append) {
 	if ((pm->node.flags & PM_NAMEREF) && pm->u.str && *(pm->u.str) &&
-		(pm = (Param) realparamtab->getnode(realparamtab, pm->node.nam)) &&
-		!(pm->node.flags & PM_UNSET)) {
+	    (pm = asset_pm(resolveparam_pm(pm, 0)))) {
 	    val = zhtricat(val, "-", paramtypestr(pm, 0));
 	}
     }

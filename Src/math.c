@@ -983,7 +983,7 @@ setmathvar(struct mathvalue *mvp, mnumber v)
 	DPUTS(!mvp->lval, "no variable name but variable value in math");
 	if ((ptr = strchr(s, '[')))
 	    s = dupstrpfx(s, ptr - s);
-	pm = (Param) paramtab->getnode(paramtab, s);
+	pm = resolveparam(s, 0);
 	if (pm == mvp->pval->pm) {
 	    if (noeval)
 		return v;
