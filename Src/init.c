@@ -190,7 +190,7 @@ loop(int toplevel, int justonce)
 	    non_empty = 1;
 	    if (toplevel &&
 		(getshfunc("preexec") ||
-		 realparamtab->getnode2(realparamtab, "preexec" HOOK_SUFFIX))) {
+		 isset_pm(resolveparam("preexec" HOOK_SUFFIX, 1)))) {
 		LinkList args;
 		char *cmdstr;
 
