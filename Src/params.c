@@ -1051,7 +1051,7 @@ createparamtable(void)
     argvparam = (Param) &argvparam_pm;
     argnparams = zshcalloc(8 * sizeof(Param));
     argnparams_size = 8;
-    argnparams[0] = (Param) paramtab->getnode(paramtab, "0");
+    argnparams[0] = getparam("0");
 
     noerrs = 2;
 
@@ -1114,8 +1114,7 @@ createparamtable(void)
 		 * aren't special to the shell, so it's always OK to
 		 * import.  Otherwise, check parameter flags.
 		 */
-		if ((!(pm = (Param) paramtab->getnode(paramtab, iname)) ||
-		     !dontimport(pm->node.flags)) &&
+		if ((!(pm = getparam(iname)) || !dontimport(pm->node.flags)) &&
 		    (pm = assignsparam(iname, metafy(ivalue, -1, META_DUP),
 				       ASSPM_ENV_IMPORT))) {
 		    pm->node.flags |= PM_EXPORTED;

@@ -2527,7 +2527,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      * not entirely clear to me isident() should reject
      * specially named parameters given that it accepts digits.
      */
-    else if ((isident(pname) || paramtab->getnode(paramtab, pname))
+    else if ((isident(pname) || getparam(pname))
 	     && (!idigit(*pname) || !strcmp(pname, "0"))) {
 	/*
 	 * Create a new node for a parameter with the flags in `on' minus the
