@@ -564,7 +564,7 @@ newparamtable(int size, char const *name)
     ht->filltable   = NULL;
     ht->cmpnodes    = strcmp;
     ht->addnode     = addhashnode;
-    ht->getnode     = gethashnode2; /* getparamnode for realparamtab */
+    ht->getnode     = gethashnode2;
     ht->getnode2    = gethashnode2;
     ht->removenode  = removehashnode;
     ht->disablenode = NULL;
@@ -573,14 +573,6 @@ newparamtable(int size, char const *name)
     ht->printnode   = printparamnode;
 
     return ht;
-}
-
-/**/
-static HashNode
-getparamnode(HashTable ht, const char *nam)
-{
-    DPUTS(ht != realparamtab, "BUG: getparamnode: ht != realparamtab");
-    return (HashNode) resolveparam_pm(getparam(nam), 1);
 }
 
 /* Returns whether the parameter is set. */
@@ -1035,8 +1027,6 @@ createparamtable(void)
 #endif
 
     paramtab = realparamtab = newparamtable(151, "paramtab");
-    paramtab->getnode = getparamnode;
-
     /* Add the special parameters to the hash table */
     for (ip = special_params; ip->node.nam; ip++)
 	paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
