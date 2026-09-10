@@ -1512,8 +1512,7 @@ get_comp_string(void)
 	    zlemetacs_qsub - wb) {
 	    s = NULL;
 	    inwhat = IN_MATH;
-	    if ((keypm = (Param)
-		 realparamtab->getnode(realparamtab, varname)) &&
+	    if ((keypm = asset_pm(resolveparam(varname, 1))) &&
 		(keypm->node.flags & PM_HASHED))
 		insubscr = 2;
 	    else
@@ -1613,8 +1612,7 @@ get_comp_string(void)
 		zsfree(varname);
 		varname = ztrdup(nb);
 		*ne = sav;
-		if ((keypm = (Param)
-		     realparamtab->getnode(realparamtab, varname)) &&
+		if ((keypm = asset_pm(resolveparam(varname, 1))) &&
 		    (keypm->node.flags & PM_HASHED))
 		    insubscr = 2;
 	    }
@@ -1695,8 +1693,7 @@ get_comp_string(void)
 	    if (wptr < sqbr) {
 		zsfree(varname);
 		varname = ztrduppfx(wptr, sqbr - wptr);
-		if ((keypm = (Param)
-		     realparamtab->getnode(realparamtab, varname)) &&
+		if ((keypm = asset_pm(resolveparam(varname, 1))) &&
 		    (keypm->node.flags & PM_HASHED)) {
 		    if (insubscr != 3)
 			insubscr = 2;

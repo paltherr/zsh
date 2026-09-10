@@ -1867,7 +1867,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	createparam(args[0], type);
     }
     queue_signals();
-    pm = (Param) realparamtab->getnode(realparamtab, args[0]);
+    pm = asset_pm(resolveparam(args[0], 1));
     if (pm && (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED))) {
 	char **a;
 
