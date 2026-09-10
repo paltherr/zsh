@@ -979,12 +979,10 @@ setmathvar(struct mathvalue *mvp, mnumber v)
 	 * Be ultra-paranoid in checking the variable is still valid.
 	 */
 	char *s = mvp->lval, *ptr;
-	Param pm;
 	DPUTS(!mvp->lval, "no variable name but variable value in math");
 	if ((ptr = strchr(s, '[')))
 	    s = dupstrpfx(s, ptr - s);
-	pm = resolveparam(s, 0);
-	if (pm == mvp->pval->pm) {
+	if (resolveparam(s, 0) == mvp->pval->pm) {
 	    if (noeval)
 		return v;
 	    setnumvalue(mvp->pval, v);

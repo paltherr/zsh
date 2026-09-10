@@ -3110,10 +3110,10 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 
     /* Take arguments literally.  Don't glob */
     while ((asg = getasg(&argv, assigns))) {
-	HashNode hn = (HashNode) getparam(asg->name);
+	pm = getparam(asg->name);
 	if (OPT_ISSET(ops,'p')) {
-	    if (hn)
-		paramtab->printnode(hn, printflags);
+	    if (pm)
+		paramtab->printnode((HashNode) pm, printflags);
 	    else {
 		zwarnnam(name, "no such variable: %s", asg->name);
 		returnval = 1;
@@ -3121,8 +3121,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    continue;
 	}
 
-	if (!typeset_single(name, asg->name, (Param)hn,
-			    func, on, off, roff, asg, NULL,
+	if (!typeset_single(name, asg->name, pm, func, on, off, roff, asg, NULL,
 			    ops, 0))
 	    returnval = 1;
     }
