@@ -111,8 +111,7 @@ getpmparameter(UNUSED(HashTable ht), const char *name)
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
-    if ((rpm = (Param) realparamtab->getnode2(realparamtab, name)) &&
-	!(rpm->node.flags & PM_UNSET)) {
+    if ((rpm = asset_pm(getparam(name)))) {
 	pm->u.str = paramtypestr(rpm, 1);
     } else {
 	pm->u.str = dupstring("");
