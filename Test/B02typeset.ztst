@@ -1284,7 +1284,7 @@ F:This is a bug, the non -h variable should not hide the autoload variable
 >typeset -h EUID=''
 >typeset -ih HOME=0
 >typeset -ah HOME=(  )
->typeset -hn HOME=''
+>typeset -nh HOME=''
 >typeset -g -i10 EUID=$EUID
 >export HOME=$HOME
 
@@ -1313,8 +1313,8 @@ F:This is a bug, the non -h variable should not hide the autoload variable
 >check:5: read-only variable: int
 >typeset -i int=15
 >Testing "local -n ref=v<N>"
->typeset -rn ref=v1
->typeset -rn ref=v1
+>typeset -nr ref=v1
+>typeset -nr ref=v1
 F:"typeset -r ref=v2" succeeds because it dereferences "ref" and assigns "v1" with "v2"
 >check:local:4: ref: read-only reference
 >check:local:5: ref: read-only reference

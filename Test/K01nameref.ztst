@@ -1124,15 +1124,15 @@ F:Checking for a bug in zmodload that affects later tests
  typeset +rn ref=RW
  typeset -p ref
 0:add and remove readonly attribute with references
->typeset -rn ref=RO
+>typeset -nr ref=RO
 >(eval):typeset:4: ref: read-only reference
 >status: 1 expected: 1
 >typeset -n ref=RO
 >typeset -r ref=RO
->typeset -rn ref=RO
+>typeset -nr ref=RO
 >status: 0 expected: 0
 >typeset -n ref=RW
->typeset -rn ref=RX
+>typeset -nr ref=RX
 >typeset ref=RW
 
  () {
@@ -1440,23 +1440,23 @@ F:previously this could create an infinite recursion and crash
 >foo
 >typeset -n x=!
 >0
->typeset -un x=!
+>typeset -nu x=!
 >0
 >typeset -n x='?'
 >0
->typeset -un x='?'
+>typeset -nu x='?'
 >0
 >typeset -n x='$'
 >$$
->typeset -un x='$'
+>typeset -nu x='$'
 >$$
 >typeset -n x=-
 >569X
->typeset -un x=-
+>typeset -nu x=-
 >569X
 >typeset -n x=_
 >x
->typeset -un x=_
+>typeset -nu x=_
 >x
 ?edgeupper: invalid variable name: argv
 ?edgeupper: invalid variable name: ARGC

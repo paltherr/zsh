@@ -317,10 +317,10 @@ F:future revision will create a global with this assignment
 >A: ref1=OUT ref2=LCL ref3= ref4= out=OUT lcl=LCL undef=
 >B: ref1=Out ref2=Lcl ref3=Glb ref4=Out out=Out lcl=Lcl undef=Glb
 >C: ref1= ref2= ref3= ref4= out=Out lcl=Lcl undef=Glb
->typeset -hn ref1=out
->typeset -hn ref2=lcl
->typeset -hn ref3=undef
->typeset -hn ref4=out
+>typeset -nh ref1=out
+>typeset -nh ref2=lcl
+>typeset -nh ref3=undef
+>typeset -nh ref4=out
 >typeset -g undef=Glb
 >D: out=Out undef=Glb
 
@@ -341,7 +341,7 @@ F:future revision will create a global with this assignment
 1:assignment to private nameref in wrong scope, part 1
 >(anon):1: ref: can't modify read-only parameter
 >typeset -a ary
->typeset -hn ref=ary
+>typeset -nh ref=ary
 >(eval):typeset:14: no such variable: ary
 
  () {
@@ -362,7 +362,7 @@ F:future revision will create a global with this assignment
 >typeset -g -a ary
 >typeset ref=XX
 >typeset -a ary
->typeset -hn ref=ary
+>typeset -nh ref=ary
 >(eval):typeset:14: no such variable: ary
 
  () {
@@ -381,7 +381,7 @@ F:future revision will create a global with this assignment
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -n ptr1=ptr2
->typeset -hn ptr2
+>typeset -nh ptr2
 >(anon):1: read-only variable: ptr2
 
  () {
@@ -400,7 +400,7 @@ F:Here ptr1 finds private ptr2 by scope mismatch
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -n ptr1=ptr2
->typeset -hn ptr2=''
+>typeset -nh ptr2=''
 >(anon):1: ptr1: can't modify read-only parameter
 
  () {
@@ -419,7 +419,7 @@ F:Here ptr1 finds private ptr2 by scope mismatch
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -n ptr1=ptr2
->typeset -hn ptr2=val
+>typeset -nh ptr2=val
 >(anon):1: ptr1: can't modify read-only parameter
 
  () {
@@ -438,7 +438,7 @@ F:Here ptr1 finds private ptr2 by scope mismatch
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -n ptr1=ptr2
->typeset -hn ptr2=foo
+>typeset -nh ptr2=foo
 >(anon):1: ptr1: can't modify read-only parameter
 
  typeset ptr2
@@ -459,13 +459,13 @@ F:Here ptr1 finds private ptr2 by scope mismatch
 F:See K01typeset.ztst up-reference part 5
 F:Here ptr1 points to global ptr2 so assignment succeeds
 >typeset -n ptr1=ptr2
->typeset -hn ptr2
+>typeset -nh ptr2
 >ptr1=ptr2
 >ptr2=val
 >print:ptr1=val
 >print:ptr2=val
 >typeset -n ptr1=ptr2
->typeset -hn ptr2
+>typeset -nh ptr2
 >typeset ptr2=val
 
  () {
@@ -478,7 +478,7 @@ F:Here ptr1 points to global ptr2 so assignment succeeds
  unset val
 0:up-reference for private namerefs, end is set and in scope but private
 >typeset -n ptr1=ptr2
->typeset -hn ptr2=val
+>typeset -nh ptr2=val
 >typeset -g val=foo
 
  () {
@@ -492,7 +492,7 @@ F:Here ptr1 points to global ptr2 so assignment succeeds
  unset val
 0:up-reference for private namerefs, end is unset and in scope but private
 >typeset -n ptr1=ptr2
->typeset -hn ptr2=val
+>typeset -nh ptr2=val
 >typeset -g val=foo
 
  () {
@@ -507,7 +507,7 @@ F:Here ptr1 points to global ptr2 so assignment succeeds
  }
 0:regression test for invalid reference detection
 >typeset -n ptr1=ptr2
->typeset -hn ptr2
+>typeset -nh ptr2
 
  () {
    private x=1

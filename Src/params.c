@@ -6257,6 +6257,7 @@ static const struct paramtypes pmtypes[] = {
     { PM_FFLOAT, "float", 'F', 0},
     { PM_ARRAY, "array", 'a', 0},
     { PM_HASHED, "association", 'A', 0},
+    { PM_NAMEREF, "nameref", 'n', 0},
     { PM_LOCAL, "local", 0, 0},
     { PM_HIDE, "hide", 'h', 0 },
     { PM_LEFT, "left justified", 'L', PMTF_USE_WIDTH},
@@ -6269,7 +6270,6 @@ static const struct paramtypes pmtypes[] = {
     { PM_EXPORTED, "exported", 'x', 0},
     { PM_UNIQUE, "unique", 'U', 0},
     { PM_TIED, "tied", 'T', 0},
-    { PM_NAMEREF, "nameref", 'n', 0}
 };
 
 #define PMTYPES_SIZE ((int)(sizeof(pmtypes)/sizeof(struct paramtypes)))
