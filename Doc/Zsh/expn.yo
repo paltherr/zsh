@@ -1185,9 +1185,10 @@ item(tt(t))(
 Use a string describing the type of the parameter where the value
 of the parameter would usually appear. This string consists of keywords
 separated by hyphens (`tt(-)'). The first keyword in the string describes
-the main type, it can be one of `tt(scalar)', `tt(array)', `tt(integer)',
-`tt(float)' or `tt(association)'. The other keywords describe the type in
-more detail, in most cases corresponding to options of the `tt(typeset)'
+the main type, it can be one of `tt(scalar)', `tt(integer)', `tt(float)',
+`tt(array)', `tt(association)' or `tt(nameref)'. The other keywords
+describe the type in more detail, in most cases corresponding to options
+of the `tt(typeset)'
 command:
 
 startitem()
@@ -1234,14 +1235,20 @@ for parameters with the `hide' flag (tt(-h))
 item(tt(hideval))(
 for parameters with the `hideval' flag (tt(-H))
 )
-item(tt(nameref))(
-for named references (tt(typeset -n)) either having an empty value or
-when combined with `tt(!)' as in `tt(${LPAR()!t)tt(RPAR()var(rname)})'
-)
 item(tt(special))(
 for special parameters defined by the shell
 )
 enditem()
+
+When combined with `tt(!)' as in `tt(${LPAR()!t)tt(RPAR()var(name)})',
+the string may also be `tt(undefined)' if the parameter may be
+autoloaded from a module but has not yet been referenced. When the key
+is the name of a named reference, the type of the referenced parameter
+is appended to the string, for example
+ifzman()
+example(tt(% typeset -nr ref=path)
+tt(% print -r ${(!t)ref})
+tt(nameref-readonly-array-tied-special))
 )
 item(tt(u))(
 Expand only the first occurrence of each unique word, like `tt(typeset -U)'.

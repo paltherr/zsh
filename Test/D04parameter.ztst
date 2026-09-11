@@ -913,7 +913,7 @@
 >float-local-right_blanks
 >float local right justified 5 flt
 >association-local-readonly-tag
->nameref-local-hide
+>nameref-local-hide-association-local-readonly-tag
 >local hide nameref ref
 >scalar-local-lower-tied-unique
 >local lowercase unique tied var VAR
@@ -923,9 +923,9 @@
 >HOME
 >integer-export-special
 >integer 10 SHLVL
->scalar
+>undefined
 >undefined auto
->nameref-local
+>nameref-local-undefined
 >local nameref refauto
 
   # it's not quite clear that these are actually right unless you know
