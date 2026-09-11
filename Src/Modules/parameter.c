@@ -36,67 +36,6 @@ static int incleanup;
 
 /* Functions for the parameters special parameter. */
 
-/* Return a string describing the type of a parameter. */
-
-/**/
-static char *
-paramtypestr(Param pm)
-{
-    char *val = NULL;
-    int f;
-
-    if (!isset_pm(pm))
-	return dupstring("");
-    {
-	if ((f = pm->node.flags) & PM_AUTOLOAD)
-	    return dupstring("undefined");
-
-	switch (PM_TYPE(f)) {
-	case PM_SCALAR:  val = "scalar"; break;
-	case PM_NAMEREF: val = "nameref"; break;
-	case PM_ARRAY:   val = "array"; break;
-	case PM_INTEGER: val = "integer"; break;
-	case PM_EFLOAT:
-	case PM_FFLOAT:  val = "float"; break;
-	case PM_HASHED:  val = "association"; break;
-	}
-	DPUTS(!val, "BUG: type not handled in parameter");
-	val = dupstring(val);
-	if (pm->level)
-	    val = dyncat(val, "-local");
-	if (f & PM_LEFT)
-	    val = dyncat(val, "-left");
-	if (f & PM_RIGHT_B)
-	    val = dyncat(val, "-right_blanks");
-	if (f & PM_RIGHT_Z)
-	    val = dyncat(val, "-right_zeros");
-	if (f & PM_LOWER)
-	    val = dyncat(val, "-lower");
-	if (f & PM_UPPER)
-	    val = dyncat(val, "-upper");
-	if (f & PM_READONLY)
-	    val = dyncat(val, "-readonly");
-	if (f & PM_TAGGED)
-	    val = dyncat(val, "-tag");
-	if (f & PM_TIED)
-	    val = dyncat(val, "-tied");
-	if (f & PM_EXPORTED)
-	    val = dyncat(val, "-export");
-	if (f & PM_UNIQUE)
-	    val = dyncat(val, "-unique");
-	if (f & PM_HIDE)
-	    val = dyncat(val, "-hide");
-	if (f & PM_HIDEVAL)
-	    val = dyncat(val, "-hideval");
-	if (f & PM_SPECIAL)
-	    val = dyncat(val, "-special");
-
-	if ((f & PM_NAMEREF) && (pm = asset_pm(resolveparam_pm(pm, 0))))
-	    val = zhtricat(val, "-", paramtypestr(pm));
-    }
-    return val;
-}
-
 /**/
 static HashNode
 getpmparameter(UNUSED(HashTable ht), const char *name)
@@ -108,7 +47,7 @@ getpmparameter(UNUSED(HashTable ht), const char *name)
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
     if ((rpm = asset_pm(getparam(name)))) {
-	pm->u.str = paramtypestr(rpm);
+	pm->u.str = gettypestr(rpm);
     } else {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
@@ -136,7 +75,7 @@ scanpmparameters(UNUSED(HashTable ht), ScanFunc func, int flags)
 	    if (func != scancountparams &&
 		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		 !(flags & SCANPM_WANTKEYS)))
-		pm.u.str = paramtypestr((Param) hn);
+		pm.u.str = gettypestr((Param) hn);
 	    func(&pm.node, flags);
 	}
 }

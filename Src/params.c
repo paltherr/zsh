@@ -2362,6 +2362,65 @@ getindex(char **pptr, Value v, int scanflags)
     return 0;
 }
 
+/* Return a string describing the type of a parameter. */
+
+/**/
+mod_export char *
+gettypestr(Param pm)
+{
+    char *val = NULL;
+    int f;
+
+    if (!isset_pm(pm))
+	return dupstring("");
+    if ((f = pm->node.flags) & PM_AUTOLOAD)
+	return dupstring("undefined");
+
+    switch (PM_TYPE(f)) {
+    case PM_SCALAR:  val = "scalar"; break;
+    case PM_NAMEREF: val = "nameref"; break;
+    case PM_ARRAY:   val = "array"; break;
+    case PM_INTEGER: val = "integer"; break;
+    case PM_EFLOAT:
+    case PM_FFLOAT:  val = "float"; break;
+    case PM_HASHED:  val = "association"; break;
+    }
+    DPUTS(!val, "BUG: type not handled in parameter");
+    val = dupstring(val);
+    if (pm->level)
+	val = dyncat(val, "-local");
+    if (f & PM_LEFT)
+	val = dyncat(val, "-left");
+    if (f & PM_RIGHT_B)
+	val = dyncat(val, "-right_blanks");
+    if (f & PM_RIGHT_Z)
+	val = dyncat(val, "-right_zeros");
+    if (f & PM_LOWER)
+	val = dyncat(val, "-lower");
+    if (f & PM_UPPER)
+	val = dyncat(val, "-upper");
+    if (f & PM_READONLY)
+	val = dyncat(val, "-readonly");
+    if (f & PM_TAGGED)
+	val = dyncat(val, "-tag");
+    if (f & PM_TIED)
+	val = dyncat(val, "-tied");
+    if (f & PM_EXPORTED)
+	val = dyncat(val, "-export");
+    if (f & PM_UNIQUE)
+	val = dyncat(val, "-unique");
+    if (f & PM_HIDE)
+	val = dyncat(val, "-hide");
+    if (f & PM_HIDEVAL)
+	val = dyncat(val, "-hideval");
+    if (f & PM_SPECIAL)
+	val = dyncat(val, "-special");
+
+    if ((f & PM_NAMEREF) && (pm = asset_pm(resolveparam_pm(pm, 0))))
+	val = zhtricat(val, "-", gettypestr(pm));
+
+    return val;
+}
 
 /**/
 mod_export Value
