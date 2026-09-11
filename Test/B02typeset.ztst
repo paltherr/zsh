@@ -153,9 +153,24 @@
 >array local array
 >scalar a r r a y
 
+ declare -p scalar
+ declare -m scalar
  declare +m scalar
-0:declare previously lacked -m/+m options
+0:declare supports -p and -m/+m options
+>typeset -g scalar=scalar
+>scalar=scalar
 >scalar
+
+ if [[ $modules[zsh/param/private] = loaded ]]; then
+   ZTST_skip='Fails with "(eval):local:1: bad option: -p" when module "zsh/param/private" is loaded'
+ fi
+ local -p scalar
+ local -m scalar
+ local +m scalar
+1:local supports -p but not -m/+m options
+>typeset -g scalar=scalar
+?(eval):local:5: bad option: -m
+?(eval):local:6: bad option: +m
 
  scope10
  print $outer

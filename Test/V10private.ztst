@@ -13,6 +13,29 @@
  (zmodload -u zsh/param/private && zmodload zsh/param/private)
 0:unload and reload the module without crashing
 
+ () {
+   private     VAR1=ok
+   local -P    VAR2=ok
+   private  -T VAR=KO var 2>&1
+   local -P -T VAR=KO var 2>&1
+   private  -p 2>&1
+   local -P -p 2>&1
+   private  -m 2>&1 >/dev/null # BUG: prints all the parameters
+   local -P -m 2>&1 >/dev/null # BUG: prints all the parameters
+   private  +m 2>&1 >/dev/null # BUG: prints all the parameters
+   local -P +m 2>&1 >/dev/null # BUG: prints all the parameters
+   private  +  2>&1 >/dev/null # BUG: prints all the parameters
+   local -P +  2>&1 >/dev/null # BUG: prints all the parameters
+   typeset -p  VAR1 VAR2
+ }
+0:private/local option compatibility
+>(anon):3: bad option: -T
+>(anon):4: bad option: -T
+>(anon):private:5: bad option: -p
+>(anon):local:6: bad option: -p
+>typeset -h VAR1=ok
+>typeset -h VAR2=ok
+
  typeset scalar_test=toplevel
  () {
   print $scalar_test
