@@ -29,8 +29,12 @@
 # that code, as that would affect the scoping.
 
 %prep
-  ## Do not remove the next line, it's used by V10private.ztst
-  # test_zsh_param_private
+  load-private-module() {
+    if ! zmodload zsh/param/private 2>/dev/null; then
+      ZTST_unimplemented="can't load the zsh/param/private module for testing"
+    fi
+  }
+  # load-private-module # Needed for V10private-B02typeset.ztst
 
   mkdir typeset.tmp && cd typeset.tmp
 

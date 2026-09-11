@@ -40,9 +40,23 @@ INSTALL         = @INSTALL@
 
 # ========== DEPENDENCIES FOR TESTING ==========
 
+V10private-B02typeset.ztst: B02typeset.ztst
+	TEXT="# load-private-module #"; \
+	if ! grep -q "$$TEXT" $<; then \
+	  echo "$<: Failed to generate $@, text \"$$TEXT\" is missing" >&2; \
+	  exit 1; \
+	fi; \
+	{ \
+	  echo '######################################################################'; \
+	  echo '# DO NOT EDIT - Generated from $< by make'; \
+	  echo '######################################################################'; \
+	  echo ''; \
+	  sed -e "s,$$TEXT.*,load-private-module," < $<; \
+	} > $@
+
 # If ZTST_handler is not empty, run that instead of runtests.zsh.
 # It's assumed to be found in the source directory.
-check test:
+check test: V10private-B02typeset.ztst
 	if test -n "$(DLLD)"; then \
 	  cd $(dir_top) && DESTDIR= \
 	  $(MAKE) MODDIR=`pwd`/$(subdir)/Modules install.modules > /dev/null; \
@@ -68,7 +82,7 @@ check test:
 @CLEAN_MK@
 
 mostlyclean-here:
-	rm -rf Modules .zcompdump *.tmp
+	rm -rf Modules .zcompdump *.tmp V10private-B02typeset.ztst
 
 distclean-here:
 	rm -f Makefile
