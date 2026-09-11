@@ -879,15 +879,54 @@
 > 
 >plit on a 
 
-  str=s
-  arr=(a)
-  typeset -A ass
-  ass=(a a)
-  integer i
-  float f
-  print ${(t)str} ${(t)arr} ${(t)ass} ${(t)i} ${(t)f}
-0:${(t)...}
->scalar array association-local integer-local float-local
+  export -L3 -u str=s
+  typeset -g -l -U arr=(a)
+  typeset -A -rt ass=(a a)
+  integer -i8 -Z4 int
+  float -F3 -R5 flt
+  local -nh ref=ass
+  typeset -Ul -T VAR var=(a b c b a)
+  zmodload -ap fake-module auto
+  typeset -n refauto=auto
+  print ${(t)str}; typeset +m str;
+  print ${(t)arr}; typeset +m arr;
+  print ${(t)ass}; typeset +m ass;
+  print ${(t)int}; typeset +m int;
+  print ${(t)flt}; typeset +m flt;
+  print ${(t)ref}; print ${(!t)ref}; typeset +m ref;
+  print ${(t)VAR}; typeset +m VAR;
+  print ${(t)var}; typeset +m var;
+  print ${(t)HOME}; typeset +m HOME;
+  print ${(t)SHLVL}; typeset +m SHLVL;
+  print ${(!t)auto}; typeset +m auto;
+  print ${(!t)refauto}; typeset +m refauto;
+  unset str arr
+0:${(t)...} and typeset +m ...
+>scalar-left-upper-export
+>left justified 3 uppercase str
+>array-lower-unique
+>array lowercase unique arr
+>association-local-readonly-tag
+>association local readonly tagged ass
+>integer-local-right_zeros
+>integer 8 local zero filled 4 int
+>float-local-right_blanks
+>float local right justified 5 flt
+>association-local-readonly-tag
+>nameref-local-hide
+>local hide nameref ref
+>scalar-local-lower-tied-unique
+>local lowercase unique tied var VAR
+>array-local-lower-tied-unique
+>array local lowercase unique tied VAR var
+>scalar-export-special
+>HOME
+>integer-export-special
+>integer 10 SHLVL
+>scalar
+>undefined auto
+>nameref-local
+>local nameref refauto
 
   # it's not quite clear that these are actually right unless you know
   # the algorithm:  search along the string for the point at which the
