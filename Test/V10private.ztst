@@ -20,19 +20,25 @@
    local -P -T VAR=KO var 2>&1
    private  -p 2>&1
    local -P -p 2>&1
-   private  -m 2>&1 >/dev/null # BUG: prints all the parameters
-   local -P -m 2>&1 >/dev/null # BUG: prints all the parameters
-   private  +m 2>&1 >/dev/null # BUG: prints all the parameters
-   local -P +m 2>&1 >/dev/null # BUG: prints all the parameters
-   private  +  2>&1 >/dev/null # BUG: prints all the parameters
-   local -P +  2>&1 >/dev/null # BUG: prints all the parameters
+   private  -m 2>&1
+   local -P -m 2>&1
+   private  +m 2>&1
+   local -P +m 2>&1
+   private  +  2>&1
+   local -P +  2>&1
    typeset -p  VAR1 VAR2
  }
 0:private/local option compatibility
->(anon):3: bad option: -T
->(anon):4: bad option: -T
->(anon):private:5: bad option: -p
->(anon):local:6: bad option: -p
+>(anon):private:3: bad option: -T
+>(anon):local:4: -T not allowed with -P
+>(anon):private:5: at least one parameter name is required
+>(anon):local:6: at least one parameter name is required with -P
+>(anon):private:7: bad option: -m
+>(anon):local:8: bad option: -m
+>(anon):private:9: bad option: +m
+>(anon):local:10: bad option: +m
+>(anon):private:11: at least one parameter name is required
+>(anon):local:12: at least one parameter name is required with -P
 >typeset -h VAR1=ok
 >typeset -h VAR2=ok
 
@@ -137,14 +143,16 @@
  }
  outer () {
   local -PA hash_test=(in function)
-  private + hash_test
+  typeset -p hash_test
+  print ${(t)hash_test} ${(kv)hash_test}
   inner
  }
  outer
  print ${(kv)hash_test}
 0:private hides value from surrounding scope in nested scope
 >typeset -a hash_test=( top level )
->hash_test=( [in]=function )
+>typeset -Ah hash_test=( [in]=function )
+>association-local-hide-special in function
 >typeset -g -a hash_test=( top level )
 >array-local top level
 >top level

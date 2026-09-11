@@ -161,16 +161,13 @@
 >scalar=scalar
 >scalar
 
- if [[ $modules[zsh/param/private] = loaded ]]; then
-   ZTST_skip='Fails with "(eval):local:1: bad option: -p" when module "zsh/param/private" is loaded'
- fi
  local -p scalar
  local -m scalar
  local +m scalar
 1:local supports -p but not -m/+m options
 >typeset -g scalar=scalar
-?(eval):local:5: bad option: -m
-?(eval):local:6: bad option: +m
+?(eval):local:2: bad option: -m
+?(eval):local:3: bad option: +m
 
  scope10
  print $outer

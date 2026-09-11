@@ -10,16 +10,20 @@ ifnzman()
 startitem()
 findex(private)
 cindex(private parameter, creating)
-item(tt(private) [ {tt(PLUS())|tt(-)}tt(AHUahlmrtux) ] \
-[ {tt(PLUS())|tt(-)}tt(EFLRZi) [ var(n) ] ] [ var(name)[tt(=)var(value)] ... ])(
+xitem(tt(private) [ {tt(PLUS())|tt(-)}tt(AHUahlrtux) ] \
+[ {tt(PLUS())|tt(-)}tt(EFLRZip) [ var(n) ] ] \
+[ tt(+) ] var(name)[tt(=)var(value)] ...)
+item(tt(private) {tt(PLUS())|tt(-)}tt(n) [ {tt(PLUS())|tt(-)}tt(Hhrtu) ] \
+[ {tt(PLUS())|tt(-)}tt(p) [ var(n) ] ] \
+[ tt(+) ] var(name)[tt(=)var(value)] ...)(
 The tt(private) builtin accepts all the same options and arguments as tt(local)
 (nmref(Shell Builtin Commands)(zshbuiltins)) except
-for the `tt(-)tt(T)' option.  Tied parameters may not be made private.
+for the `tt(-T)' option.  Tied parameters may not be made private.
 
-The `tt(-)tt(p)' option is presently disabled because the state of
-private parameters cannot reliably be reloaded.  When `tt(typeset -)tt(p)'
+Querying for private parameters is presently not supported. At least
+one parameter name must be provided. When `tt(typeset -p)'
 outputs a private parameter, it is treated as a local with the
-`tt(-)tt(h)' (hide) option enabled.
+`tt(-h)' (hide) option enabled.
 
 If used at the top level (outside a function scope), tt(private) creates a
 normal parameter in the same manner as tt(declare) or tt(typeset).  A
@@ -31,7 +35,7 @@ declared with tt(local), except having special properties noted below.
 Special parameters which expose or manipulate internal shell state, such
 as tt(ARGC), tt(argv), tt(COLUMNS), tt(LINES), tt(UID), tt(EUID), tt(IFS),
 tt(PROMPT), tt(RANDOM), tt(SECONDS), etc., cannot be made private unless
-the `tt(-)tt(h)' option is used to hide the special meaning of the
+the `tt(-h)' option is used to hide the special meaning of the
 parameter.  This may change in the future.
 )
 enditem()

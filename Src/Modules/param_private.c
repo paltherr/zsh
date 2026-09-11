@@ -210,50 +210,47 @@ is_private(Param pm)
     return 1;
 }
 
-static int fakelevel;
+static int fakelevel = 0;
 
 /**/
 static int
 bin_private(char *nam, char **args, LinkList assigns, Options ops, int func)
 {
-    int from_typeset = 1;
-    int ofake = fakelevel;	/* paranoia in case of recursive call */
-    int hasargs = /* *args != NULL || */ (assigns && firstnode(assigns));
-    makeprivate_error = 0;
+    int errors;
 
     if (!OPT_ISSET(ops, 'P')) {
-	fakelevel = 0;
-	from_typeset = bin_typeset(nam, args, assigns, ops, func);
-	fakelevel = ofake;
-	return from_typeset;
+	return bin_typeset(nam, args, assigns, ops, func);
     } else if (OPT_ISSET(ops, 'T')) {
-	zwarn("bad option: -T");
+	zwarnnam(nam, *nam == 'l' ?
+		 "-T not allowed with -P" : "bad option: -T");
 	return 1;
-    }
-
-    if (locallevel == 0) {
+    } else if (!*args && !(assigns && firstnode(assigns))) {
+	zwarnnam(nam, *nam == 'l' ?
+		 "at least one parameter name is required with -P" :
+		 "at least one parameter name is required");
+	return 1;
+    } else if (OPT_ISSET(ops, 'p')) {
+	return bin_typeset(nam, args, assigns, ops, func);
+    } else if (locallevel == 0) {
 	if (isset(WARNCREATEGLOBAL))
 	    zwarnnam(nam, "invalid local scope, using globals");
-	return bin_typeset("private", args, assigns, ops, func);
+	return bin_typeset(nam, args, assigns, ops, func);
     }
 
-    if (!(OPT_ISSET(ops, 'm') || OPT_ISSET(ops, '+')))
-	ops->ind['g'] = 2;	/* force bin_typeset() to behave as "local" */
-    if (OPT_ISSET(ops, 'p') || OPT_ISSET(ops, 'm') ||
-	(!hasargs && OPT_ISSET(ops, '+'))) {
-	return bin_typeset("private", args, assigns, ops, func);
-    }
+    ops->ind['g'] = 2;	/* force bin_typeset() to behave as "local" */
 
     queue_signals();
     fakelevel = locallevel;
     startparamscope();
-    from_typeset = bin_typeset("private", args, assigns, ops, func);
+    errors = bin_typeset(nam, args, assigns, ops, func);
+    makeprivate_error = 0;
     scanhashtable(realparamtab, 0, 0, 0, makeprivate, 0);
+    errors |= makeprivate_error;
     endparamscope();
-    fakelevel = ofake;
+    fakelevel = 0;
     unqueue_signals();
 
-    return makeprivate_error | from_typeset;
+    return errors;
 }
 
 static void
@@ -649,7 +646,7 @@ printprivatenode(HashNode hn, int printflags)
 
 static struct builtin bintab[] = {
     /* Copied from BUILTIN("local"), "P" added */
-    BUILTIN("private", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_private, 0, -1, 0, "AE:%F:%HL:%PR:%TUZ:%ahi:%lnmrtux", "P")
+    BUILTIN("private", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_private, 0, -1, 0, "AE:%F:%HL:%PR:%TUZ:%ahi:%lnp:%rtux", "P")
 };
 
 static struct features module_features = {
