@@ -39,67 +39,6 @@
   scalar=scalar
   array=(a r r a y)
 
-  scope00() {
-    typeset scalar
-    scalar=local
-    typeset -a array
-    array=(l o c a l)
-    print $scalar $array
-    typeset -p scalar array
-    typeset -m scalar array
-    typeset +m scalar array
-  }
-  scope01() {
-    local scalar
-    scalar=local
-    local -a array
-    array=(l o c a l)
-    print $scalar $array
-    typeset -p scalar array
-    typeset -m scalar array
-    typeset +m scalar array
-  }
-  scope02() {
-    declare scalar
-    scalar=local
-    declare -a array
-    array=(l o c a l)
-    print $scalar $array
-    typeset -p scalar array
-    typeset -m scalar array
-    typeset +m scalar array
-  }
-  scope10() {
-    export outer=outer
-    /bin/sh -fc 'echo $outer'
-    typeset -p outer
-    typeset -m outer
-    typeset +m outer
-  }
-  scope11() {
-    typeset -x outer=outer
-    /bin/sh -fc 'echo $outer'
-  }
-  scope12() {
-    local -x outer=inner
-    /bin/sh -fc 'echo $outer'
-  }
-  scope13() {
-    local -xT OUTER outer
-    outer=(i n n e r)
-    /bin/sh -fc 'echo $OUTER'
-    typeset -p OUTER outer
-    typeset -m OUTER outer
-    typeset +m OUTER outer
-  }
-
-  # Bug?  `typeset -h' complains that ! # $ * - ? @ are not identifiers.
-  stress00() {
-    typeset -h +g -m [[:alpha:]_]*
-    unset -m [[:alpha:]_]*
-    typeset +m [[:alpha:]_]*
-  }
-
 %test
 
  typeset -p scalar array
@@ -113,9 +52,26 @@
 >scalar
 >array array
 
- scope00
+ check() {
+   print "# Testing: $@"
+   $@ scalar
+   scalar=local
+   $@ -a array
+   array=(l o c a l)
+   print $scalar $array
+   typeset -p scalar array
+   typeset -m scalar array
+   typeset +m scalar array
+ }
+ check typeset
  print $scalar $array
-0:Simple local declarations
+ check local
+ print $scalar $array
+ check declare
+ print $scalar $array
+ unfunction check
+0:Equivalence of typeset, local, and declare for simple local declarations
+># Testing: typeset
 >local l o c a l
 >typeset scalar=local
 >typeset -a array=( l o c a l )
@@ -124,10 +80,7 @@
 >local scalar
 >array local array
 >scalar a r r a y
-
- scope01
- print $scalar $array
-0:Equivalence of local and typeset in functions
+># Testing: local
 >local l o c a l
 >typeset scalar=local
 >typeset -a array=( l o c a l )
@@ -136,10 +89,7 @@
 >local scalar
 >array local array
 >scalar a r r a y
-
- scope02
- print $scalar $array
-0:Basic equivalence of declare and typeset
+># Testing: declare
 >local l o c a l
 >typeset scalar=local
 >typeset -a array=( l o c a l )
@@ -153,7 +103,13 @@
 0:declare previously lacked -m/+m options
 >scalar
 
- scope10
+ () {
+   export outer=outer
+   /bin/sh -fc 'echo $outer'
+   typeset -p outer
+   typeset -m outer
+   typeset +m outer
+ }
  print $outer
 0:Global export
 >outer
@@ -162,13 +118,19 @@
 >outer
 >outer
 
- scope11
+ () {
+   typeset -x outer=outer
+   /bin/sh -fc 'echo $outer'
+ }
  print $outer
 0:Equivalence of export and typeset -x
 >outer
 >outer
 
- scope12
+ () {
+   local -x outer=inner
+   /bin/sh -fc 'echo $outer'
+ }
  print $outer
 0:Local export
 >inner
@@ -349,7 +311,14 @@ F:BUG:The inner "typeset -p VAR" should contain the value of the outer "var"
 ?(eval):typeset:2: use unset to remove tied variables
 
  OUTER=outer
- scope13
+ () {
+   local -xT OUTER outer
+   outer=(i n n e r)
+   /bin/sh -fc 'echo $OUTER'
+   typeset -p OUTER outer
+   typeset -m OUTER outer
+   typeset +m OUTER outer
+ }
  print $OUTER
 0:Export of tied parameters
 >i:n:n:e:r
@@ -543,9 +512,14 @@ F:BUG:The inner "typeset -p VAR" should contain the value of the outer "var"
 >'000004.000'
 >'-00004.000'
 
- stress00
+ # Bug?  `typeset -h' complains that ! # $ * - ? @ are not identifiers.
+ () {
+   typeset -h +g -m [[:alpha:]_]*
+   unset -m [[:alpha:]_]*
+   typeset +m [[:alpha:]_]*
+ }
  print $scalar $array
-0q:Stress test: all parameters are local and unset, using -m
+0:Stress test: all parameters are local and unset, using -m
 >scalar a r y
 
  local parentenv=preserved
