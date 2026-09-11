@@ -103,38 +103,53 @@
 0:declare previously lacked -m/+m options
 >scalar
 
- () {
-   export outer=outer
-   /bin/sh -fc 'echo $outer'
-   typeset -p outer
-   typeset -m outer
-   typeset +m outer
+ check() {
+   print "# Testing: $@"
+   $@ VAR; VAR=exported
+   $@ -a var; var=(e x p o r t e d)
+   /bin/sh -fc 'echo $VAR $var'
+   typeset -p VAR var
+   typeset -m VAR var
+   typeset +m VAR var
  }
- print $outer
-0:Global export
->outer
->export outer=outer
->outer=outer
->outer
->outer
-
- () {
-   typeset -x outer=outer
-   /bin/sh -fc 'echo $outer'
- }
- print $outer
-0:Equivalence of export and typeset -x
->outer
->outer
-
- () {
-   local -x outer=inner
-   /bin/sh -fc 'echo $outer'
- }
- print $outer
-0:Local export
->inner
->outer
+ check export
+ print $VAR $var
+ unset VAR var
+ check typeset -x
+ print $VAR $var
+ unset VAR var
+ check local -x
+ print $VAR $var
+ unset VAR var
+ unfunction check
+0:Comparison of export, typeset -x and local -x for exports
+># Testing: export
+>exported
+>export VAR=exported
+>typeset -g -ax var=( e x p o r t e d )
+>VAR=exported
+>var=( e x p o r t e d )
+>VAR
+>array exported var
+>exported e x p o r t e d
+># Testing: typeset -x
+>exported
+>export VAR=exported
+>typeset -g -ax var=( e x p o r t e d )
+>VAR=exported
+>var=( e x p o r t e d )
+>VAR
+>array exported var
+>exported e x p o r t e d
+># Testing: local -x
+>exported
+>local -x VAR=exported
+>local -ax var=( e x p o r t e d )
+>VAR=exported
+>var=( e x p o r t e d )
+>local exported VAR
+>array local exported var
+>
 
  addflags() {
    setopt localoptions typeset_to_unset
