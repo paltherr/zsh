@@ -903,7 +903,7 @@
   unset str arr
 0:${(t)...} and typeset +m ...
 >scalar-left-upper-export
->left justified 3 uppercase str
+>left justified 3 uppercase exported str
 >array-lower-unique
 >array lowercase unique arr
 >association-local-readonly-tag
@@ -920,9 +920,9 @@
 >array-local-lower-tied-unique
 >array local lowercase unique tied VAR var
 >scalar-export-special
->HOME
+>exported HOME
 >integer-export-special
->integer 10 SHLVL
+>integer 10 exported SHLVL
 >undefined
 >undefined auto
 >nameref-local-undefined

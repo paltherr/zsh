@@ -129,7 +129,7 @@
 >typeset -g -ax var=( e x p o r t e d )
 >VAR=exported
 >var=( e x p o r t e d )
->VAR
+>exported VAR
 >array exported var
 >exported e x p o r t e d
 ># Testing: typeset -x
@@ -138,7 +138,7 @@
 >typeset -g -ax var=( e x p o r t e d )
 >VAR=exported
 >var=( e x p o r t e d )
->VAR
+>exported VAR
 >array exported var
 >exported e x p o r t e d
 ># Testing: local -x
@@ -1026,9 +1026,9 @@ F:BUG:The inner "typeset -p VAR" should contain the value of the outer "var"
 >zsh_eval_context=( toplevel shfunc shfunc shfunc eval )
 >ZSH_EVAL_CONTEXT=toplevel:shfunc:shfunc:shfunc:eval
 >array tied PATH path
->tied path PATH
+>exported tied path PATH
 >array tied MANPATH manpath
->tied manpath MANPATH
+>exported tied manpath MANPATH
 >array readonly tied ZSH_EVAL_CONTEXT zsh_eval_context
 >readonly tied zsh_eval_context ZSH_EVAL_CONTEXT
 >path: array-tied-special

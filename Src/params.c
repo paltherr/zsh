@@ -6451,6 +6451,7 @@ printparamnode(HashNode hn, int printflags)
 	    if (!(pflags & pmptr->binflag))
 		continue;
 	    if (pmptr->binflag == PM_EXPORTED &&
+		(printflags & PRINT_TYPESET) &&
 		!(pflags & (PM_LOCAL|PM_ARRAY|PM_HASHED)))
 		continue;
 
