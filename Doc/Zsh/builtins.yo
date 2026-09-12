@@ -2035,7 +2035,7 @@ typeset var1 && var1=$(exit 1) || echo "Trouble with var1"
 )
 
 To initialize a parameter var(param) to a command output and mark it readonly,
-use tt(typeset -r )var(param) or tt(readonly )var(param) after the parameter
+use `tt(typeset -r )var(param)' or `tt(readonly )var(param)' after the parameter
 assignment statement.
 
 If no attribute flags are given, and either no var(name) arguments are
@@ -2044,7 +2044,7 @@ preceded by a list of the attributes of that parameter (tt(array),
 tt(association), tt(exported), tt(float), tt(integer), tt(readonly),
 or tt(undefined) for autoloaded parameters not yet loaded).  If tt(+m) is
 used with attribute flags, and all those flags are introduced with
-tt(PLUS()), the matching parameter names are printed but their values
+`tt(PLUS())', the matching parameter names are printed but their values
 are not.
 
 The following control flags change the behavior of tt(typeset):
@@ -2060,7 +2060,7 @@ effect of `tt(PLUS())' is as if all attribute flags which precede it were
 given with a `tt(PLUS())' prefix.  For example, `tt(typeset -U PLUS())' is
 equivalent to `tt(typeset +U)' and displays the names of all arrays having
 the uniqueness attribute, whereas `tt(typeset -f -U PLUS())' displays the
-names of all autoloadable functions.  If tt(PLUS()) is the only option,
+names of all autoloadable functions.  If `tt(PLUS())' is the only option,
 then type information (array, readonly, etc.) is also printed for each
 parameter, in the same manner as `tt(typeset +m "*")'.
 )
@@ -2074,12 +2074,12 @@ unless that function also
 has the tt(-t) or tt(-T) flag.  The tt(-u) and tt(-U) flags cause the
 function to be marked for autoloading; tt(-U) also causes alias
 expansion to be suppressed when the function is loaded.  See the
-description of the `tt(autoload)' builtin for details.
+description of the tt(autoload) builtin for details.
 
 Note that the builtin tt(functions) provides the same basic capabilities
-as tt(typeset -f) but gives access to a few extra options; tt(autoload)
-gives further additional options for the case tt(typeset -fu) and
-tt(typeset -fU).
+as `tt(typeset -f)' but gives access to a few extra options; tt(autoload)
+gives further additional options for the case `tt(typeset -fu)' and
+`tt(typeset -fU)'.
 )
 item(tt(-g))(
 The tt(-g) (global) means that any resulting parameter will not be
@@ -2102,7 +2102,7 @@ created for every matching parameter that is not already local.  Otherwise
 tt(-m) applies all other flags or assignments to the existing parameters,
 except that the tt(-n) option cannot create named references in this way.
 
-Except when assignments are made with var(name)tt(=)var(value), using
+Except when assignments are made with `var(name)tt(=)var(value)', using
 tt(+m) forces the matching parameters and their attributes to be printed,
 even inside a function.  Note that tt(-m) is ignored if no patterns are
 given, so `tt(typeset -m)' displays attributes but `tt(typeset -a +m)'
@@ -2124,7 +2124,7 @@ The names and values of readonly special parameters
 (most of the parameters marked `<S>' in
 sectref(Parameters Set by the Shell)(zshparam),
 except those documented as settable)
-are not printed with `tt(-)tt(p)' because to execute those typeset commands
+are not printed with tt(-p) because to execute those typeset commands
 would cause errors.  However, these parameters are printed when they
 have been made local to the scope where `tt(typeset -p)' is run.
 )
@@ -2247,7 +2247,7 @@ The width is the count of characters, which may be multibyte characters
 if the tt(MULTIBYTE) option is in effect.  Note that the screen
 width of the character is not taken into account; if this is required,
 use padding with parameter expansion flags
-tt(${+LPAR()ml)var(...)tt(RPAR())var(...)tt(}) as described in
+`tt(${+LPAR()ml)var(...)tt(RPAR())var(...)tt(})' as described in
 subref(Parameter Expansion Flags)(zshexpn).
 
 When the parameter is expanded, it is filled on the right with
