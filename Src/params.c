@@ -6441,22 +6441,22 @@ printparamnode(HashNode hn, int printflags)
 
     /* Print the attributes of the parameter */
     if (printflags & (PRINT_TYPE|PRINT_TYPESET)) {
-	int pflags = p->node.flags, doneminus = 0, i;
-	const struct paramtypes *pmptr;
+	int pflags = p->node.flags, doneminus = 0, n = PMTYPES_SIZE;
 
 	if (p->level)
 	    pflags |= PM_LOCAL;
-	for (pmptr = pmtypes, i = 0; i < PMTYPES_SIZE; i++, pmptr++) {
-	    int doprint = 0;
-
+	for (const struct paramtypes *pmptr = pmtypes; n; n--, pmptr++) {
 	    if (altname && altname == pmptr->typeflag)
 		continue;
+	    if (!(pflags & pmptr->binflag))
+		continue;
+	    if (pmptr->binflag == PM_EXPORTED &&
+		!(pflags & (PM_LOCAL|PM_ARRAY|PM_HASHED)))
+		continue;
 
-	    if (pmptr->binflag == PM_LOCAL) {
-		if (pflags & PM_LOCAL) {
 		    /*
-		    if ((pflags & PM_SPECIAL) &&
-			(pflags & PM_LOCAL) &&
+		    if (pmptr->binflag == PM_LOCAL &&
+			(pflags & PM_SPECIAL) &&
 			!(pflags & PM_HIDE)) {
 			if (doneminus)
 			    putchar(' ');
@@ -6464,14 +6464,8 @@ printparamnode(HashNode hn, int printflags)
 			doneminus = 0;
 		    }
 		    */
-		    doprint = 1;
-		}
-	    } else if ((pmptr->binflag != PM_EXPORTED ||
-			(pflags & (PM_LOCAL|PM_ARRAY|PM_HASHED))) &&
-		       (pflags & pmptr->binflag))
-		doprint = 1;
 
-	    if (doprint) {
+	    {
 		if (printflags & PRINT_TYPESET) {
 		    if (pmptr->typeflag) {
 			if (!doneminus) {
