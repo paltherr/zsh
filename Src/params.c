@@ -6241,7 +6241,6 @@ freeparamnode(HashNode hn)
 enum paramtypes_flags {
     PMTF_USE_BASE	= (1<<0),
     PMTF_USE_WIDTH	= (1<<1),
-    PMTF_TEST_LEVEL	= (1<<2)
 };
 
 struct paramtypes {
@@ -6258,7 +6257,7 @@ static const struct paramtypes pmtypes[] = {
     { PM_FFLOAT, "float", 'F', 0},
     { PM_ARRAY, "array", 'a', 0},
     { PM_HASHED, "association", 'A', 0},
-    { 0, "local", 0, PMTF_TEST_LEVEL},
+    { PM_LOCAL, "local", 0, 0},
     { PM_HIDE, "hide", 'h', 0 },
     { PM_LEFT, "left justified", 'L', PMTF_USE_WIDTH},
     { PM_RIGHT_B, "right justified", 'R', PMTF_USE_WIDTH},
@@ -6442,21 +6441,23 @@ printparamnode(HashNode hn, int printflags)
 
     /* Print the attributes of the parameter */
     if (printflags & (PRINT_TYPE|PRINT_TYPESET)) {
-	int doneminus = 0, i;
+	int pflags = p->node.flags, doneminus = 0, i;
 	const struct paramtypes *pmptr;
 
+	if (p->level)
+	    pflags |= PM_LOCAL;
 	for (pmptr = pmtypes, i = 0; i < PMTYPES_SIZE; i++, pmptr++) {
 	    int doprint = 0;
 
 	    if (altname && altname == pmptr->typeflag)
 		continue;
 
-	    if (pmptr->flags & PMTF_TEST_LEVEL) {
-		if (p->level) {
+	    if (pmptr->binflag == PM_LOCAL) {
+		if (pflags & PM_LOCAL) {
 		    /*
-		    if ((p->node.flags & PM_SPECIAL) &&
-			(p->node.flags & PM_LOCAL) &&
-			!(p->node.flags & PM_HIDE)) {
+		    if ((pflags & PM_SPECIAL) &&
+			(pflags & PM_LOCAL) &&
+			!(pflags & PM_HIDE)) {
 			if (doneminus)
 			    putchar(' ');
 			printf("+h ");
@@ -6465,9 +6466,9 @@ printparamnode(HashNode hn, int printflags)
 		    */
 		    doprint = 1;
 		}
-	    } else if ((pmptr->binflag != PM_EXPORTED || p->level ||
-			(p->node.flags & (PM_LOCAL|PM_ARRAY|PM_HASHED))) &&
-		       (p->node.flags & pmptr->binflag))
+	    } else if ((pmptr->binflag != PM_EXPORTED ||
+			(pflags & (PM_LOCAL|PM_ARRAY|PM_HASHED))) &&
+		       (pflags & pmptr->binflag))
 		doprint = 1;
 
 	    if (doprint) {
@@ -6494,7 +6495,7 @@ printparamnode(HashNode hn, int printflags)
 	if (doneminus)
 	    putchar(' ');
 
-	if (p->node.flags & PM_TIED) {
+	if (pflags & PM_TIED) {
 	    /*
 	     * For scalars tied to arrays,s
 	     *   * typeset +m outputs
@@ -6518,7 +6519,7 @@ printparamnode(HashNode hn, int printflags)
 	    /*
 	     * Swap param and tied peer for typeset -p output
 	     */
-	    if (!(printflags & PRINT_TYPESET) || (p->node.flags & PM_ARRAY))
+	    if (!(printflags & PRINT_TYPESET) || (pflags & PM_ARRAY))
 		peer = tmp;
 	    else {
 		peer = p;
