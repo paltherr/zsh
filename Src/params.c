@@ -6454,36 +6454,34 @@ printparamnode(HashNode hn, int printflags)
 		!(pflags & (PM_LOCAL|PM_ARRAY|PM_HASHED)))
 		continue;
 
-		    /*
-		    if (pmptr->binflag == PM_LOCAL &&
-			(pflags & PM_SPECIAL) &&
-			!(pflags & PM_HIDE)) {
-			if (doneminus)
-			    putchar(' ');
-			printf("+h ");
-			doneminus = 0;
-		    }
-		    */
+	    /*
+	    if (pmptr->binflag == PM_LOCAL &&
+		(pflags & PM_SPECIAL) &&
+		!(pflags & PM_HIDE)) {
+		if (doneminus)
+		    putchar(' ');
+		printf("+h ");
+		doneminus = 0;
+	    }
+	    */
 
-	    {
-		if (printflags & PRINT_TYPESET) {
-		    if (pmptr->typeflag) {
-			if (!doneminus) {
-			    putchar('-');
-			    doneminus = 1;
-			}
-			putchar(pmptr->typeflag);
+	    if (printflags & PRINT_TYPESET) {
+	        if (pmptr->typeflag) {
+		    if (!doneminus) {
+			putchar('-');
+			doneminus = 1;
 		    }
-		} else
-		    printf("%s ", pmptr->string);
-		if ((pmptr->flags & PMTF_USE_BASE) && p->base) {
-		    printf("%d ", p->base);
-		    doneminus = 0;
-		}
-		if ((pmptr->flags & PMTF_USE_WIDTH) && p->width) {
-		    printf("%u ", p->width);
-		    doneminus = 0;
-		}
+		    putchar(pmptr->typeflag);
+	        }
+	    } else
+	        printf("%s ", pmptr->string);
+	    if ((pmptr->flags & PMTF_USE_BASE) && p->base) {
+	        printf("%d ", p->base);
+	        doneminus = 0;
+	    }
+	    if ((pmptr->flags & PMTF_USE_WIDTH) && p->width) {
+	        printf("%u ", p->width);
+	        doneminus = 0;
 	    }
 	}
 	if (doneminus)
