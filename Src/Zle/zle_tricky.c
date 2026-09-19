@@ -1512,11 +1512,13 @@ get_comp_string(void)
 	    zlemetacs_qsub - wb) {
 	    s = NULL;
 	    inwhat = IN_MATH;
-	    if ((keypm = asset_pm(resolveparam(varname, 1))) &&
+	    if ((keypm = resolveparam(varname, 1)) && isset_pm(keypm) &&
 		(keypm->node.flags & PM_HASHED))
 		insubscr = 2;
-	    else
+	    else {
+		keypm = NULL;
 		insubscr = 1;
+	    }
 	} else if (*s == '=') {
             if (zlemetacs_qsub > wb + (s - tt)) {
                 s++;
@@ -1612,9 +1614,11 @@ get_comp_string(void)
 		zsfree(varname);
 		varname = ztrdup(nb);
 		*ne = sav;
-		if ((keypm = asset_pm(resolveparam(varname, 1))) &&
+		if ((keypm = resolveparam(varname, 1)) && isset_pm(keypm) &&
 		    (keypm->node.flags & PM_HASHED))
 		    insubscr = 2;
+		else
+		    keypm = NULL;
 	    }
 	}
     }
@@ -1693,12 +1697,14 @@ get_comp_string(void)
 	    if (wptr < sqbr) {
 		zsfree(varname);
 		varname = ztrduppfx(wptr, sqbr - wptr);
-		if ((keypm = asset_pm(resolveparam(varname, 1))) &&
+		if ((keypm = resolveparam(varname, 1)) && isset_pm(keypm) &&
 		    (keypm->node.flags & PM_HASHED)) {
 		    if (insubscr != 3)
 			insubscr = 2;
-		} else
+		} else {
+		    keypm = NULL;
 		    insubscr = 1;
+		}
 	    }
 	}
 

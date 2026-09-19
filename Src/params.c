@@ -579,15 +579,6 @@ isset_pm(Param pm)
 	(!(pm->node.flags & PM_UNSET) || (pm->node.flags & PM_DECLARED));
 }
 
-/* Returns the parameter if it is set, otherwise NULL. */
-
-/**/
-mod_export Param
-asset_pm(Param pm)
-{
-    return isset_pm(pm) ? pm : NULL;
-}
-
 /* Returns whether the parameter is a placeholder reference. */
 
 /**/

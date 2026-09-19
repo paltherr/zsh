@@ -490,10 +490,10 @@ zfmovefd(int fd)
 static void
 zfsetparam(char *name, void *val, int flags)
 {
-    Param pm = NULL;
+    Param pm = getparam(name);
     int type = (flags & ZFPM_INTEGER) ? PM_INTEGER : PM_SCALAR;
 
-    if (!(pm = asset_pm(getparam(name)))) {
+    if (!pm || !isset_pm(pm)) {
 	/*
 	 * just make it readonly when creating, in case user
 	 * *really* knows what they're doing
@@ -524,9 +524,9 @@ zfsetparam(char *name, void *val, int flags)
 static void
 zfunsetparam(char *name)
 {
-    Param pm;
+    Param pm = getparam(name);
 
-    if ((pm = asset_pm(getparam(name)))) {
+    if (isset_pm(pm)) {
 	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }

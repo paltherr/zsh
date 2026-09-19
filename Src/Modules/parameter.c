@@ -93,7 +93,7 @@ paramtypestr(Param pm, int append)
 
     if (append) {
 	if ((pm->node.flags & PM_NAMEREF) &&
-	    (pm = asset_pm(resolveparam_pm(pm, 0)))) {
+	    (pm = resolveparam_pm(pm, 0)) && isset_pm(pm)) {
 	    val = zhtricat(val, "-", paramtypestr(pm, 0));
 	}
     }
@@ -104,13 +104,12 @@ paramtypestr(Param pm, int append)
 static HashNode
 getpmparameter(UNUSED(HashTable ht), const char *name)
 {
-    Param rpm, pm = NULL;
+    Param rpm = getparam(name), pm = (Param) hcalloc(sizeof(struct param));
 
-    pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
-    if ((rpm = asset_pm(getparam(name)))) {
+    if (isset_pm(rpm)) {
 	pm->u.str = paramtypestr(rpm, 1);
     } else {
 	pm->u.str = dupstring("");

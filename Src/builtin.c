@@ -3786,7 +3786,6 @@ mkautofn(Shfunc shf)
 int
 bin_unset(char *name, char **argv, Options ops, int func)
 {
-    Param pm, next;
     Patprog pprog;
     char *s;
     int match = 0, returnval = 0;
@@ -3805,7 +3804,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    if ((pprog = patcompile(s, PAT_STATIC, NULL))) {
 		/* Go through the parameter table, and unset any matches */
 		for (i = 0; i < paramtab->hsize; i++) {
-		    for (pm = (Param) paramtab->nodes[i]; pm; pm = next) {
+		    for (Param pm = (Param) paramtab->nodes[i], next; pm;
+			 pm = next) {
 			/* record pointer to next, since we may free this one */
 			next = (Param) pm->node.next;
 			if (pattry(pprog, pm->node.nam)) {
@@ -3849,18 +3849,18 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    returnval = 1;
 	    continue;
 	}
-	pm = getparam(s);
 	if (!ss) {
-	    pm = asset_pm(OPT_ISSET(ops,'n') ? pm : resolveparam_pm(pm, 0));
+	    Param pm = OPT_ISSET(ops,'n') ? getparam(s) : resolveparam(s, 0);
 	    /*
 	     * Unsetting a nonexistent or unset variable is not an error.
 	     * This appears to be reasonably standard behaviour.
 	     */
-	    if (pm && unsetparam_pm(pm, 0, 1))
+	    if (isset_pm(pm) && unsetparam_pm(pm, 0, 1))
 		returnval = 1;
 	} else {
+	    Param pm = resolveparam(s, 1);
 	    *ss = '[';
-	    if (!(pm = asset_pm(resolveparam_pm(pm, 1)))) {
+	    if (!isset_pm(pm)) {
 		/* warning? */
 		continue;
 	    }

@@ -130,7 +130,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     resource_name = OPT_ARG(ops, 'f');
     pmname = *args;
 
-    if ((tied_param = asset_pm(resolveparam(pmname, 0)))) {
+    if ((tied_param = resolveparam(pmname, 0)) && isset_pm(tied_param)) {
 	/*
 	 * Unset any existing parameter.  Note there's no implicit
 	 * "local" here, but if the existing parameter is local
