@@ -64,7 +64,7 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmprs", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, BIN_EXPORT, "E:%F:%HL:%R:%TUZ:%afhi:%lp:%rtu", "xg"),
+    BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, BIN_EXPORT, "AE:%F:%HL:%R:%TUZ:%ahi:%lp:%rtu", "xg"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     /*
      * We used to behave as if the argument to -e was optional.
@@ -107,7 +107,7 @@ static struct builtin builtins[] =
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "IlLnr", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "cd:ek:%lnpqrst:%zu:AE", NULL),
-    BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, BIN_READONLY, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
+    BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, BIN_READONLY, "AE:%F:%HL:%R:%TUZ:%aghi:%lp:%tuxn", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_set, 0, -1, 0, NULL, NULL),
@@ -2711,14 +2711,14 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	else
 	    continue;
 	if (OPT_MINUS(ops,'n')) {
-	    if (bit & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL|PM_HIDE)) {
+	    if (bit & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL|PM_HIDE|PM_TAGGED)) {
 		zwarnnam(name, "-%c not allowed with -n", optval);
 		/* return 1; */
 	    }
 	}
     }
     if (OPT_MINUS(ops,'n')) {
-	if ((on|off) & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL|PM_HIDE)) {
+	if ((on|off) & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL|PM_HIDE|PM_TAGGED)) {
 	    /* zwarnnam(name, "no other attributes allowed with -n"); */
 	    return 1;
 	}
