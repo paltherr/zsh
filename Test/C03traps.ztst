@@ -57,10 +57,7 @@
 >Function 1 going
 >Function 2 going
 
-# $ZTST_exe is relative to the parent directory.
-# We ought to fix this in ztst.zsh...
-  (cd ..
-  $ZTST_exe -fc 'TRAPEXIT() { print Exited.; }')
+  $ZTST_zsh -fc 'TRAPEXIT() { print Exited.; }'
 0:EXIT traps on a script
 >Exited.
 
@@ -242,14 +239,14 @@
 # Autoloaded traps are horrid, but unfortunately people expect
 # them to work if we support them.
   echo "print Running exit trap" >TRAPEXIT
-  ${${ZTST_exe##[^/]*}:-$ZTST_testdir/$ZTST_exe} -fc '
+  $ZTST_zsh -fc '
     fpath=(. $fpath)
     autoload TRAPEXIT
     print "Exiting, attempt 1"
     exit
     print "What?"
   '
-  ${${ZTST_exe##[^/]*}:-$ZTST_testdir/$ZTST_exe} -fc '
+  $ZTST_zsh -fc '
     fpath=(. $fpath)
     autoload TRAPEXIT;
     fn() { print Some function }
@@ -457,14 +454,14 @@ F:Shouldn't the error in the trap prevent any further execution?
 0: EXIT trap set in command substitution
 >command substitution exited
 
-   (cd ..; $ZTST_exe -fc 'setopt posixtraps;
+   $ZTST_zsh -fc 'setopt posixtraps;
    TRAPEXIT() { print Exited; }
    fn1() { trap; }
    setopt localtraps # should be ignored by EXIT
    fn2() { TRAPEXIT() { print No, really exited; } }
    fn1
    fn2
-   fn1')
+   fn1'
 0:POSIX_TRAPS option
 >TRAPEXIT () {
 >	print Exited
@@ -474,7 +471,7 @@ F:Shouldn't the error in the trap prevent any further execution?
 >}
 >No, really exited
 
-   (cd ..; $ZTST_exe -fc 'unsetopt posixtraps;
+   $ZTST_zsh -fc 'unsetopt posixtraps;
    echo start program
    emulate sh -c '\''testfn() {
      echo start function
@@ -484,7 +481,7 @@ F:Shouldn't the error in the trap prevent any further execution?
    }'\''
    testfn
    echo program continuing
-   echo end of program')
+   echo end of program'
 0:POSIX_TRAPS effect on EXIT trap is sticky
 >start program
 >start function
@@ -494,7 +491,7 @@ F:Shouldn't the error in the trap prevent any further execution?
 >end of program
 >EXIT TRAP TRIGGERED
 
-   (cd ..; $ZTST_exe -fc '
+   $ZTST_zsh -fc '
      echo entering program
      emulate sh -c '\''trap "echo POSIX exit trap triggered" EXIT'\''
      fn() {
@@ -503,7 +500,7 @@ F:Shouldn't the error in the trap prevent any further execution?
      }
      fn
      echo exiting program
-   ')
+   '
 0:POSIX EXIT trap can have nested native mode EXIT trap
 >entering program
 >entering native zsh function
@@ -511,7 +508,7 @@ F:Shouldn't the error in the trap prevent any further execution?
 >exiting program
 >POSIX exit trap triggered
 
-   (cd ..; $ZTST_exe -fc '
+   $ZTST_zsh -fc '
      echo entering program
      emulate sh -c '\''spt() { trap "echo POSIX exit trap triggered" EXIT; }'\''
      fn() {
@@ -521,7 +518,7 @@ F:Shouldn't the error in the trap prevent any further execution?
      spt
      fn
      echo exiting program
-   ')
+   '
 0:POSIX EXIT trap not replaced if defined within function
 >entering program
 >entering native zsh function

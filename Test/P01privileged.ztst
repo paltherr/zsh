@@ -122,7 +122,7 @@
       opts+=( $1 )
       shift
     done
-    re_exec "$1" "$2" "$3" "$4" $ZTST_exe $opts -fc \
+    re_exec "$1" "$2" "$3" "$4" $ZTST_zsh $opts -fc \
       "MODULE_PATH=${(q)MODULE_PATH}; ${(F)@[5,-1]}"
   }
   #
