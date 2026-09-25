@@ -338,16 +338,16 @@
 
  ztie -d db/gdbm -f $dbfile dbase
  zgdbmpath dbase
- [[ $REPLY = */Test/db.gdbm ]] && echo correct
+ [[ $REPLY = $ZTST_rundir/db.gdbm ]] && echo correct
  zuntie dbase
  ztie -r -d db/gdbm -f $dbfile dbase
  zgdbmpath dbase
- [[ $REPLY = */Test/db.gdbm ]] && echo correct
+ [[ $REPLY = $ZTST_rundir/db.gdbm ]] && echo correct
  zuntie -u dbase
  local -n rbase=dbase
  ztie -r -d db/gdbm -f $dbfile rbase
  zgdbmpath rbase
- [[ $REPLY = */Test/db.gdbm ]] && echo correct
+ [[ $REPLY = $ZTST_rundir/db.gdbm ]] && echo correct
  zuntie -u rbase
 0:zgdbmpath builtin
 >correct
