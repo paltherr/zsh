@@ -11,7 +11,7 @@
   print $LINENO + $functrace + ${funcsourcetrace}
   ' >sourcedfile
   print -r -- 'print Started functrace.zsh
-  module_path=(./Modules)
+  module_path=(' ${(q)module_path} ')
   print $LINENO + $functrace + ${funcsourcetrace}
   :
   fn() {
@@ -45,7 +45,7 @@
 >In sourced file
 >2 + ./functrace.zsh:22 + ./sourcedfile:0
 
-  print -r -- 'module_path=(./Modules)
+  print -r -- 'module_path=(' ${(q)module_path} ')
   debug_hook() { print $funcfiletrace[1] $functrace[1]; }
   set -o DEBUG_BEFORE_CMD
   trap "debug_hook" DEBUG

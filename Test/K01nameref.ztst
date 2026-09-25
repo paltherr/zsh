@@ -1575,7 +1575,7 @@ F:previously this could create an infinite recursion and crash
 
  # Use "${(kv)nameddirs}" because "typeset -p nameddirs" prints no value
  PS1= $ZTST_zsh -fis <<<'
-   [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
+   module_path=('"${(q)module_path}"')
    typeset v1=/1 v2
    typeset -n r1=v1 r2
    { echo "~v1:" ~v1 } 2>&1
