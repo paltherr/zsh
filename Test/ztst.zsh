@@ -45,6 +45,9 @@ ZTST_find_UTF8 () {
 # Don't propagate variables that are set by default in the shell.
 typeset +x WORDCHARS
 
+# Unset relative paths inherited from the Makefile.
+unset ZTST_srcdir ZTST_exe
+
 # Set the root to correspond to this build of zsh.
 ZTST_root=$0:a:h:h
 
@@ -137,16 +140,6 @@ ZTST_hashmark() {
 
 # We run in the current directory, so remember it.
 ZTST_rundir=$PWD
-ZTST_testdir=$PWD
-
-# The source directory is not necessarily the current directory,
-# but if $0 doesn't contain a `/' assume it is.
-if [[ $0 = */* ]]; then
-  ZTST_srcdir=${0%/*}
-else
-  ZTST_srcdir=$PWD
-fi
-[[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_rundir/$ZTST_srcdir"
 
 : ${TMPPREFIX:=/tmp/zsh}
 ZTST_tmp=${TMPPREFIX}.ztst.$$
