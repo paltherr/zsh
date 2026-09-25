@@ -3,7 +3,7 @@
 %prep
   ZSH_TEST_LANG=$(ZTST_find_UTF8)
   if ( zmodload zsh/zpty 2>/dev/null ); then
-    . $ZTST_srcdir/comptest
+    . $ZTST_comptest
     mkdir comp.tmp
     cd comp.tmp
     comptestinit &&

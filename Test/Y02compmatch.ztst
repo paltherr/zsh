@@ -12,7 +12,7 @@
 
 %prep
   if ( zmodload zsh/zpty 2>/dev/null ); then
-    . $ZTST_srcdir/comptest
+    . $ZTST_comptest
     mkdir match.tmp
     cd match.tmp
     comptestinit &&

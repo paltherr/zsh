@@ -3,7 +3,7 @@
 %prep
 
   if ( zmodload -s zsh/zpty ); then
-    source $ZTST_srcdir/comptest
+    source $ZTST_comptest
     mkdir comp.tmp
     cd comp.tmp
     comptestinit && {
