@@ -13,7 +13,7 @@
    [[ $link == no ]] && continue
    mods=($mods $name)
    moddeps=
-   modfile=$ZTST_srcdir/../$modfile
+   modfile=$ZTST_root/$modfile
    eval ${${${(f)"$(<$modfile)"}[(r)moddeps=*]}:-:}
    [[ -n $moddeps ]] && zmodload -d $name $=moddeps
  done < $ZTST_testdir/../config.modules

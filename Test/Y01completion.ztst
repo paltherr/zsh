@@ -194,12 +194,12 @@ F:regression test workers/51641
 F:regression test workers/42164
 
 # Depends on path assignment in comptestinit
-  comptesteval "path=( $ZTST_srcdir:A )"
+  comptesteval "path=( $ZTST_root/Test )"
   comptest $'zt\t'
 0:command
 >line: {ztst.zsh }{}
 
-  comptesteval "path=( $ZTST_srcdir:A )"
+  comptesteval "path=( $ZTST_root/Test )"
   comptest $':;zt\t'
 0:command after separator
 >line: {:;ztst.zsh }{}
@@ -364,7 +364,7 @@ F:regression test workers/31611
 >NO:{bat  -- ( [' ']='!' ['"']='#' ['$']=% ['&']=\' ['(']=')' ['*']=+ [,]=- [.]=/}
 >NO:{bay  -- '^@ ^A ^B ^C ^D ^E ^F ^G ^H \t \n ^K ^L ^M ^N ^O ^P ^Q ^R ^S ^T ^U ^}
 
-  comptesteval "path=( $ZTST_srcdir:A )"
+  comptesteval "path=( $ZTST_root/Test )"
   comptesteval 'typeset -H paths=HIDDEN'
   comptest $': $path\t'
 0:verbose doesn't show special or hidden parameter values
