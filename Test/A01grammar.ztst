@@ -399,7 +399,7 @@
 >This is name2
 >This is still name2
 
-  if [[ -f foo && -d . && -n $ZTST_testdir ]]; then
+  if [[ -f foo && -d . && -n $ZTST_rundir ]]; then
     true
   else
     false

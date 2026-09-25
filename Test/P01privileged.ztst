@@ -51,7 +51,7 @@
   else
     print -ru$ZTST_fd 'Selecting unprivileged UID:EUID pair automatically'
     # See above for why we do this
-    zmodload -sF zsh/stat b:zstat && euid=${"$( zstat +uid -- $ZTST_testdir )":#0}
+    zmodload -sF zsh/stat b:zstat && euid=${"$( zstat +uid -- $ZTST_rundir )":#0}
     local tmp=$( getent passwd 2> /dev/null || < /etc/passwd )
     # Note: Some awks require -v and its argument to be separate
     ruid=$( awk -F: -v u=${euid:-0} '$3 > 0 && $3 != u { print $3; exit; }' <<< $tmp )
@@ -64,7 +64,7 @@
   else
     print -ru$ZTST_fd 'Selecting unprivileged GID:EGID pair automatically'
     # See above again -- this shouldn't have the same impact as the UID, though
-    zmodload -sF zsh/stat b:zstat && egid=${"$( zstat +gid -- $ZTST_testdir )":#0}
+    zmodload -sF zsh/stat b:zstat && egid=${"$( zstat +gid -- $ZTST_rundir )":#0}
     local tmp=$( getent group 2> /dev/null || < /etc/group )
     # Note: Some awks require -v and its argument to be separate
     rgid=$( awk -F: -v g=${egid:-0} '$3 > 0 && $3 != g { print $3; exit; }' <<< $tmp )

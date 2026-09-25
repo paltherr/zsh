@@ -33,8 +33,8 @@
 0:./prog execution
 >This is top
 
-  path=($ZTST_testdir/command.tmp/dir1
-        $ZTST_testdir/command.tmp/dir2
+  path=($ZTST_rundir/command.tmp/dir1
+        $ZTST_rundir/command.tmp/dir2
         .)
   tstcmd
   path=($storepath)
@@ -47,18 +47,18 @@
 0:path (2)
 >This is top
 
-  PATH=${shpath}:${ZTST_testdir}/command.tmp/ tstcmd-slashless
+  PATH=${shpath}:$ZTST_rundir/command.tmp/ tstcmd-slashless
 0:path (3)
 >This is slashless
 
-  PATH=${echopath}:${ZTST_testdir}/command.tmp tstcmd-arg
+  PATH=${echopath}:$ZTST_rundir/command.tmp tstcmd-arg
 0:path (4)
 *>foo */command.tmp/tstcmd-arg
 
   # Just check this exits with non-zero status,
   # as output and status code can differ.
   (
-    path=($shpath $echopath ${ZTST_testdir}/command.tmp/)
+    path=($shpath $echopath $ZTST_rundir/command.tmp/)
     if tstcmd-interp-too-long >/dev/null 2>&1; then
       exit 0
     else
@@ -137,7 +137,7 @@
   cd .
   unfunction chpwd
 0q:chpwd
->Changed to $ZTST_testdir/command.tmp
+>Changed to $ZTST_rundir/command.tmp
 
   chpwd() { print chpwd: changed to $PWD; }
   chpwdfn1()  { print chpwdfn1: changed to $PWD; }
@@ -147,9 +147,9 @@
   unfunction chpwd
   unset chpwd_functions
 0q:chpwd_functions
->chpwd: changed to $ZTST_testdir/command.tmp
->chpwdfn1: changed to $ZTST_testdir/command.tmp
->chpwdfn2: changed to $ZTST_testdir/command.tmp
+>chpwd: changed to $ZTST_rundir/command.tmp
+>chpwdfn1: changed to $ZTST_rundir/command.tmp
+>chpwdfn2: changed to $ZTST_rundir/command.tmp
 
 # Hard to test periodic, precmd and preexec non-interactively.
 
