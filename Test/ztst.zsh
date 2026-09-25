@@ -82,6 +82,7 @@ done
 ZTST_mainopts=(${(kv)options})
 
 ZTST_testname=$1
+ZTST_testfile=$1:a
 
 integer ZTST_testfailed=0
 
@@ -138,8 +139,10 @@ ZTST_hashmark() {
   (( SECONDS > COLUMNS+1 && (SECONDS -= COLUMNS) ))
 }
 
-# We run in the current directory, so remember it.
-ZTST_rundir=$PWD
+# Setup test specific run directory and cd into it.
+ZTST_rundir=$ZTST_testfile:h/rundirs.tmp/${${ZTST_testfile:t}%.ztst}
+[[ -d $ZTST_rundir ]] || mkdir -p $ZTST_rundir
+cd $ZTST_rundir
 
 : ${TMPPREFIX:=/tmp/zsh}
 ZTST_tmp=${TMPPREFIX}.ztst.$$
@@ -170,13 +173,13 @@ ZTST_cleanup() {
 # Make sure it's clean now.
 rm -rf dummy.tmp *.tmp
 
-if [[ ! -r $ZTST_testname ]]; then
+if [[ ! -r $ZTST_testfile ]]; then
   ZTST_testfailed "can't read test file."
   exit 1
 fi
 
 exec {ZTST_fd}>&1
-exec {ZTST_input}<$ZTST_testname
+exec {ZTST_input}<$ZTST_testfile
 
 # The current line read from the test file.
 ZTST_curline=''
