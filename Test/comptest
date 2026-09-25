@@ -1,13 +1,9 @@
 comptestinit () {
   setopt extendedglob
-  [[ -d $ZTST_testdir/Modules/zsh ]] && module_path=( $ZTST_testdir/Modules )
-  fpath=( $ZTST_srcdir/../Functions/*~*/CVS(/)
-          $ZTST_srcdir/../Completion
-          $ZTST_srcdir/../Completion/*/*~*/CVS(/) )
 
   zmodload zsh/zpty || return $?
 
-  comptest_zsh=${ZSH:-zsh}
+  comptest_zsh=$ZTST_zsh
   comptest_keymap=e
 
   while getopts vz: opt; do
@@ -29,7 +25,7 @@ comptestinit () {
   comptesteval \
 "export LC_ALL=${ZSH_TEST_LANG:-C}" \
 "emulate -R zsh" \
-"export ZDOTDIR=$ZTST_testdir" \
+"export ZDOTDIR=$ZTST_rundir" \
 "module_path=( $module_path )" \
 "fpath=( $fpath )" \
 "bindkey -$comptest_keymap" \

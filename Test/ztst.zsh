@@ -45,14 +45,21 @@ ZTST_find_UTF8 () {
 # Don't propagate variables that are set by default in the shell.
 typeset +x WORDCHARS
 
+# Set the root to correspond to this build of zsh.
+ZTST_root=$0:a:h:h
+
+# Set zsh and comptest to correspond to this build of zsh.
+ZTST_zsh=$ZTST_root/Src/zsh
+ZTST_comptest=$ZTST_root/Test/comptest
+
 # Set the module load path to correspond to this build of zsh.
 # This Modules directory should have been created by "make check".
-[[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
+module_path=( $ZTST_root/Test/Modules )
 
 # Set the function autoload paths to correspond to this build of zsh.
-fpath=( $ZTST_srcdir/../Functions/*(/)
-        $ZTST_srcdir/../Completion
-        $ZTST_srcdir/../Completion/*/*(/) )
+fpath=( $ZTST_root/Functions/*(/)
+        $ZTST_root/Completion
+        $ZTST_root/Completion/*/*(/) )
 
 # We need to be able to save and restore the options used in the test.
 # We use the $options variable of the parameter module for this.
@@ -129,6 +136,7 @@ ZTST_hashmark() {
 }
 
 # We run in the current directory, so remember it.
+ZTST_rundir=$PWD
 ZTST_testdir=$PWD
 
 # The source directory is not necessarily the current directory,
@@ -138,7 +146,7 @@ if [[ $0 = */* ]]; then
 else
   ZTST_srcdir=$PWD
 fi
-[[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
+[[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_rundir/$ZTST_srcdir"
 
 : ${TMPPREFIX:=/tmp/zsh}
 ZTST_tmp=${TMPPREFIX}.ztst.$$
@@ -157,8 +165,8 @@ ZTST_tout=${ZTST_tmp}/ztst.tout
 ZTST_terr=${ZTST_tmp}/ztst.terr
 
 ZTST_cleanup() {
-  cd $ZTST_testdir
-  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp(N) ${ZTST_tmp}
+  cd $ZTST_rundir
+  rm -rf $ZTST_rundir/dummy.tmp $ZTST_rundir/*.tmp(N) ${ZTST_tmp}
 }
 
 # This cleanup always gets performed, even if we abort.  Later,
