@@ -1,8 +1,8 @@
 # Tests for process substitution: <(...), >(...) and =(...).
 
 %prep
-  if grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h > /dev/null 2>&1 ||
-     grep '#define HAVE_FIFOS' $ZTST_testdir/../config.h > /dev/null 2>&1; then
+  if grep '#define PATH_DEV_FD' $ZTST_root/config.h > /dev/null 2>&1 ||
+     grep '#define HAVE_FIFOS' $ZTST_root/config.h > /dev/null 2>&1; then
     mkdir procsubst.tmp
     cd procsubst.tmp
     print 'First\tSecond\tThird\tFourth' >FILE1

@@ -16,7 +16,7 @@
    modfile=$ZTST_root/$modfile
    eval ${${${(f)"$(<$modfile)"}[(r)moddeps=*]}:-:}
    [[ -n $moddeps ]] && zmodload -d $name $=moddeps
- done < $ZTST_testdir/../config.modules
+ done < $ZTST_root/config.modules
 
  zmodunload() {
    local m n=$#

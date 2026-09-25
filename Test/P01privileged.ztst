@@ -38,7 +38,7 @@
     return 0
   }
 
-  grep -qE '#define HAVE_SETRES?UID' $ZTST_testdir/../config.h || {
+  grep -qE '#define HAVE_SETRES?UID' $ZTST_root/config.h || {
     ZTST_unimplemented='PRIVILEGED tests require setreuid()/setresuid()'
     return 0
   }
@@ -191,7 +191,7 @@
 *?zsh:1: failed to change effective group ID: *
 
   local rruid
-  grep -qF '#define HAVE_INITGROUPS' $ZTST_testdir/../config.h || {
+  grep -qF '#define HAVE_INITGROUPS' $ZTST_root/config.h || {
     ZTST_skip='initgroups() not available'
     return 1
   }
