@@ -591,7 +591,7 @@ F:BUG:The inner "typeset -p VAR" should contain the value of the outer "var"
  (export FOOENV=BAR
  env | grep '^FOOENV'
  print Exec
- exec $ZTST_testdir/../Src/zsh -fc '
+ exec $ZTST_zsh -fc '
  print Unset
  unset FOOENV
  env | grep "^FOOENV"')
@@ -1104,7 +1104,7 @@ F:BUG:The inner "typeset -p VAR" should contain the value of the outer "var"
 0:Make sure +x is honoured when tying a parameter
 >typeset -T FOO foo=( a b )
 
- $ZTST_testdir/../Src/zsh --emulate sh -f -c '
+ $ZTST_zsh --emulate sh -f -c '
  PATH=/bin; export PATH; readonly PATH
  export -p PATH		# Should be a no-op, -p ignored
  typeset -p PATH

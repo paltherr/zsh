@@ -112,7 +112,7 @@
 #
 # Tests for `Precommand Modifiers'
 #
-  - $ZTST_testdir/../Src/zsh -fc "[[ \$0 = \"-$ZTST_testdir/../Src/zsh\" ]]"
+  - $ZTST_zsh -fc "[[ \$0 = \"-$ZTST_zsh\" ]]"
 0:`-' precommand modifier
 
   echo f*
@@ -124,27 +124,27 @@
   (exec /bin/sh; echo bar)
 0:`exec' precommand modifier
 
-  (exec -l $ZTST_testdir/../Src/zsh -fc 'echo $0' | sed 's%/.*/%%' )
+  (exec -l $ZTST_zsh -fc 'echo $0' | sed 's%/.*/%%' )
 0:`exec' with -l option
 >-zsh
 
-  (exec -a /bin/SPLATTER $ZTST_testdir/../Src/zsh -fc 'echo $0')
+  (exec -a /bin/SPLATTER $ZTST_zsh -fc 'echo $0')
 0:`exec' with -a option
 >/bin/SPLATTER
 
-  (exec -a/bin/SPLOOSH $ZTST_testdir/../Src/zsh -fc 'echo $0')
+  (exec -a/bin/SPLOOSH $ZTST_zsh -fc 'echo $0')
 0:`exec' with -a option, no space
 >/bin/SPLOOSH
 
-  (exec -a foo* $ZTST_testdir/../Src/zsh -fc 'print -r -- ${(V)0}')
-  (exec -a "" $ZTST_testdir/../Src/zsh -fc 'print -r -- ${(V)0}')
+  (exec -a foo* $ZTST_zsh -fc 'print -r -- ${(V)0}')
+  (exec -a "" $ZTST_zsh -fc 'print -r -- ${(V)0}')
 0:rationalisation of arguments to exec -a
 >foo*
 >
 
   (
     opts=(-a /bin/WHOOOSH)
-    exec $opts $ZTST_testdir/../Src/zsh -fc 'echo $0'
+    exec $opts $ZTST_zsh -fc 'echo $0'
   )
 0:`exec' with -a option from expansion
 >/bin/WHOOOSH
@@ -619,21 +619,21 @@
 0:Handling of &&'s and ||'s with a for loop in between
 >no
 
-  $ZTST_testdir/../Src/zsh -f unmatched_quote.txt
+  $ZTST_zsh -f unmatched_quote.txt
 1:Parse error with file causes non-zero exit status
 ?unmatched_quote.txt:2: unmatched '
 
-  $ZTST_testdir/../Src/zsh -f <unmatched_quote.txt
+  $ZTST_zsh -f <unmatched_quote.txt
 1:Parse error on standard input causes non-zero exit status
 ?zsh: unmatched '
 
-  $ZTST_testdir/../Src/zsh -f -c "'"
+  $ZTST_zsh -f -c "'"
 1:Parse error on inline command causes non-zero exit status
 ?zsh:1: unmatched '
 
-  $ZTST_testdir/../Src/zsh -f NonExistentScript
+  $ZTST_zsh -f NonExistentScript
 127q:Non-existent script causes exit status 127
-?$ZTST_testdir/../Src/zsh: can't open input file: NonExistentScript
+?$ZTST_zsh: can't open input file: NonExistentScript
 
   (setopt nonomatch
   # use this to get stuff at start of line
@@ -686,16 +686,16 @@
   chmod u+x test_path_script/myscript
   path=($PWD/test_path_script $path)
   export PATH
-  $ZTST_testdir/../Src/zsh -f -o pathscript myscript
+  $ZTST_zsh -f -o pathscript myscript
 0:PATHSCRIPT option
 >Found the script.
 
-  $ZTST_testdir/../Src/zsh -f myscript
+  $ZTST_zsh -f myscript
 127q:PATHSCRIPT option not used.
-?$ZTST_testdir/../Src/zsh: can't open input file: myscript
+?$ZTST_zsh: can't open input file: myscript
 # '
 
-  $ZTST_testdir/../Src/zsh -fc 'echo $0; echo $1' myargzero myargone
+  $ZTST_zsh -fc 'echo $0; echo $1' myargzero myargone
 0:$0 is traditionally if bizarrely set to the first argument with -c
 >myargzero
 >myargone
@@ -935,7 +935,7 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
 >and true
 >or false
 
- $ZTST_testdir/../Src/zsh -fc '{ ( ) } always { echo foo }'
+ $ZTST_zsh -fc '{ ( ) } always { echo foo }'
 0:exec last command optimization inhibited for try/always
 >foo
 
@@ -948,7 +948,7 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
   echo $(
   echo bar # comment
  )' >source_comments.zsh
- $ZTST_testdir/../Src/zsh -f -o extendedglob -is -c '. ./source_comments.zsh'
+ $ZTST_zsh -f -o extendedglob -is -c '. ./source_comments.zsh'
 0:Comments should be handled in command subst in interactively sourced files
 >foo
 >bar
@@ -964,7 +964,7 @@ F:its expectations.
  (
    export VALUE=first
    print -l 'echo Value is $VALUE' 'VALUE=second sh' 'echo Value is $VALUE' |
-   $ZTST_testdir/../Src/zsh -f
+   $ZTST_zsh -f
  )
 0:Non-interactive shell command input is line buffered
 >Value is first

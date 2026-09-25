@@ -58,7 +58,7 @@
 >And this too
 >And aliases are expanded
 
-  PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+  PS1= $ZTST_zsh -fis <<<'
     alias \{=echo
     { begin
     {end
@@ -70,7 +70,7 @@
 *>*2*{ begin
 *>*3*{end
 
-  PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+  PS1= $ZTST_zsh -fis <<<'
     alias -g S=\"
     echo S a string S "
     fc -l -1

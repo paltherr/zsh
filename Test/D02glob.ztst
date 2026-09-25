@@ -7,7 +7,7 @@
   : >glob.tmp/{,{dir1,dir2}/}{a,b,c}
 
   globtest () {
-    $ZTST_testdir/../Src/zsh -f $ZTST_srcdir/../Misc/$1
+    $ZTST_zsh -f $ZTST_srcdir/../Misc/$1
   }
 
   regress_absolute_path_and_core_dump() {

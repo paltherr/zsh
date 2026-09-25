@@ -7,7 +7,7 @@
     zpty_start() {
       export PS1= PS2=
       zpty -d
-      zpty zsh "${(q)ZTST_testdir}/../Src/zsh -fiV +Z"
+      zpty zsh "${(q)ZTST_zsh} -fiV +Z"
       zpty -w zsh 'alias sleep="sleep </dev/null >/dev/null 2>&1"; exec {ZTST_fd}>&-'
     }
     zpty_input() {

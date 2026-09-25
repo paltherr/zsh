@@ -141,11 +141,11 @@ F:something is broken.  But you already knew that.
 0:
 ?(eval):cd:3: not a directory: link_to_nonexistent
 
- (unset HOME; ARGV0=sh $ZTST_testdir/../Src/zsh -c cd)
+ (unset HOME; ARGV0=sh $ZTST_zsh -c cd)
 1:Implicit cd with unset HOME.
 ?zsh:cd:1: HOME not set
 
- $ZTST_testdir/../Src/zsh -fc 'cd -P ////dev && pwd'
+ $ZTST_zsh -fc 'cd -P ////dev && pwd'
 -f:(workers/45367) cd -P squashes multiple leading slashes
 >/dev  
 

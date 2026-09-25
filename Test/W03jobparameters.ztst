@@ -6,7 +6,7 @@
     zpty_start() {
       export PS1= PS2=
       zpty -d
-      zpty zsh "${(q)ZTST_testdir}/../Src/zsh -fiV +Z"
+      zpty zsh "${(q)ZTST_zsh} -fiV +Z"
     }
     zpty_input() {
       zpty -w zsh "${(F)@}" $'\n'

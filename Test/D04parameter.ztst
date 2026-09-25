@@ -147,7 +147,7 @@
 ?(eval):1: unset1: exiting1
 ?(eval):2: null1: exiting2
 
-  PS1= PS2= $ZTST_testdir/../Src/zsh -fis <<<'
+  PS1= PS2= $ZTST_zsh -fis <<<'
     exec 2>&1
     foo() {
         print ${1:?no arguments given}
@@ -1720,7 +1720,7 @@
    () { : > $1 } >( read; contextfn )
    : > >( contextfn )
    source <( <<< contextfn )
-   $ZTST_testdir/../Src/zsh -fc 'print -r - $zsh_eval_context'
+   $ZTST_zsh -fc 'print -r - $zsh_eval_context'
    () { () { print -r - $( : $(( contextfn(0) )) ) } }
 0:$ZSH_EVAL_CONTEXT and $zsh_eval_context
 >toplevel
@@ -2063,17 +2063,17 @@
 >l
 
   SHLVL=1
-  $ZTST_testdir/../Src/zsh -fc 'echo $SHLVL'
-  $ZTST_testdir/../Src/zsh -fc '(echo $SHLVL)'
+  $ZTST_zsh -fc 'echo $SHLVL'
+  $ZTST_zsh -fc '(echo $SHLVL)'
 0:SHLVL appears sensible when about to exit shell
 >2
 >2
 
   # SHLVL is incremented twice and decremented once in between.
   SHLVL=1
-  $ZTST_testdir/../Src/zsh -fc $ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"'
-  $ZTST_testdir/../Src/zsh -fc '('$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL")'
-  $ZTST_testdir/../Src/zsh -fc '( ('$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"))'
+  $ZTST_zsh -fc $ZTST_zsh' -fc "echo \$SHLVL"'
+  $ZTST_zsh -fc '('$ZTST_zsh' -fc "echo \$SHLVL")'
+  $ZTST_zsh -fc '( ('$ZTST_zsh' -fc "echo \$SHLVL"))'
 0:SHLVL decremented upon implicit exec optimisation
 >2
 >2
@@ -2081,9 +2081,9 @@
 
   # SHLVL is incremented twice with no decrement in between.
   SHLVL=1
-  $ZTST_testdir/../Src/zsh -fc '('$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"); exit'
-  $ZTST_testdir/../Src/zsh -fc '(exec '$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"); exit'
-  $ZTST_testdir/../Src/zsh -fc '( ('$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"); exit)'
+  $ZTST_zsh -fc '('$ZTST_zsh' -fc "echo \$SHLVL"); exit'
+  $ZTST_zsh -fc '(exec '$ZTST_zsh' -fc "echo \$SHLVL"); exit'
+  $ZTST_zsh -fc '( ('$ZTST_zsh' -fc "echo \$SHLVL"); exit)'
 0:SHLVL not decremented upon exec in subshells
 >3
 >3
@@ -2958,7 +2958,7 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 1:broken length in ${name:offset:length} (workers/45843#1)
 ?(eval):1: unrecognized modifier `$'
 
- $ZTST_testdir/../Src/zsh -fc $'$\\\n('
+ $ZTST_zsh -fc $'$\\\n('
 1:regression test for workers/45843#2: escaped newline in command substitution start token
 ?zsh:2: parse error near `$('
 
@@ -3061,7 +3061,7 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 
   (
    export ZDOTDIR=${ echo $PWD/'\0360\0237\0224\0256' }
-   $ZTST_testdir/../Src/zsh -c 'echo $ZDOTDIR'
+   $ZTST_zsh -c 'echo $ZDOTDIR'
   )
 0:regression for workers/53179 unicode ZDOTDIR
 F:output ignorable as long as not an error
@@ -3069,7 +3069,7 @@ F:output ignorable as long as not an error
 
   argv0=/not/a/real/path
   exepath=$(
-    ARGV0=$argv0 $ZTST_testdir/../Src/zsh -fc 'print -r - $ZSH_EXEPATH'
+    ARGV0=$argv0 $ZTST_zsh -fc 'print -r - $ZSH_EXEPATH'
   )
   if
     [[ $OSTYPE == (darwin|dragonfly|freebsd|netbsd)* ]] || # via library call
@@ -3089,7 +3089,7 @@ F:output ignorable as long as not an error
 *>match: /*
 
   for 1 in '' -m; do
-    COLUMNS=47 LINES=47 $ZTST_testdir/../Src/zsh $1 -fc '
+    COLUMNS=47 LINES=47 $ZTST_zsh $1 -fc '
       echo $COLUMNS $LINES
       COLUMNS=74 LINES=74
       echo $COLUMNS $LINES
@@ -3105,7 +3105,7 @@ F:output ignorable as long as not an error
 >74 74
 >74 74
 
-  $ZTST_testdir/../Src/zsh -fic '
+  $ZTST_zsh -fic '
     echo ${ZLE_RPROMPT_INDENT-unset}
     for 1 in "" 0 1 2; do (
       ZLE_RPROMPT_INDENT=$1

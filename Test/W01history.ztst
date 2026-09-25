@@ -6,7 +6,7 @@
 
 %test
 
-  PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+  PS1= $ZTST_zsh -fis <<<'
     print one two three four five six seven eight nine ten
     print !:$ !:10 !:9 !:1 !:0
     print one two three four five six seven eight nine ten
@@ -18,7 +18,7 @@
 >one two three four five six seven eight nine ten
 >print one two three four five six seven eight nine ten one two
 
-  PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+  PS1= $ZTST_zsh -fis <<<'
     print line one of an arbitrary series
     print issue two for some mystery sequence
     print !-1:5-$
@@ -34,7 +34,7 @@
 >two
 >mystery sequence
 
-  PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+  PS1= $ZTST_zsh -fis <<<'
     print All metaphor, Malachi, stilts and all
     print !1:2:s/,/\\\\?/ !1:2:s/m/shm/:s/,/\!/
     print !1:2:&
@@ -47,7 +47,7 @@
 >metophor,
 >Molochi,
 
-  PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+  PS1= $ZTST_zsh -fis <<<'
     echo foo bar
     echo $(!!) again
     echo more $( !! )
@@ -60,7 +60,7 @@
 F:Check that a history bug introduced by workers/34160 is working again.
 # Discarded line of error output consumes prompts printed by "zsh -i".
 
- PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+ PS1= $ZTST_zsh -fis <<<'
    echo /my/path/for/testing
    echo !1:1:h10
    echo !1:1:h3
@@ -84,7 +84,7 @@ F:Check that a history bug introduced by workers/34160 is working again.
 >testing
 >path/for
 
- PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+ PS1= $ZTST_zsh -fis <<<'
    echo /my/path/for/testing
    echo !1:1:P
  '
@@ -92,7 +92,7 @@ F:Check that a history bug introduced by workers/34160 is working again.
 >/my/path/for/testing
 >/my/path/for/testing
 
- PS1= $ZTST_testdir/../Src/zsh -fgis <<<'
+ PS1= $ZTST_zsh -fgis <<<'
    SAVEHIST=7
    print -rs "one\\"
    print -rs "two\\\\"

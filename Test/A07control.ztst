@@ -23,14 +23,14 @@
 >start 255
 >255
 
-  $ZTST_testdir/../Src/zsh -fc 'fn() {
+  $ZTST_zsh -fc 'fn() {
     break
   }
   fn'
 1:break outside loop
 ?fn:break:1: not in for, while, until, select, or repeat loop
 
-  $ZTST_testdir/../Src/zsh -fc 'fn() {
+  $ZTST_zsh -fc 'fn() {
     continue
   }
   fn'

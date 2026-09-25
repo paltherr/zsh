@@ -52,7 +52,7 @@
 	# Failure
 	exit 10
 	HERE
-  $ZTST_testdir/../Src/zsh -f ./zsh-trapreturn-bug2 2>erroutput.dif
+  $ZTST_zsh -f ./zsh-trapreturn-bug2 2>erroutput.dif
   mystat=$?
   (
    setopt extendedglob

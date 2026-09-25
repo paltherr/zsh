@@ -359,7 +359,7 @@
 ?(eval):6: unknown function: systell
 ?(eval):9: file descriptor out of range
 
- $ZTST_testdir/../Src/zsh -fc "
+ $ZTST_zsh -fc "
    MODULE_PATH=${(q)MODULE_PATH}
    if zmodload -e zsh/parameter; then zmodload -u zsh/parameter; fi
    unset options
@@ -370,7 +370,7 @@
 >0
 # Currently prints '1'.
 
- $ZTST_testdir/../Src/zsh -fc "
+ $ZTST_zsh -fc "
    MODULE_PATH=${(q)MODULE_PATH}
    zmodload zsh/parameter
    unset options
@@ -379,7 +379,7 @@
 0:can unset a non-readonly autoloadable parameter after loading the module
 >0
 
- $ZTST_testdir/../Src/zsh -fc "
+ $ZTST_zsh -fc "
    MODULE_PATH=${(q)MODULE_PATH}
    if zmodload -e zsh/parameter; then zmodload -u zsh/parameter; fi
    unset builtins
@@ -388,7 +388,7 @@
 *?zsh:?: read-only variable: builtins
 # Currently, the 'unset' succeeds.
 
- $ZTST_testdir/../Src/zsh -fc "
+ $ZTST_zsh -fc "
    MODULE_PATH=${(q)MODULE_PATH}
    zmodload zsh/parameter
    unset builtins
@@ -396,7 +396,7 @@
 1:can't unset a readonly autoloadable parameter after loading the module
 *?zsh:?: read-only variable: builtins
 
- $ZTST_testdir/../Src/zsh -fc "
+ $ZTST_zsh -fc "
    MODULE_PATH=${(q)MODULE_PATH}
    zmodload zsh/parameter
    zmodload -u zsh/parameter
@@ -405,7 +405,7 @@
 0:unloading a module doesn't implicitly unset autoloadable parameters
 *>(on|off) *
 
- $ZTST_testdir/../Src/zsh -fc "
+ $ZTST_zsh -fc "
   MODULE_PATH=${(q)MODULE_PATH}
   #
   zmodload zsh/zutil

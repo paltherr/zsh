@@ -32,7 +32,7 @@
   autofn
   autofn
   . ./sourcedfile' >functrace.zsh
-  $ZTST_testdir/../Src/zsh +Z -f ./functrace.zsh
+  $ZTST_zsh +Z -f ./functrace.zsh
 0q:Function tracing
 >Started functrace.zsh
 >3 + +
@@ -59,7 +59,7 @@
   eval "x=6
   y=7"
   z=8' >rocky3.zsh
-  $ZTST_testdir/../Src/zsh +Z -f ./rocky3.zsh
+  $ZTST_zsh +Z -f ./rocky3.zsh
 0:Eval tracing
 >./rocky3.zsh:5 ./rocky3.zsh:5
 >./rocky3.zsh:10 ./rocky3.zsh:10

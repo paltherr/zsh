@@ -8,7 +8,7 @@
       typeset +x TERM_PROGRAM
       typeset +x -m .term.\*
       zpty -d
-      zpty zsh "${(q)ZTST_testdir}/../Src/zsh -fiV +Z"
+      zpty zsh "${(q)ZTST_zsh} -fiV +Z"
       zpty -w zsh "module_path=( ${(j< >)${(@q-)module_path}} \$module_path )"
       zpty -w zsh ".term.extensions=( -bracketed-paste -integration )"
       zpty -w zsh "setopt zle"

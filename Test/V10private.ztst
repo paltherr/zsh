@@ -147,11 +147,11 @@ F:note "typeset" rather than "private" in output from outer
 
  inner () {
   print $+scalar_test
-  $ZTST_testdir/../Src/zsh -fc 'print X $scalar_test'
+  $ZTST_zsh -fc 'print X $scalar_test'
  }
  () {
   private -x scalar_test=whaat
-  $ZTST_testdir/../Src/zsh -fc 'print X $scalar_test'
+  $ZTST_zsh -fc 'print X $scalar_test'
   inner
   print Y $scalar_test
  }
@@ -163,12 +163,12 @@ F:note "typeset" rather than "private" in output from outer
 
  inner () {
   typeset -p array_test
-  $ZTST_testdir/../Src/zsh -fc 'print X $array_test'
+  $ZTST_zsh -fc 'print X $array_test'
  }
  () {
   local -Pax array_test=(whaat)
   print Y $array_test
-  $ZTST_testdir/../Src/zsh -fc 'print X $array_test'
+  $ZTST_zsh -fc 'print X $array_test'
   inner
  }
 0:exported private behaves like a local, part 2 (arrays do not export)
@@ -179,16 +179,16 @@ F:note "typeset" rather than "private" in output from outer
 
  inner () {
   print $+scalar_test
-  $ZTST_testdir/../Src/zsh -fc 'print X $scalar_test'
+  $ZTST_zsh -fc 'print X $scalar_test'
  }
  () {
   private scalar_test=whaat
   export scalar_test
-  $ZTST_testdir/../Src/zsh -fc 'print X $scalar_test'
+  $ZTST_zsh -fc 'print X $scalar_test'
   inner
   () {
    print $+scalar_test
-   $ZTST_testdir/../Src/zsh -fc 'print X $scalar_test'
+   $ZTST_zsh -fc 'print X $scalar_test'
   }
   print Y $scalar_test
  }

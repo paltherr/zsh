@@ -293,7 +293,7 @@ F:scenario if you encounter it.
 	fi
       fi
       exit 0'
-      $ZTST_testdir/../Src/zsh -f ./regex_test.sh
+      $ZTST_zsh -f ./regex_test.sh
   fi
 0:regex tests shouldn't crash
 

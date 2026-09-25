@@ -96,7 +96,7 @@
 %test
 
 # --version is technically an option
-  v=$( $ZTST_testdir/../Src/zsh --version )
+  v=$( $ZTST_zsh --version )
   print -r - $v
   # patchlevel should appear in output if different from version
   [[ $ZSH_PATCHLEVEL == zsh-$ZSH_VERSION-0-* ]] ||
@@ -907,7 +907,7 @@
 
 # PRINTEXITVALUE only works if shell input is coming from standard input.
 # Goodness only knows why.
-  $ZTST_testdir/../Src/zsh -f <<<'
+  $ZTST_zsh -f <<<'
       setopt printexitvalue
       func() {
 	  false
@@ -917,7 +917,7 @@
 1:PRINT_EXIT_VALUE option
 ?zsh: exit 1
 
-  $ZTST_testdir/../Src/zsh -f <<<'
+  $ZTST_zsh -f <<<'
       setopt printexitvalue
       () { false; }
   '
@@ -1492,7 +1492,7 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
       '/' '/*'
     do
       before=`ls -a -- $target_dir`
-      zpty subshell $ZTST_testdir/../Src/zsh -f +Z
+      zpty subshell $ZTST_zsh -f +Z
       [[ $PWD == */options.tmp ]] || return 1 # Sanity check before calling rm(1).
       zpty -w subshell 'PS1=PROMPT'
       zpty -r -m subshell REPLY $'*PROMPT'
@@ -1527,7 +1527,7 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
 F:compare E03posix.ztst
 >typeset -r var=''
 
-  $ZTST_testdir/../Src/zsh -fc "
+  $ZTST_zsh -fc "
   foo(){
       setopt err_return
       source <(echo 'if true; then return 42; fi')
@@ -1537,13 +1537,13 @@ F:compare E03posix.ztst
   "
 42:ERR_RETURN inside 'source' and 'if'
 
-  $ZTST_testdir/../Src/zsh --autonamedirs +Z -fic '
+  $ZTST_zsh --autonamedirs +Z -fic '
     b=/bin; hash -d | grep "^b="
   '
 0:AUTO_NAME_DIRS
 >b=/bin
 
-  $ZTST_testdir/../Src/zsh --autonamedirs +Z -fic '
+  $ZTST_zsh --autonamedirs +Z -fic '
     () { local b=/bin; hash -d | grep "^b=" }
     c=/bin
     () { local c=/sbin; hash -d | grep "^c=" }
