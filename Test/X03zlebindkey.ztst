@@ -6,7 +6,7 @@
   ZSH_TEST_LANG=$(ZTST_find_UTF8)
   if ( zmodload zsh/zpty 2>/dev/null ); then
     . $ZTST_srcdir/comptest
-    comptestinit -z $ZTST_testdir/../Src/zsh
+    comptestinit
   else
     ZTST_unimplemented="the zsh/zpty module is not available"
   fi

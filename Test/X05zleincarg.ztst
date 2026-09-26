@@ -4,7 +4,7 @@
   ZSH_TEST_LANG=$(ZTST_find_UTF8)
   if ( zmodload zsh/zpty 2>/dev/null ); then
     . $ZTST_srcdir/comptest
-    comptestinit -v -z $ZTST_testdir/../Src/zsh
+    comptestinit -v
     zpty_run '
       autoload -Uz incarg
       for name in {,vim-,vim-backward-}{,sync-}{inc,dec}arg; do

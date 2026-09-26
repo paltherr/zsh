@@ -7,7 +7,7 @@
     . $ZTST_srcdir/comptest
     mkdir comp.tmp
     cd comp.tmp
-    comptestinit -z $ZTST_testdir/../Src/zsh &&
+    comptestinit &&
     {
       word=$'[^\0]#\0'
       comptesteval \

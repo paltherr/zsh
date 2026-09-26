@@ -15,7 +15,7 @@
     . $ZTST_srcdir/comptest
     mkdir match.tmp
     cd match.tmp
-    comptestinit -z $ZTST_testdir/../Src/zsh &&
+    comptestinit &&
     {
       list1=(IndianRed IndianRed2 IndianRed3 IndianRed4)
       test_code () {

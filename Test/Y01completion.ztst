@@ -6,7 +6,7 @@
     . $ZTST_srcdir/comptest
     mkdir comp.tmp
     cd comp.tmp
-    comptestinit -z $ZTST_testdir/../Src/zsh &&
+    comptestinit &&
     {
       comptesteval 'compdef _tst tst'
       mkdir dir1 &&

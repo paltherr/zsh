@@ -3,19 +3,17 @@ comptestinit () {
 
   zmodload zsh/zpty || return $?
 
-  comptest_zsh=$ZTST_zsh
   comptest_keymap=e
 
-  while getopts vz: opt; do
+  while getopts v opt; do
     case $opt in
-      z) comptest_zsh="$OPTARG";;
       v) comptest_keymap="v";;
     esac
   done
   (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
   export PS1="<PROMPT>"
-  zpty zsh "$comptest_zsh -f +Z"
+  zpty zsh "$ZTST_zsh -f +Z"
 
   zpty_read log1 "*<PROMPT>*" || {
     print "first prompt hasn't appeared."
