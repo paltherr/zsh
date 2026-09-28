@@ -8,24 +8,29 @@ emulate zsh
 # We could probably do that with subshells instead.
 
 integer success=0 failure=0 skipped=0
-typeset resln rule col
-typeset -a ffiles res
+typeset -a ffiles
 
-# colour to use for ztst failure messages. also used as a signal that colours
-# are available generally
-[[ -t 1 ]] &&
-(( ! $+ZTST_failcolour )) &&
-[[ -z $NO_COLOR ]] &&
-[[ $TERM == *color* || "$( tput colors 2> /dev/null )" == <8-> ]] &&
-typeset -x ZTST_failcolour=red
+# Colors to use for ztst messages. ZTST_failcolor is also used as a
+# signal that colors are available generally.
+if [[ -z $NO_COLOR && \
+    ( -n $ZTST_failcolor || \
+    ( -t 1 && \
+    ( $TERM == *color* || "$( tput colors 2> /dev/null )" == <8-> ))) ]]; then
+  : ${ZTST_failcolor:=red}
+  : ${ZTST_warncolor:=yellow}
+  : ${ZTST_passcolor:=green}
+  typeset -x -m "ZTST_*color"
+else
+  unset -m "ZTST_*color"
+fi
 
 run-test() {
   $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh $test
   local -i result=$?
   (( result > 128 )) && {
-    [[ -n $ZTST_failcolour ]] && print -rnP "%F{$ZTST_failcolour}"
+    [[ -n $ZTST_failcolor ]] && print -rnP "%F{$ZTST_failcolor}"
     print -r - "$test: test failed: SIG$signals[result - 127]."
-    [[ -n $ZTST_failcolour ]] && print -rnP %f
+    [[ -n $ZTST_failcolor ]] && print -rnP %f
   }
   print
   return result
@@ -50,21 +55,21 @@ run-tests-sequentially() {
 typeset -a tests=(${${(f)ZTST_testlist}#./})
 run-tests-sequentially
 
-res=(
+typeset -a res=(
   "$success successful test script${${success:#1}:+s}"
   "$failure failure${${failure:#1}:+s}"
   "$skipped skipped"
 )
-resln=${(j<, >)res}
-rule=${resln//?/\*}
-
-[[ -n $ZTST_failcolour ]] &&
+typeset resln=${(j<, >)res}
+typeset rule=${resln//?/\*}
+typeset col
+[[ -n $ZTST_failcolor ]] &&
 if (( failure )); then
-  col=red
+  col=$ZTST_failcolor
 elif (( success )); then
-  col=green
+  col=$ZTST_passcolor
 else
-  col=yellow
+  col=$ZTST_warncolor
 fi
 
 (( $#col )) && print -rnP - "%F{$col}"

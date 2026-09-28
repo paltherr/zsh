@@ -93,9 +93,9 @@ ZTST_testfailed() {
   if [[ -n $ZTST_message ]]; then
     print -r "Was testing: $ZTST_message"
   fi
-  [[ -n $ZTST_failcolour ]] && print -rnP "%F{$ZTST_failcolour}"
+  [[ -n $ZTST_failcolor ]] && print -rnP "%F{$ZTST_failcolor}"
   print -r "$ZTST_testname: test failed."
-  [[ -n $ZTST_failcolour ]] && print -rnP %f
+  [[ -n $ZTST_failcolor ]] && print -rnP %f
   if [[ -n $ZTST_failmsg ]]; then
     print -r "The following may (or may not) help identifying the cause:
 $ZTST_failmsg"
@@ -112,9 +112,9 @@ ZTST_testxpassed() {
   if [[ -n $ZTST_message ]]; then
     print -r "Was testing: $ZTST_message"
   fi
-  [[ -n $ZTST_failcolour ]] && print -rnP "%F{$ZTST_failcolour}"
+  [[ -n $ZTST_failcolor ]] && print -rnP "%F{$ZTST_failcolor}"
   print -r "$ZTST_testname: test XPassed."
-  [[ -n $ZTST_failcolour ]] && print -rnP %f
+  [[ -n $ZTST_failcolor ]] && print -rnP %f
   if [[ -n $ZTST_failmsg ]]; then
     print -r "The following may (or may not) help identifying the cause:
 $ZTST_failmsg"
@@ -337,12 +337,12 @@ ZTST_diff() {
 
     out=( ${(f)"$( $cmd "$@" )"} ) || ret=$?
 
-    # massage + colourise diff
+    # massage + colorize diff
     (( ret )) && {
       local B=${(%):-%B} b=${(%):-%b} f=${(%):-%f}
       local Fr=${(%):-'%F{red}'} Fg=${(%):-'%F{green}'} Fc=${(%):-'%F{cyan}'}
 
-      [[ -n $ZTST_failcolour ]] || B= b= Fr= Fg= Fc= f=
+      [[ -n $ZTST_failcolor ]] || B= b= Fr= Fg= Fc= f=
 
       out[1]=${out[1]/#---*/$B--- expected$b}
       out[2]=${out[2]/#+++*/$B+++ actual$b}

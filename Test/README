@@ -37,5 +37,10 @@ respectively. Multiple sets of scripts can be run with
   make TESTNUM="{A,C02,E}" check
 to run all scripts beginning with A, C02, and E.
 
+Unless NO_COLOR is non-empty and `make check' runs in a terminal supporting
+colors, the output is colorized. The use of colors can be forced by setting
+ZTST_failcolor to the color for failure messages. Colors for warning and
+success messages can be specified with ZTST_warncolor and ZTST_passcolor.
+
 Instructions on how to write scripts are given in B01cd.ztst, which acts as
 a model.
