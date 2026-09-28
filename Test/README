@@ -42,5 +42,9 @@ colors, the output is colorized. The use of colors can be forced by setting
 ZTST_failcolor to the color for failure messages. Colors for warning and
 success messages can be specified with ZTST_warncolor and ZTST_passcolor.
 
+Unless ZTST_hide_failing is non-zero, failing scripts are listed in the
+summary. If ZTST_show_skipped or ZTST_show_passing are non-zero, skipped or
+passing scripts are listed, too.
+
 Instructions on how to write scripts are given in B01cd.ztst, which acts as
 a model.

@@ -7,9 +7,6 @@ emulate zsh
 # protect from catastrophic failure of an individual test.
 # We could probably do that with subshells instead.
 
-integer success=0 failure=0 skipped=0
-typeset -a ffiles
-
 # Colors to use for ztst messages. ZTST_failcolor is also used as a
 # signal that colors are available generally.
 if [[ -z $NO_COLOR && \
@@ -36,11 +33,13 @@ run-test() {
   return result
 }
 
+typeset -a passing=() skipped=() failing=()
+
 add-test-result() {
   case $1 in
-    0) success+=1;;
-    2) skipped+=1;;
-    *) failure+=1 ffiles+=$test;;
+    0) passing+=$test;;
+    2) skipped+=$test;;
+    *) failing+=$test;;
   esac
 }
 
@@ -56,17 +55,17 @@ typeset -a tests=(${${(f)ZTST_testlist}#./})
 run-tests-sequentially
 
 typeset -a res=(
-  "$success successful test script${${success:#1}:+s}"
-  "$failure failure${${failure:#1}:+s}"
-  "$skipped skipped"
+  "$#passing successful test script${${${#passing}:#1}:+s}"
+  "$#failing failure${${${#failing}:#1}:+s}"
+  "$#skipped skipped"
 )
 typeset resln=${(j<, >)res}
 typeset rule=${resln//?/\*}
 typeset col
 [[ -n $ZTST_failcolor ]] &&
-if (( failure )); then
+if (( $#failing )); then
   col=$ZTST_failcolor
-elif (( success )); then
+elif (( $#passing )); then
   col=$ZTST_passcolor
 else
   col=$ZTST_warncolor
@@ -74,9 +73,13 @@ fi
 
 (( $#col )) && print -rnP - "%F{$col}"
 print -rl - $rule $resln
-(( $#ffiles )) &&
-print -rl - '' "failing test script${${#ffiles:#1}:+s}:" ${(@)ffiles/#/  }
+(( !ZTST_hide_failing && $#failing )) &&
+print -rl - '' "failing test script${${${#failing}:#1}:+s}:" ${(@)failing/#/  }
+(( ZTST_show_skipped && $#skipped )) &&
+print -rl - '' "skipped test script${${${#skipped}:#1}:+s}:" ${(@)skipped/#/  }
+(( ZTST_show_passing && $#passing )) &&
+print -rl - '' "passing test script${${${#passing}:#1}:+s}:" ${(@)passing/#/  }
 print -rl - $rule
 (( $#col )) && print -rnP - %f
 
-return $(( failure ? 1 : 0 ))
+return $(( $#failing ? 1 : 0 ))
