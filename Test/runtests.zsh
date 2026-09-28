@@ -7,7 +7,7 @@ emulate zsh
 # protect from catastrophic failure of an individual test.
 # We could probably do that with subshells instead.
 
-integer success=0 failure=0 skipped=0 retval
+integer success=0 failure=0 skipped=0
 typeset resln rule col
 typeset -a ffiles res
 
@@ -19,25 +19,36 @@ typeset -a ffiles res
 [[ $TERM == *color* || "$( tput colors 2> /dev/null )" == <8-> ]] &&
 typeset -x ZTST_failcolour=red
 
-for file in "${(f)ZTST_testlist}"; do
-  file=${file#./}
-  $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh $file
-  retval=$?
-  if (( $retval == 2 )); then
-    (( skipped++ ))
-  elif (( $retval )); then
-    (( failure++ ))
-    (( $retval > 128 )) && {
-      [[ -n $ZTST_failcolour ]] && print -rnP "%F{$ZTST_failcolour}"
-      print -r - "$file: test failed: SIG$signals[$retval - 127]."
-      [[ -n $ZTST_failcolour ]] && print -rnP %f
-    }
-    ffiles+=( $file )
-  else
-    (( success++ ))
-  fi
+run-test() {
+  $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh $test
+  local -i result=$?
+  (( result > 128 )) && {
+    [[ -n $ZTST_failcolour ]] && print -rnP "%F{$ZTST_failcolour}"
+    print -r - "$test: test failed: SIG$signals[result - 127]."
+    [[ -n $ZTST_failcolour ]] && print -rnP %f
+  }
   print
-done
+  return result
+}
+
+add-test-result() {
+  case $1 in
+    0) success+=1;;
+    2) skipped+=1;;
+    *) failure+=1 ffiles+=$test;;
+  esac
+}
+
+run-tests-sequentially() {
+  local test
+  for test in $tests; do
+    run-test
+    add-test-result $?
+  done
+}
+
+typeset -a tests=(${${(f)ZTST_testlist}#./})
+run-tests-sequentially
 
 res=(
   "$success successful test script${${success:#1}:+s}"
