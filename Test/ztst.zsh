@@ -49,6 +49,11 @@ typeset +x WORDCHARS
 # This Modules directory should have been created by "make check".
 [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
 
+# Set the function autoload paths to correspond to this build of zsh.
+fpath=( $ZTST_srcdir/../Functions/*(/)
+        $ZTST_srcdir/../Completion
+        $ZTST_srcdir/../Completion/*/*(/) )
+
 # We need to be able to save and restore the options used in the test.
 # We use the $options variable of the parameter module for this.
 zmodload zsh/parameter
@@ -66,53 +71,9 @@ done
 # Options set in main script
 ZTST_mainopts=(${(kv)options})
 
-# We run in the current directory, so remember it.
-ZTST_testdir=$PWD
 ZTST_testname=$1
 
 integer ZTST_testfailed=0
-
-# The source directory is not necessarily the current directory,
-# but if $0 doesn't contain a `/' assume it is.
-if [[ $0 = */* ]]; then
-  ZTST_srcdir=${0%/*}
-else
-  ZTST_srcdir=$PWD
-fi
-[[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
-
-# Set the function autoload paths to correspond to this build of zsh.
-fpath=( $ZTST_srcdir/../Functions/*(/)
-        $ZTST_srcdir/../Completion
-        $ZTST_srcdir/../Completion/*/*(/) )
-
-: ${TMPPREFIX:=/tmp/zsh}
-ZTST_tmp=${TMPPREFIX}.ztst.$$
-if ! rm -f $ZTST_tmp || ! mkdir -p $ZTST_tmp || ! chmod go-w $ZTST_tmp; then
-  print "Can't create $ZTST_tmp for exclusive use." >&2
-  exit 1
-fi
-# Temporary files for redirection inside tests.
-ZTST_in=${ZTST_tmp}/ztst.in
-# hold the expected output
-ZTST_out=${ZTST_tmp}/ztst.out
-ZTST_err=${ZTST_tmp}/ztst.err
-# hold the actual output from the test
-ZTST_tout=${ZTST_tmp}/ztst.tout
-ZTST_terr=${ZTST_tmp}/ztst.terr
-
-ZTST_cleanup() {
-  cd $ZTST_testdir
-  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp(N) ${ZTST_tmp}
-}
-
-# This cleanup always gets performed, even if we abort.  Later,
-# we should try and arrange that any test-specific cleanup
-# always gets called as well.
-##trap 'print cleaning up...
-##ZTST_cleanup' INT QUIT TERM
-# Make sure it's clean now.
-rm -rf dummy.tmp *.tmp
 
 # Report failure.  Note that all output regarding the tests goes to stdout.
 # That saves an unpleasant mixture of stdout and stderr to sort out.
@@ -166,6 +127,47 @@ ZTST_hashmark() {
   fi
   (( SECONDS > COLUMNS+1 && (SECONDS -= COLUMNS) ))
 }
+
+# We run in the current directory, so remember it.
+ZTST_testdir=$PWD
+
+# The source directory is not necessarily the current directory,
+# but if $0 doesn't contain a `/' assume it is.
+if [[ $0 = */* ]]; then
+  ZTST_srcdir=${0%/*}
+else
+  ZTST_srcdir=$PWD
+fi
+[[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
+
+: ${TMPPREFIX:=/tmp/zsh}
+ZTST_tmp=${TMPPREFIX}.ztst.$$
+if ! rm -f $ZTST_tmp || ! mkdir -p $ZTST_tmp || ! chmod go-w $ZTST_tmp; then
+  print "Can't create $ZTST_tmp for exclusive use." >&2
+  exit 1
+fi
+
+# Temporary files for redirection inside tests.
+ZTST_in=${ZTST_tmp}/ztst.in
+# hold the expected output
+ZTST_out=${ZTST_tmp}/ztst.out
+ZTST_err=${ZTST_tmp}/ztst.err
+# hold the actual output from the test
+ZTST_tout=${ZTST_tmp}/ztst.tout
+ZTST_terr=${ZTST_tmp}/ztst.terr
+
+ZTST_cleanup() {
+  cd $ZTST_testdir
+  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp(N) ${ZTST_tmp}
+}
+
+# This cleanup always gets performed, even if we abort.  Later,
+# we should try and arrange that any test-specific cleanup
+# always gets called as well.
+##trap 'print cleaning up...
+##ZTST_cleanup' INT QUIT TERM
+# Make sure it's clean now.
+rm -rf dummy.tmp *.tmp
 
 if [[ ! -r $ZTST_testname ]]; then
   ZTST_testfailed "can't read test file."
