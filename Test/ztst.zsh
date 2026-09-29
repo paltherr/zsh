@@ -144,7 +144,8 @@ ZTST_rundir=$ZTST_testfile:h/rundirs.tmp/${${ZTST_testfile:t}%.ztst}
 [[ -d $ZTST_rundir ]] || mkdir -p $ZTST_rundir
 cd $ZTST_rundir
 
-: ${TMPPREFIX:=/tmp/zsh}
+# Create all temporary files inside the test specific run directory.
+TMPPREFIX=$ZTST_rundir/zsh
 ZTST_tmp=${TMPPREFIX}.ztst.$$
 if ! rm -f $ZTST_tmp || ! mkdir -p $ZTST_tmp || ! chmod go-w $ZTST_tmp; then
   ZTST_testfailed "can't create $ZTST_tmp for exclusive use."

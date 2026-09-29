@@ -21,7 +21,7 @@
 
 %test
  tst_regex /one/ ':first:first:(one)'
- comptesteval "functions _tst >/tmp/hello"
+ comptesteval "functions _tst >$ZTST_rundir/hello"
  comptest $'tst \t'
 0:standalone spec
 >line: {tst one }{}
