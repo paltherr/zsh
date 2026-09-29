@@ -133,9 +133,9 @@
 0:ALL_EXPORT option
 >scalar-export
 >scalar
-  
+
   # Count the number of directories on the stack.  Don't care what they are.
-  dircount() { dirs -v | tail -1 | awk '{ print $1 + 1}'; }
+  dircount() { local dirs=("${(@f)$(dirs -v)}"); echo $(( ${dirs[-1]%$'\t'*} + 1 )) }
   unsetopt autopushd
   cd tmpcd
   dircount

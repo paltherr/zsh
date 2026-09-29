@@ -72,33 +72,6 @@ ZTST_testname=$1
 
 integer ZTST_testfailed=0
 
-# This is POSIX nonsense.  Because of the vague feeling someone, somewhere
-# may one day need to examine the arguments of "tail" using a standard
-# option parser, every Unix user in the world is expected to switch
-# to using "tail -n NUM" instead of "tail -NUM".  Older versions of
-# tail don't support this.
-tail() {
-  emulate -L zsh
-
-  if [[ -z $TAIL_SUPPORTS_MINUS_N ]]; then
-    local test
-    test=$(echo "foo\nbar" | command tail -n 1 2>/dev/null)
-    if [[ $test = bar ]]; then
-      TAIL_SUPPORTS_MINUS_N=1
-    else
-      TAIL_SUPPORTS_MINUS_N=0
-    fi
-  fi
-
-  integer argi=${argv[(i)-<->]}
-
-  if [[ $argi -le $# && $TAIL_SUPPORTS_MINUS_N = 1 ]]; then
-    argv[$argi]=(-n ${argv[$argi][2,-1]})
-  fi
-
-  command tail "$argv[@]"
-}
-
 # The source directory is not necessarily the current directory,
 # but if $0 doesn't contain a `/' assume it is.
 if [[ $0 = */* ]]; then
