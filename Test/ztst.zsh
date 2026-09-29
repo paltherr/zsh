@@ -143,7 +143,7 @@ fi
 : ${TMPPREFIX:=/tmp/zsh}
 ZTST_tmp=${TMPPREFIX}.ztst.$$
 if ! rm -f $ZTST_tmp || ! mkdir -p $ZTST_tmp || ! chmod go-w $ZTST_tmp; then
-  print "Can't create $ZTST_tmp for exclusive use." >&2
+  ZTST_testfailed "can't create $ZTST_tmp for exclusive use."
   exit 1
 fi
 
