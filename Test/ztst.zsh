@@ -82,9 +82,9 @@ fi
 [[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
 
 # Set the function autoload paths to correspond to this build of zsh.
-fpath=( $ZTST_srcdir/../Functions/*~*/CVS(/)
+fpath=( $ZTST_srcdir/../Functions/*(/)
         $ZTST_srcdir/../Completion
-        $ZTST_srcdir/../Completion/*/*~*/CVS(/) )
+        $ZTST_srcdir/../Completion/*/*(/) )
 
 : ${TMPPREFIX:=/tmp/zsh}
 ZTST_tmp=${TMPPREFIX}.ztst.$$
