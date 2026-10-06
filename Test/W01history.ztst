@@ -1,24 +1,105 @@
 # Tests for BANG_HIST replacements
 
 %prep
+  if ! zmodload zsh/zpty 2>/dev/null; then
+    ZTST_unimplemented="the zsh/zpty module is not available"
+  fi
 
-  if [[ -t 0 ]]; then print -u $ZTST_fd History tests write to /dev/tty; fi
+  setopt extendedglob
+
+  EOF=$'\4'
+  ESC=$'\e'
+  RRN=$'\r\r\n'
+  PARTIAL_LINE_MARKER=p:$'\e\\[1m\e\\[7m%\e\\[27m\e\\[1m\e\\[0m #\r \r'
+
+  skipif() {
+    case $1 in
+      s:*) [[ $output = ${1:2}* ]] && output=${output:$#1-2};;
+      p:*) [[ $output = ${~1:2}* ]] && output=${output#${~1:2}};;
+      r:*) [[ $output =~ "^${1:2}" ]] && output=${output:$#MATCH};;
+        *) printf "Unrecognized token: %s\n" ${(qqqq)1} 1>&2; return 1;;
+    esac
+  }
+
+  skip() {
+    skipif $1 || {
+      printf "expected: %s%s\n" ${1[1,2]} ${(qqqq)1:2} 1>&2
+      printf "found   :   %s\n" ${(qqqq)output} 1>&2
+      return 1
+    }
+  }
+
+  echo-text() {
+    local -i esc=$output[(i)$ESC]
+    if ((esc > 1)); then
+      # printf "DEBUG echo: %s\n" ${(qqqq)${output[1,esc-1]}} >/dev/tty
+      print -rl ${${(f)output[1,esc-1]}//%$'\r'#/}${${output[esc-1]/[$'\n\r']}:+%}
+      output=$output[esc,-1]
+    fi
+  }
+
+  zpty-zsh() {
+    local -x PS1="<prompt>"
+    zpty zsh "$ZTST_zsh -fis"
+    zpty -w -n zsh ${(F)"${(@f)${:-${1#$'\n'}$EOF}}"## #}
+    zpty -r zsh >zpty-output.tmp && echo EOF >>zpty-output.tmp
+    zpty -d zsh
+    local output=${"$(<zpty-output.tmp)"%EOF}
+    # Parse initialization output
+    skip $PARTIAL_LINE_MARKER &&
+    skip s:$'\e]11;?\e\\' &&   # OSC 11: Query terminal's background color
+    skip s:$'\e]10;?\e\\' &&   # OSC 10: Query terminal's foreground color
+    skip s:$'\e]12;?\e\\' &&   # OSC 12: Query terminal's cursor color
+    skip s:$'\e[c'        &&   # DA1: Query terminal's primary device attributes
+    skip s:$'  \r'        &&   # ?
+    skip p:$'\e]7;*\e\\'  &&   # OSC 7: Report current working directory
+    true || return
+    while true; do
+      # print -r "DEBUG loop: ${(qqqq)output}" >/dev/tty
+      # Parse prompt and command line
+      skip p:$'\e]133;A*\e\\'      &&   # OSC 133 A: Prompt start
+      skip s:$'\r\e[0m\e[J'        &&   # Clear line
+      skip p:$'\e]133;P*\e\\'      &&   # OSC 133 P: Prompt properties
+      skip s:$PS1                  &&   # Prompt
+      skip s:$'\e[K'               &&   # Clear end of line
+      skip s:$'\e[?2004h'          &&   # Enable bracketed paste mode
+      skip s:$'\e]133;B\e\\'       &&   # OSC 133 B: Command line start
+      skip s:$'\e[?2004l'          &&   # Disable bracketed paste mode
+      true || return
+      [[ $output = $RRN ]] && return    # Return on Ctrl-D triggered EOF
+      printf "%% " && echo-text         # Echo command line
+      if skipif s:$'\e]133;C\e\\'; then # OSC 133 C: Command output start
+        echo-text                       # Echo command output
+        [[ -z $output ]] && return      # Return on command triggered EOF
+        skip s:$'\e]133;D\e\\'     &&   # OSC 133 D: Command finished
+        true || return
+      fi
+      skip $PARTIAL_LINE_MARKER    &&
+      true || return
+    done
+  }
 
 %test
 
-  PS1= $ZTST_zsh -fis <<<'
+  zpty-zsh '
     print one two three four five six seven eight nine ten
     print !:$ !:10 !:9 !:1 !:0
     print one two three four five six seven eight nine ten
     print !:0-$ !:1-2
   '
 0:History word references
+>% print one two three four five six seven eight nine ten
 >one two three four five six seven eight nine ten
+>% print !:$ !:10 !:9 !:1 !:0
+>print ten ten nine one print
 >ten ten nine one print
+>% print one two three four five six seven eight nine ten
 >one two three four five six seven eight nine ten
+>% print !:0-$ !:1-2
+>print print one two three four five six seven eight nine ten one two
 >print one two three four five six seven eight nine ten one two
 
-  PS1= $ZTST_zsh -fis <<<'
+  zpty-zsh '
     print line one of an arbitrary series
     print issue two for some mystery sequence
     print !-1:5-$
@@ -27,40 +108,60 @@
     print !-3:1-$
   '
 0:History line numbering
+>% print line one of an arbitrary series
 >line one of an arbitrary series
+>% print issue two for some mystery sequence
 >issue two for some mystery sequence
+>% print !-1:5-$
+>print mystery sequence
 >mystery sequence
+>% print !1:2
+>print one
 >one
+>% print !2:2
+>print two
 >two
+>% print !-3:1-$
+>print mystery sequence
 >mystery sequence
 
-  PS1= $ZTST_zsh -fis <<<'
+  zpty-zsh '
     print All metaphor, Malachi, stilts and all
     print !1:2:s/,/\\\\?/ !1:2:s/m/shm/:s/,/\!/
     print !1:2:&
     print -l !1:2-3:gs/a/o/
   '
 0:History substitution
+>% print All metaphor, Malachi, stilts and all
 >All metaphor, Malachi, stilts and all
+>% print !1:2:s/,/\\\\?/ !1:2:s/m/shm/:s/,/\!/
+>print metaphor\? shmetaphor!
 >metaphor? shmetaphor!
+>% print !1:2:&
+>print metaphor!
 >metaphor!
+>% print -l !1:2-3:gs/a/o/
+>print -l metophor, Molochi,
 >metophor,
 >Molochi,
 
-  PS1= $ZTST_zsh -fis <<<'
+  zpty-zsh '
     echo foo bar
     echo $(!!) again
     echo more $( !! )
   '
 0:Regression test for history references in command substitution
+>% echo foo bar
 >foo bar
+>% echo $(!!) again
+>echo $(echo foo bar) again
 >foo bar again
+>% echo more $( !! )
+>echo more $( echo $(echo foo bar) again )
 >more foo bar again
-*?*
 F:Check that a history bug introduced by workers/34160 is working again.
-# Discarded line of error output consumes prompts printed by "zsh -i".
 
- PS1= $ZTST_zsh -fis <<<'
+ zpty-zsh '
    echo /my/path/for/testing
    echo !1:1:h10
    echo !1:1:h3
@@ -73,40 +174,79 @@ F:Check that a history bug introduced by workers/34160 is working again.
    echo !1:1:t3:h2
  '
 0:Modifiers :h and :t with arguments
+>% echo /my/path/for/testing
 >/my/path/for/testing
+>% echo !1:1:h10
+>echo /my/path/for/testing
 >/my/path/for/testing
+>% echo !1:1:h3
+>echo /my/path
 >/my/path
+>% echo !1:1:h2
+>echo /my
 >/my
+>% echo !1:1:h1
+>echo /
 >/
+>% echo !1:1:t10
+>echo /my/path/for/testing
 >/my/path/for/testing
+>% echo !1:1:t3
+>echo path/for/testing
 >path/for/testing
+>% echo !1:1:t2
+>echo for/testing
 >for/testing
+>% echo !1:1:t1
+>echo testing
 >testing
+>% echo !1:1:t3:h2
+>echo path/for
 >path/for
 
- PS1= $ZTST_zsh -fis <<<'
+ zpty-zsh '
    echo /my/path/for/testing
    echo !1:1:P
  '
 0:Modifier :P
+>% echo /my/path/for/testing
 >/my/path/for/testing
+>% echo !1:1:P
+>echo /my/path/for/testing
 >/my/path/for/testing
 
- PS1= $ZTST_zsh -fgis <<<'
-   SAVEHIST=7
-   print -rs "one\\"
-   print -rs "two\\\\"
-   print -rs "three\\\\\\"
-   print -rs "four\\\\\\\\"
-   print -rs "five\\\\\\\\\\"
-   print -s  "while false\ndo\ntrue\\\\\n && break\ndone"
-   print -s  "echo one\\\\\ntwo"
-   fc -W hist
+ zpty-zsh '
+   setopt -g
+   alias nohist=" "
+   fc -p
+   nohist SAVEHIST=7
+   nohist print -rs "one\\"
+   nohist print -rs "two\\\\"
+   nohist print -rs "three\\\\\\"
+   nohist print -rs "four\\\\\\\\"
+   nohist print -rs "five\\\\\\\\\\"
+   nohist print -s  "while false\ndo\ntrue\\\\\n && break\ndone"
+   nohist print -s  "echo one\\\\\ntwo"
+   nohist fc -W hist
    fc -p -R hist
    fc -l
    rm hist
  '
 0:Lines ending in backslash saved and restored to history
+>% setopt -g
+>% alias nohist=" "
+>% fc -p
+>% nohist SAVEHIST=7
+>% nohist print -rs "one\\"
+>% nohist print -rs "two\\\\"
+>% nohist print -rs "three\\\\\\"
+>% nohist print -rs "four\\\\\\\\"
+>% nohist print -rs "five\\\\\\\\\\"
+>% nohist print -s  "while false\ndo\ntrue\\\\\n && break\ndone"
+>% nohist print -s  "echo one\\\\\ntwo"
+>% nohist fc -W hist
+>% fc -p -R hist
+>% fc -l
 >    1  one\
 >    2  two\\
 >    3  three\\\
@@ -114,3 +254,4 @@ F:Check that a history bug introduced by workers/34160 is working again.
 >    5  five\\\\\
 >    6  while false\ndo\ntrue\\n && break\ndone
 >    7  echo one\\ntwo
+>% rm hist
