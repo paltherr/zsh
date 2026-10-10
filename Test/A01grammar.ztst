@@ -1014,8 +1014,7 @@ F:BUG:output should bet 0-unset
   }
   print $?-$msg
 0:return causes immediate return (immediate assign)
-F:BUG:output should bet 7-unset
->0-set
+>7-unset
 
   msg=unset
   () {
@@ -1024,7 +1023,8 @@ F:BUG:output should bet 7-unset
   }
   print $?-$msg
 0:return causes immediate return (assign after operator change)
->7-unset
+F:BUG:output should bet 7-unset
+>0-set
 
   $ZTST_testdir/../Src/zsh -fc '
     msg=unset
@@ -1035,8 +1035,7 @@ F:BUG:output should bet 7-unset
     print $?-$msg
   '
 0:return causes immediate return (no enclosing loops)
-F:BUG:output should bet 7-unset
->0-set
+>7-unset
 
   msg=unset
   for x in 1; do
