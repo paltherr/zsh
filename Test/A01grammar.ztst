@@ -985,8 +985,7 @@ F:its expectations.
  for x in 1; do
    ! continue
  done
-1:! does not affect status of explicit continue
-F:BUG:status should be 0
+0:! does not affect status of explicit continue
 
   msg=unset
   for x in 1; do
@@ -1042,8 +1041,7 @@ F:BUG:status should be 0
   done
   print $?-$msg
 0:! continue causes immediate continuation
-F:BUG:output should bet 0-unset
->1-unset
+>0-unset
 
   msg=unset
   () {
