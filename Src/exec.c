@@ -1564,7 +1564,8 @@ execlist(Estate state, int dont_change_job, int exiting)
 		    code = *state->pc++;
 		    next = state->pc + WC_SUBLIST_SKIP(code);
 		    while (wc_code(code) == WC_SUBLIST &&
-			   WC_SUBLIST_TYPE(code) == WC_SUBLIST_AND) {
+			   (breaks || retflag ||
+			    WC_SUBLIST_TYPE(code) == WC_SUBLIST_AND)) {
 			state->pc = next;
 			code = *state->pc++;
 			next = state->pc + WC_SUBLIST_SKIP(code);
@@ -1598,7 +1599,8 @@ execlist(Estate state, int dont_change_job, int exiting)
 		    code = *state->pc++;
 		    next = state->pc + WC_SUBLIST_SKIP(code);
 		    while (wc_code(code) == WC_SUBLIST &&
-			   WC_SUBLIST_TYPE(code) == WC_SUBLIST_OR) {
+			   (breaks || retflag ||
+			    WC_SUBLIST_TYPE(code) == WC_SUBLIST_OR)) {
 			state->pc = next;
 			code = *state->pc++;
 			next = state->pc + WC_SUBLIST_SKIP(code);
