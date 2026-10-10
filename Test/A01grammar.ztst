@@ -982,38 +982,77 @@ F:its expectations.
  fn
 1:! does not affect return status of explicit return
 
+ for x in 1; do
+   ! continue
+ done
+1:! does not affect status of explicit continue
+F:BUG:status should be 0
+
   msg=unset
-  for x in 1 2 3 4 5; do
+  for x in 1; do
     continue && msg=set && print Not executed
     print Not executed, neither.
   done
-  print $msg
-0:continue causes immediate continuation
->unset
+  print $?-$msg
+0:continue causes immediate continuation (immediate assign)
+>0-unset
+
+  msg=unset
+  for x in 1; do
+    continue && false || msg=set && print Not executed
+    print Not executed, neither.
+  done
+  print $?-$msg
+0:continue causes immediate continuation (assign after operator change)
+F:BUG:output should bet 0-unset
+>0-set
 
   msg=unset
   () {
-    return && msg=set && print Not executed
-    print Not executed, not nor neither.
+    return 7 || msg=set && print Not executed
+    print Not executed, neither.
   }
-  print $msg
-0:return causes immediate return
->unset
+  print $?-$msg
+0:return causes immediate return (immediate assign)
+>7-unset
 
   msg=unset
-  for x in 1 2 3 4 5; do
+  () {
+    return 7 || true && msg=set && print Not executed
+    print Not executed, neither.
+  }
+  print $?-$msg
+0:return causes immediate return (assign after operator change)
+F:BUG:output should bet 7-unset
+>0-set
+
+  $ZTST_testdir/../Src/zsh -fc '
+    msg=unset
+    () {
+      return 7 || msg=set && print Not executed
+      print Not executed, neither.
+    }
+    print $?-$msg
+  '
+0:return causes immediate return (no enclosing loops)
+F:BUG:output should bet 7-unset
+>0-set
+
+  msg=unset
+  for x in 1; do
     ! continue || msg=set && print Not executed
     print Not executed, neither.
   done
-  print $msg
+  print $?-$msg
 0:! continue causes immediate continuation
->unset
+F:BUG:output should bet 0-unset
+>1-unset
 
   msg=unset
   () {
-    ! return || msg=set && print Not executed
-    print Not executed, not nor neither.
+    ! return 7 && msg=set && print Not executed
+    print Not executed, neither.
   }
-  print $msg
+  print $?-$msg
 0:! return causes immediate return
->unset
+>7-unset
