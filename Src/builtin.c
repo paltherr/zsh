@@ -5811,6 +5811,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	if ((isset(INTERACTIVE) && isset(SHINSTDIN))
 	    || locallevel || sourcelevel) {
 	    retflag = 1;
+	    breaks = loops;
 	    lastval = num;
 	    if (trap_state == TRAP_STATE_PRIMED && trap_return == -2
 		/*
@@ -5850,6 +5851,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 		if (trap_state) 
 		    trap_state = TRAP_STATE_FORCE_RETURN;
 		retflag = 1;
+		breaks = loops;
 		exit_pending = 1;
 		exit_level = locallevel;
 		exit_val = num;
