@@ -89,12 +89,12 @@ integer ZTST_testfailed=0
 # Report failure.  Note that all output regarding the tests goes to stdout.
 # That saves an unpleasant mixture of stdout and stderr to sort out.
 ZTST_testfailed() {
-  print -r "Test $ZTST_testname failed: $1"
+  print -r "$ZTST_testname:${2:+$2:} Test failed: $1"
   if [[ -n $ZTST_message ]]; then
     print -r "Was testing: $ZTST_message"
   fi
   [[ -n $ZTST_failcolor ]] && print -rnP "%F{$ZTST_failcolor}"
-  print -r "$ZTST_testname: test failed."
+  print -r "$ZTST_testname:${2:+$2:} test failed."
   [[ -n $ZTST_failcolor ]] && print -rnP %f
   if [[ -n $ZTST_failmsg ]]; then
     print -r "The following may (or may not) help identifying the cause:
@@ -108,12 +108,12 @@ $ZTST_failmsg"
   return 1
 }
 ZTST_testxpassed() {
-  print -r "Test $ZTST_testname was expected to fail, but passed."
+  print -r "$ZTST_testname:${1:+$1:} Test was expected to fail, but passed."
   if [[ -n $ZTST_message ]]; then
     print -r "Was testing: $ZTST_message"
   fi
   [[ -n $ZTST_failcolor ]] && print -rnP "%F{$ZTST_failcolor}"
-  print -r "$ZTST_testname: test XPassed."
+  print -r "$ZTST_testname:${1:+$1:} test XPassed."
   [[ -n $ZTST_failcolor ]] && print -rnP %f
   if [[ -n $ZTST_failmsg ]]; then
     print -r "The following may (or may not) help identifying the cause:
@@ -184,8 +184,12 @@ exec {ZTST_input}<$ZTST_testfile
 
 # The current line read from the test file.
 ZTST_curline=''
+# The line number of the current line
+typeset -i ZTST_curline_ln=0
 # The current section being run
 ZTST_cursect=''
+# The line number of the current section
+ZTST_cursect_ln=0
 
 # Get a new input line.  Don't mangle spaces; set IFS locally to empty.
 # We shall skip comments at this level.
@@ -193,6 +197,7 @@ ZTST_getline() {
   local IFS=
   while true; do
     read -u $ZTST_input -r ZTST_curline || return 1
+    ZTST_curline_ln+=1
     [[ $ZTST_curline == \#* ]] || return 0
   done
 }
@@ -209,13 +214,14 @@ ZTST_getsect() {
     [[ $ZTST_curline = [[:blank:]]# ]] && continue
     if [[ $# -eq 0 && $ZTST_curline != '%'[[:alnum:]]##* ]]; then
       ZTST_testfailed "bad line found before or after section:
-$ZTST_curline"
+$ZTST_curline" $ZTST_curline_ln
       exit 1
     fi
   done
+  ZTST_cursect=${match[1]}
+  ZTST_cursect_ln=$ZTST_curline_ln
   # have the next line ready waiting
   ZTST_getline
-  ZTST_cursect=${match[1]}
   ZTST_verbose 2 "ZTST_getsect: read section name: $ZTST_cursect"
   return 0
 }
@@ -230,6 +236,7 @@ ZTST_getchunk() {
   while [[ $ZTST_curline = [[:blank:]]# ]]; do
     ZTST_getline || break
   done
+  ZTST_code_ln=$ZTST_curline_ln
   while [[ $ZTST_curline = [[:blank:]]##[^[:blank:]]* ]]; do
     ZTST_code="${ZTST_code:+${ZTST_code}
 }${ZTST_curline}"
@@ -259,7 +266,7 @@ $ZTST_redir"
     ;;
     ('?') fn=$ZTST_err
     ;;
-    (*)  ZTST_testfailed "bad redir operator: $char"
+    (*)  ZTST_testfailed "bad redir operator: $char" $ZTST_curline_ln
     return 1
     ;;
   esac
@@ -298,7 +305,7 @@ ZTST_prep ZTST_clean () {
   while [[ -z "$ZTST_unimplemented" ]] && ZTST_getchunk; do
     ZTST_execchunk >/dev/null || [[ $0 = ZTST_clean ]] || {
       ZTST_testfailed "non-zero status from preparation code:
-$ZTST_code"
+$ZTST_code" $ZTST_code_ln
       return 1
     }
   done
@@ -308,7 +315,7 @@ $ZTST_code"
 ZTST_attr() {
   if ZTST_getchunk; then
     ZTST_testfailed "code not allowed in \`attr' section, found:
-$ZTST_code"
+$ZTST_code" $ZTST_code_ln
     return 1
   fi
 }
@@ -414,6 +421,7 @@ ZTST_test() {
     rm -f $ZTST_in $ZTST_out $ZTST_err
     touch $ZTST_in $ZTST_out $ZTST_err
     ZTST_message=''
+    ZTST_message_ln=0
     ZTST_failmsg=''
     found=0
     diff_out=d
@@ -445,9 +453,10 @@ $ZTST_curline"
 	    ZTST_xstatus=$match[1]
 	    ZTST_flags=$match[2]
 	    ZTST_message=${match[3]:+${match[3][2,-1]}}
+            ZTST_message_ln=$ZTST_curline_ln
 	  else
 	    ZTST_testfailed "expecting test status at:
-$ZTST_curline"
+$ZTST_curline" $ZTST_curline_ln
 	    return 1
 	  fi
 	  ZTST_getline
@@ -478,7 +487,7 @@ $ZTST_curline"
 	  found=1
           ;;
 	(*) ZTST_testfailed "bad line in test block:
-$ZTST_curline"
+$ZTST_curline" $ZTST_curline_ln
 	  return 1
           ;;
       esac
@@ -521,7 +530,7 @@ $ZTST_curline"
 	ZTST_testfailed "bad status $ZTST_status, expected $ZTST_xstatus from:
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
-$(<$ZTST_terr)}"
+$(<$ZTST_terr)}" $ZTST_message_ln
         if (( ZTST_continue ));then continue; else return 1; fi
       fi
 
@@ -544,7 +553,7 @@ $(<$ZTST_terr)"
 	ZTST_testfailed "output differs from expected as shown above for:
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
-$(<$ZTST_terr)}"
+$(<$ZTST_terr)}" $ZTST_message_ln
         if (( ZTST_continue ));then continue; else return 1; fi
       fi
       if [[ $ZTST_flags = *q* && -s $ZTST_err ]]; then
@@ -558,11 +567,11 @@ $(<$ZTST_terr)}"
           continue
         fi
 	ZTST_testfailed "error output differs from expected as shown above for:
-$ZTST_code"
+$ZTST_code" $ZTST_message_ln
         if (( ZTST_continue ));then continue; else return 1; fi
       fi
       if (( expected_to_fail )); then
-        ZTST_testxpassed
+        ZTST_testxpassed $ZTST_message_ln
         if (( ZTST_continue ));then continue; else return 1; fi
       fi
     fi
@@ -578,6 +587,7 @@ $ZTST_code"
 
   # reset message to keep ZTST_testfailed output correct
   ZTST_message=''
+  ZTST_message_ln=0
 
   return ZTST_failures
 }
@@ -596,13 +606,14 @@ ZTST_skipok=
 ZTST_unimplemented=
 while [[ -z "$ZTST_unimplemented" ]] && ZTST_getsect $ZTST_skipok; do
   if (( ${ZTST_sects[$ZTST_cursect]} )); then
-    ZTST_testfailed "duplicate \`$ZTST_cursect' section not allowed"
+    ZTST_testfailed "duplicate \`$ZTST_cursect' section not allowed" \
+        $ZTST_cursect_ln
     break
   fi
   case $ZTST_cursect in
     (attr)
       if (( ${ZTST_sects[prep]} + ${ZTST_sects[test]} )); then
-	ZTST_testfailed "\`attr' section must come first"
+	ZTST_testfailed "\`attr' section must come first" $ZTST_cursect_ln
 	break
       fi
       ZTST_attr || break
@@ -610,7 +621,8 @@ while [[ -z "$ZTST_unimplemented" ]] && ZTST_getsect $ZTST_skipok; do
       ;;
     (prep)
       if (( ${ZTST_sects[test]} )); then
-	ZTST_testfailed "\`prep' section must come before \`test' section"
+	ZTST_testfailed "\`prep' section must come before \`test' section" \
+            $ZTST_cursect_ln
 	break
       fi
       ZTST_prep || ZTST_skipok=1
@@ -627,7 +639,8 @@ while [[ -z "$ZTST_unimplemented" ]] && ZTST_getsect $ZTST_skipok; do
       ;;
     (clean)
       if (( ${ZTST_sects[test]} == 0 )); then
-	ZTST_testfailed "\`clean' section must come after \`test' section"
+	ZTST_testfailed "\`clean' section must come after \`test' section" \
+            $ZTST_cursect_ln
 	break
       fi
       ZTST_clean
@@ -635,7 +648,7 @@ while [[ -z "$ZTST_unimplemented" ]] && ZTST_getsect $ZTST_skipok; do
       ZTST_skipok=
       ;;
     (*)
-      ZTST_testfailed "bad section name: $ZTST_cursect"
+      ZTST_testfailed "bad section name: $ZTST_cursect" $ZTST_cursect_ln
       break
       ;;
   esac
