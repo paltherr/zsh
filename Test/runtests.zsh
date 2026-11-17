@@ -21,9 +21,28 @@ else
   unset -m "ZTST_*color"
 fi
 
+# Set the module load path to correspond to this build of zsh.
+# This Modules directory should have been created by "make check".
+module_path=( $0:a:h:h/Test/Modules )
+
 run-test() {
-  $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh $test
-  local -i result=$?
+  local attrs=(${(s: :)${${(M)${(f)"$(<$test)"}:#%attr*}#%attr}})
+  local testcmd=($ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh $test)
+  if [[ -n ${(M)attrs:#mutetty} ]] && zmodload -s zsh/zpty; then
+    local -i fd1 fd2 && exec {fd1}>&1 {fd2}>&2
+    zpty zsh "
+        exec 1>&$fd1 2>&$fd2
+        ${(@q)testcmd}
+        echo \$? >${test%.ztst}-status.txt
+    "
+    zpty -r zsh >${test%.ztst}-tty.log
+    zpty -d zsh
+    local -i result=$(<${test%.ztst}-status.txt)
+    exec {fd1}>&- {fd2}>&-
+  else
+    $testcmd
+    local -i result=$?
+  fi
   (( result > 128 )) && {
     [[ -n $ZTST_failcolor ]] && print -rnP "%F{$ZTST_failcolor}"
     print -r - "$test: test failed: SIG$signals[result - 127]."

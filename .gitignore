@@ -154,5 +154,8 @@ Src/Zle/zle_things.h
 Src/Zle/zle_widget.h
 
 Test/*.tmp
+Test/*-status.txt
+Test/*-tty.log
+
 /.project
 .DS_Store

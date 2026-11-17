@@ -9,9 +9,10 @@
 
 # All section names start with a % in the first column.  The names
 # must be in the expected order, though not all sections are required.
-# The sections are %prep (preparatory setup:  code executed should return
-# status 0, but no other tests are performed), %test (the main tests), and
-# %clean (to cleanup: the code is simply unconditionally executed).
+# The sections are %attr (to specify test attributes), %prep
+# (preparatory setup: code executed should return status 0, but no
+# other tests are performed), %test (the main tests), and %clean (to
+# cleanup: the code is simply unconditionally executed).
 #
 # Literal shell code to be evaluated must be indented with any number
 # of spaces and/or tabs, to differentiate it from tags with a special
@@ -21,6 +22,15 @@
 # preserves the original stdout.  Option settings are preserved between the
 # execution of different code chunks; initially, all standard zsh options
 # (the effect of `emulate -R zsh') are set.
+
+%attr
+# This optional section lists test attributes (on the section line).
+# The section may otherwise only contain comments, no code.  There is
+# currently only one supported attribute:
+#
+# - mutetty: directs the test harness to capture any output written
+#   directly to the terminal. The captured output is saved in the file
+#   ${testfile%.ztst}-tty.log.
 
 %prep
 # This optional section prepares the test, creating directories and files

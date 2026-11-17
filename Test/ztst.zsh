@@ -305,6 +305,14 @@ $ZTST_code"
   return 0
 }
 
+ZTST_attr() {
+  if ZTST_getchunk; then
+    ZTST_testfailed "code not allowed in \`attr' section, found:
+$ZTST_code"
+    return 1
+  fi
+}
+
 # diff wrapper
 ZTST_diff() {
   emulate -L zsh
@@ -577,7 +585,7 @@ $ZTST_code"
 
 # Remember which sections we've done.
 typeset -A ZTST_sects
-ZTST_sects=(prep 0 test 0 clean 0)
+ZTST_sects=(attr 0 prep 0 test 0 clean 0)
 
 print "$ZTST_testname: starting."
 
@@ -587,39 +595,49 @@ print "$ZTST_testname: starting."
 ZTST_skipok=
 ZTST_unimplemented=
 while [[ -z "$ZTST_unimplemented" ]] && ZTST_getsect $ZTST_skipok; do
+  if (( ${ZTST_sects[$ZTST_cursect]} )); then
+    ZTST_testfailed "duplicate \`$ZTST_cursect' section not allowed"
+    break
+  fi
   case $ZTST_cursect in
-    (prep) if (( ${ZTST_sects[prep]} + ${ZTST_sects[test]} + \
-	        ${ZTST_sects[clean]} )); then
-	    ZTST_testfailed "\`prep' section must come first"
-	    break   # skip %test and %clean sections, but run ZTST_cleanup
-	  fi
-	  ZTST_prep || ZTST_skipok=1
-	  ZTST_sects[prep]=1
-	  ;;
+    (attr)
+      if (( ${ZTST_sects[prep]} + ${ZTST_sects[test]} )); then
+	ZTST_testfailed "\`attr' section must come first"
+	break
+      fi
+      ZTST_attr || break
+      ZTST_sects[attr]=1
+      ;;
+    (prep)
+      if (( ${ZTST_sects[test]} )); then
+	ZTST_testfailed "\`prep' section must come before \`test' section"
+	break
+      fi
+      ZTST_prep || ZTST_skipok=1
+      ZTST_sects[prep]=1
+      ;;
     (test)
-	  if (( ${ZTST_sects[test]} + ${ZTST_sects[clean]} )); then
-	    ZTST_testfailed "bad placement of \`test' section"
-	    break   # skip %clean section, but run ZTST_cleanup
-	  fi
-          if [[ -z "$ZTST_skipok" ]]; then  # if no error in %prep
-            # careful here: we can't execute ZTST_test before || or &&
-            # because that affects the behaviour of traps in the tests.
-            ZTST_test
-            (( $? )) && ZTST_skipok=1
-          fi
-	  ZTST_sects[test]=1
-	  ;;
+      if [[ -z "$ZTST_skipok" ]]; then  # if no error in %prep
+	# careful here: we can't execute ZTST_test before || or &&
+	# because that affects the behaviour of traps in the tests.
+	ZTST_test
+	(( $? )) && ZTST_skipok=1
+      fi
+      ZTST_sects[test]=1
+      ;;
     (clean)
-	   if (( ${ZTST_sects[test]} == 0 || ${ZTST_sects[clean]} )); then
-	     ZTST_testfailed "bad use of \`clean' section"
-	   else
-	     ZTST_clean
-	     ZTST_sects[clean]=1
-	   fi
-	   ZTST_skipok=
-	   ;;
-    *) ZTST_testfailed "bad section name: $ZTST_cursect"
-       ;;
+      if (( ${ZTST_sects[test]} == 0 )); then
+	ZTST_testfailed "\`clean' section must come after \`test' section"
+	break
+      fi
+      ZTST_clean
+      ZTST_sects[clean]=1
+      ZTST_skipok=
+      ;;
+    (*)
+      ZTST_testfailed "bad section name: $ZTST_cursect"
+      break
+      ;;
   esac
 done
 

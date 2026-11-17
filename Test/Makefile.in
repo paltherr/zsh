@@ -68,7 +68,7 @@ check test:
 @CLEAN_MK@
 
 mostlyclean-here:
-	rm -rf Modules .zcompdump *.tmp
+	rm -rf Modules .zcompdump *.tmp *-status.txt *-tty.log
 
 distclean-here:
 	rm -f Makefile
